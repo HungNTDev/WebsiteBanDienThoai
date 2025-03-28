@@ -1,0 +1,6 @@
+@NET1061_Server_HostAddress = http://localhost:5225
+
+GET {{NET1061_Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

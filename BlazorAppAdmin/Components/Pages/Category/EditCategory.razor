@@ -1,0 +1,104 @@
+﻿@page "/categoryEdit/{Id:guid}";
+@using BlazorAppAdmin.Model.Category
+@using BlazorAppAdmin.Service.CategoryService
+@using BlazorAppAdmin.Service.ImageService
+@inject CategoryService CategoryService
+@inject NavigationManager Navigation
+@inject ImageService imageService
+
+<div class="d-flex justify-content-center mt-5">
+    <div class="card shadow-lg p-4" style="width: 400px;">
+        <h3 class="text-center text-primary">Edit Category</h3>
+
+        <div class="mb-3">
+            <label for="categoryName" class="form-label fw-semibold">Name:</label>
+            <input type="text" class="form-control" id="categoryName" @bind="categoryName"
+                   placeholder="Enter category name" />
+        </div>
+
+        <div class="mb-3">
+            <label for="categoryImage" class="form-label fw-semibold">Image:</label>
+            <InputFile OnChange="HandleFileSelected" class="form-control" />
+        </div>
+
+        @if (!string.IsNullOrEmpty(existingImage))
+        {
+            <div class="mb-3 text-center">
+                <strong>Current Image:</strong>
+                <img src="@imageService.GetImageUrl(existingImage)"
+                     class="img-thumbnail rounded" style="width: 150px; height: auto;" />
+            </div>
+        }
+
+        <div class="d-flex justify-content-between gap-2 mt-3">
+            <button class="btn btn-secondary w-50" @onclick="Cancel">Cancel</button>
+            <button class="btn btn-primary w-50" @onclick="UpdateCategory">Save</button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-info text-center mt-3">@message</div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private string categoryName = "";
+    private IBrowserFile? selectedFile;
+    private string? existingImage;
+    private string message = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var category = await CategoryService.GetCategoryByIdAsync(Id);
+        if (category != null)
+        {
+            categoryName = category.Name;
+            existingImage = category.Image;
+        }
+        else
+        {
+            message = "Category not found!";
+        }
+    }
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+
+    private async Task UpdateCategory()
+    {
+        if (string.IsNullOrWhiteSpace(categoryName))
+        {
+            message = "Please enter a category name.";
+            return;
+        }
+
+        var updatedCategory = new BlazorAppAdmin.Model.Category.UpdateCategory
+            {
+                Id = Id,
+                Name = categoryName,
+                Image = selectedFile == null ? existingImage : null
+            };
+
+        var isSuccess = await CategoryService.UpdateCategoryAsync(updatedCategory, selectedFile);
+
+        if (isSuccess)
+        {
+            message = "Category updated successfully!";
+            Navigation.NavigateTo("/categories");
+        }
+        else
+        {
+            message = "An error occurred while updating the category.";
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/categories");
+    }
+}

@@ -1,0 +1,89 @@
+﻿@page "/categories"
+@using BlazorAppCustomer.Model.Base
+@using BlazorAppCustomer.Model.Category
+@using BlazorAppCustomer.Service.CategoryService
+@using BlazorAppCustomer.Service.ImageService
+@inject CategoryService CategoryService
+@inject ImageService imageService
+
+<h3>Danh sách danh mục</h3>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <a href="/categoryCreate" class="btn btn-success btn-lg">
+        <i class="bi bi-plus-lg"></i> Thêm
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark text-center">
+            <tr>
+                <th>Tên</th>
+                <th>Ảnh</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Categories == null || Categories.Items == null || !Categories.Items.Any())
+            {
+                <tr><td colspan="3" class="text-center">Không có danh mục</td></tr>
+            }
+            else
+            {
+                @foreach (var item in Categories.Items)
+                {
+                    <tr>
+                        <td class="text-center">@item.Name</td>
+
+                        @if (item.Image != null)
+                        {
+                            <td class="text-center">
+                                <img src="@imageService.GetImageUrl(item.Image)"
+                                     class="img-thumbnail rounded"
+                                     style="width:100px; height:auto;" alt="@item.Name" />
+                            </td>
+                        }
+                        <td class="text-center">
+                            <a href="/categoryEdit/{@item.Id}"
+                               class="btn btn-outline-warning btn-sm me-2">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </a>
+                            <a href="/CategoryDetail/{@item.Id}"
+                               class="btn btn-outline-info btn-sm me-2">
+                                <i class="bi bi-info-circle"></i> Details
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Phân trang -->
+<div class="d-flex justify-content-center mt-3">
+    <button @onclick="PreviousPage" class="btn btn-primary me-2"
+            disabled="@(PageIndex == 1)">
+        Trước
+    </button>
+
+    @if (Categories != null && Categories.TotalPages > 0)
+    {
+        @for (int i = 1; i <= Categories.TotalPages; i++)
+        {
+            <button class="btn @(i == PageIndex ? "btn-success" : "btn-outline-primary") mx-1"
+                    @onclick="@(async () => await GoToPage(i))">
+                @i
+            </button>
+        }
+    }
+
+    @if (Categories != null && Categories.TotalPages > 0)
+    {
+        <button @onclick="() => NextPage()" class="btn btn-primary ms-2"
+                disabled="@(PageIndex >= Categories.TotalPages)">
+            Tiếp
+        </button>
+    }
+</div>
+
