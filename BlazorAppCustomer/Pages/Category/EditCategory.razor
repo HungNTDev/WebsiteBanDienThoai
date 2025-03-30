@@ -13,7 +13,7 @@
         <div class="mb-3">
             <label for="categoryName" class="form-label fw-semibold">Name:</label>
             <input type="text" class="form-control" id="categoryName" @bind="categoryName"
-            placeholder="Enter category name" />
+                   placeholder="Enter category name" />
         </div>
 
         <div class="mb-3">
@@ -26,7 +26,7 @@
             <div class="mb-3 text-center">
                 <strong>Current Image:</strong>
                 <img src="@imageService.GetImageUrl(existingImage)"
-                class="img-thumbnail rounded" style="width: 150px; height: auto;" />
+                        class="img-thumbnail rounded" style="width: 150px; height: auto;" />
             </div>
         }
 
@@ -61,7 +61,7 @@
         else
         {
             message = "Category not found!";
-            await Task.Delay(2000); 
+            await Task.Delay(2000);
             Navigation.NavigateTo("/categories");
         }
     }
@@ -69,8 +69,6 @@
     private void HandleFileSelected(InputFileChangeEventArgs e)
     {
         selectedFile = e.File;
-    
-       
     }
 
     private async Task UpdateCategory()
@@ -85,7 +83,7 @@
             {
                 Id = Id,
                 Name = categoryName,
-                Image = existingImage // Giữ ảnh cũ nếu không có file mới
+                Image = existingImage
             };
 
         var isSuccess = await CategoryService.UpdateCategoryAsync(updatedCategory, selectedFile);
@@ -100,7 +98,6 @@
             message = "An error occurred while updating the category. Please try again!";
         }
     }
-
 
     private void Cancel()
     {
