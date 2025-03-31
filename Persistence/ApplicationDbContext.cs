@@ -12,17 +12,6 @@ namespace Persistence
         { }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            //foreach (var entityType in builder.Model.GetEntityTypes())
-            //{
-            //    var properties = entityType.GetProperties()
-            //        .Where(p => p.ClrType == typeof(Guid) && p.ValueGenerated == Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.Never);
-
-            //    foreach (var property in properties)
-            //    {
-            //        property.SetDefaultValueSql("NEWID()");
-            //    }
-            //}
-
             builder.Entity<Inventory>()
                 .HasOne(i => i.ProductItem)
                 .WithOne(pi => pi.Inventory)
