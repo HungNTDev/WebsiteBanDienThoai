@@ -9,8 +9,13 @@ namespace Application.CategoryManagement.Commands.Create
         public string? Name { get; set; }
 
         [JsonIgnore]
+        [BindNever]
 
         public string? Image { get; set; }
         public IFormFile? FromFileImages { get; set; }
+
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        //public string? CreatedBy { get; set; }
+
     }
 }

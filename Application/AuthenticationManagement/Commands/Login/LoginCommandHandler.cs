@@ -60,7 +60,8 @@ namespace Application.AuthenticationManagement.Commands.Login
                 {
                      new Claim("Id", user.Id.ToString()),
                      new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                     new Claim(ClaimTypes.Email, user.Email)
+                     new Claim(ClaimTypes.Email, user.Email),
+                     new Claim(ClaimTypes.Name, user.FullName)
                 };
 
                 var roles = await _signInManager.UserManager.GetRolesAsync(user);
