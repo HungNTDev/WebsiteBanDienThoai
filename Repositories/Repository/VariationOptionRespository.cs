@@ -1,11 +1,12 @@
-﻿using Domain.Entities;
+﻿using Application.Abstract.Repository;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Repositories.Repository.GeneralRepository;
 
 namespace Repositories.Repository
 {
-    public class VariationOptionRespository : GeneralRepository<VariationOption>
+    public class VariationOptionRespository : GeneralRepository<VariationOption>, IVariationOptionRepository
     {
         public VariationOptionRespository(ApplicationDbContext context) : base(context)
         { }
