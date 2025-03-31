@@ -5,10 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
-    public class Order : IEntity
+    public class Order : BaseEntity
     {
-        [Key]
-        public Guid Id { get; set; }
         public DateTime OrderDate { get; set; }
         public decimal OrderTotal { get; set; }
 

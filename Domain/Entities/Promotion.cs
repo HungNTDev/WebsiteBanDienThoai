@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Entities
 {
-    public class Promotion : IEntity
+    public class Promotion : BaseEntity
     {
-        [Key]
-        public Guid Id { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
         public string? DiscountRate { get; set; }

@@ -5,10 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
-    public class Combo : IEntity
+    public class Combo : BaseEntity
     {
-        [Key]
-        public Guid Id { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
         public decimal? Price { get; set; }

@@ -1,13 +1,9 @@
-﻿using Domain.Abstract;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
-    public class UserPayment : IEntity
+    public class UserPayment : BaseEntity
     {
-        [Key]
-        public Guid Id { get; set; }        
         public string? Provider { get; set; }
 
         [ForeignKey("ApplicationUser")]

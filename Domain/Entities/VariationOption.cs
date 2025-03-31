@@ -1,13 +1,9 @@
-﻿using Domain.Abstract;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
-    public class VariationOption : IEntity
+    public class VariationOption : BaseEntity
     {
-        [Key]
-        public Guid Id { get; set; }
         public string? Value { get; set; }
 
         [ForeignKey("Variation")]

@@ -1,14 +1,9 @@
-﻿using Domain.Abstract;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
-    public class CartItem : IEntity
+    public class CartItem : BaseEntity
     {
-        [Key]
-        public Guid Id { get; set; }
-
         [ForeignKey("Cart")]
         public Guid CartId { get; set; }
         public Cart? Cart { get; set; }

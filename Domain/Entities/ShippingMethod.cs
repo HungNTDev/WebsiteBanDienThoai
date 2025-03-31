@@ -1,12 +1,7 @@
-﻿using Domain.Abstract;
-using System.ComponentModel.DataAnnotations;
-
-namespace Domain.Entities
+﻿namespace Domain.Entities
 {
-    public class ShippingMethod : IEntity
+    public class ShippingMethod : BaseEntity
     {
-        [Key]
-        public Guid Id { get; set; }
         public string? Name { get; set; }
         public decimal Price { get; set; }
         public ICollection<Order>? Orders { get; set; }
