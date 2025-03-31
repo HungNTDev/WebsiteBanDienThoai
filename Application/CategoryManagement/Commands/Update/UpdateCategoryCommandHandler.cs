@@ -8,7 +8,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.CategoryManagement.Commands.Update
 {
-    public class UpdateCategoryCommandHandler : ICommandHandler<UpdateCategoryCommand, ApiResponse<object>>
+    public class UpdateCategoryCommandHandler : ICommandHandler<UpdateCategoryCommand,
+        ApiResponse<object>>
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
@@ -45,16 +46,9 @@ namespace Application.CategoryManagement.Commands.Update
                     return ApiResponseBuilder.ValidationError<object>(validationResult.Errors);
                 }
 
-                //if (category.Name != model.Name)
-                //{
-                //    bool isExistedName = await _categoryRepository.IsUniqueCategoryName(model.Name);
-                //    if (!isExistedName)
-                //    {
-                //        return ApiResponseBuilder.ValidationError<object>(validationResult.Errors);
-                //    }
-                //}
-                _mapper.Map(model, category);
-                _categoryRepository.Update(category);
+                var updateCategory = _mapper.Map(model, category);
+                updateCategory.UpdatedBy = request.userName;
+                _categoryRepository.Update(updateCategory);
                 await _unitOfWork.SaveChangesAsync();
                 return ApiResponseBuilder.Success<object>("", $"Cập nhật thể loại sản phẩm  thành công");
             }
