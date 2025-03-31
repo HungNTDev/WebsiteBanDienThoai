@@ -4,11 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
-    public class OrderItem : IEntity
+    public class OrderItem : BaseEntity
     {
-        [Key]
-        public Guid Id { get; set; }
-
         [ForeignKey("Order")]
         public Guid OrderId { get; set; }
         public Order? Order { get; set; }

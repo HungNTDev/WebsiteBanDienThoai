@@ -16,8 +16,6 @@ namespace Repositories.Repository.GeneralRepository
             _entity = _context.Set<TEntity>();
         }
 
-        
-
         public async Task<IEnumerable<TEntity>> GetAllAsync()
         {
             return await _entity.ToListAsync();
@@ -27,7 +25,7 @@ namespace Repositories.Repository.GeneralRepository
         {
             return _entity;
         }
-   
+
         public async Task<TEntity> CreateAsync(TEntity entity)
         {
             await _entity.AddAsync(entity);

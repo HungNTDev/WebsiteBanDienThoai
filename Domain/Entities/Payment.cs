@@ -1,14 +1,10 @@
-﻿using Domain.Abstract;
-using Domain.Enum;
-using System.ComponentModel.DataAnnotations;
+﻿using Domain.Enum;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
-    public class Payment : IEntity
+    public class Payment : BaseEntity
     {
-        [Key]
-        public Guid Id { get; set; }
         public string? TransactionId { get; set; }
         public decimal? Amount { get; set; }
         public PaymentStatus Status { get; set; }

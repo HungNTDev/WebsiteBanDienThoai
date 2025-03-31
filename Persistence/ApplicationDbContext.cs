@@ -12,16 +12,16 @@ namespace Persistence
         { }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            foreach (var entityType in builder.Model.GetEntityTypes())
-            {
-                var properties = entityType.GetProperties()
-                    .Where(p => p.ClrType == typeof(Guid) && p.ValueGenerated == Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.Never);
+            //foreach (var entityType in builder.Model.GetEntityTypes())
+            //{
+            //    var properties = entityType.GetProperties()
+            //        .Where(p => p.ClrType == typeof(Guid) && p.ValueGenerated == Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.Never);
 
-                foreach (var property in properties)
-                {
-                    property.SetDefaultValueSql("NEWID()");
-                }
-            }
+            //    foreach (var property in properties)
+            //    {
+            //        property.SetDefaultValueSql("NEWID()");
+            //    }
+            //}
 
             builder.Entity<Inventory>()
                 .HasOne(i => i.ProductItem)
@@ -52,6 +52,8 @@ namespace Persistence
                 .HasForeignKey(r => r.OrderItemId)
                 .OnDelete(DeleteBehavior.Restrict); // 🔥 Thay vì Cascade
 
+            builder.Entity<CategoryBrand>()
+                  .HasKey(ua => new { ua.BrandId, ua.CategoryId });
 
             builder.Entity<ProductConfig>()
                 .HasKey(pc => new { pc.ProductItemId, pc.VariationOptionId });

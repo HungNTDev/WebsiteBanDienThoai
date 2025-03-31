@@ -3,9 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
-    public class ComboProduct : IEntity
+    public class ComboProduct : BaseEntity
     {
-        public Guid Id { get; set; }
         public int Quantity { get; set; }
 
         [ForeignKey("Combo")]

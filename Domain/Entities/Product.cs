@@ -1,14 +1,10 @@
-﻿using Domain.Abstract;
-using Microsoft.AspNetCore.Http;
-using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
-    public class Product : IEntity
+    public class Product : BaseEntity
     {
-        [Key]
-        public Guid Id { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
         public string? Image { get; set; }
@@ -20,6 +16,10 @@ namespace Domain.Entities
         [ForeignKey("Category")]
         public Guid CategoryId { get; set; }
         public Category? Category { get; set; }
+
+        [ForeignKey("Brand")]
+        public Guid BrandId { get; set; }
+        public Brand? Brand { get; set; }
 
         public ICollection<ProductItem>? ProductItems { get; set; }
     }
