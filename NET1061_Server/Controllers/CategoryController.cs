@@ -5,7 +5,9 @@ using Application.CategoryManagement.Commands.Update;
 using Application.CategoryManagement.Queries.GetAll;
 using Application.CategoryManagement.Queries.GetDetail;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace NET1061_Server.Controllers
 {
@@ -52,9 +54,19 @@ namespace NET1061_Server.Controllers
         }
 
         // POST api/<CategoriesController>
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Post([FromForm] CreateCategoryDto model)
         {
+            var userName = User.FindFirst(ClaimTypes.Name)?.Value;
+            if (string.IsNullOrEmpty(userName))
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+
+            // Gán email của người tạo
+
+
             string contentRootPath = _webHostEnvironment.ContentRootPath;
 
             if (string.IsNullOrEmpty(contentRootPath))
@@ -77,7 +89,8 @@ namespace NET1061_Server.Controllers
                 model.Image = model.FromFileImages.FileName;
             }
 
-            var request = new CreateCategoryCommand(model);
+
+            var request = new CreateCategoryCommand(model, userName);
             var result = await _mediator.Send(request);
 
             if (result != null)
@@ -88,9 +101,16 @@ namespace NET1061_Server.Controllers
         }
 
         // PUT api/<CategoriesController>/5
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(Guid id, [FromForm] UpdateCategoryDto model)
         {
+            var userName = User.FindFirst(ClaimTypes.Name)?.Value;
+            if (string.IsNullOrEmpty(userName))
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+
             string contentRootPath = _webHostEnvironment.ContentRootPath;
 
             if (string.IsNullOrEmpty(contentRootPath))
@@ -113,7 +133,8 @@ namespace NET1061_Server.Controllers
                 model.Image = model.FromFileImages.FileName;
             }
             model.Id = id;
-            var request = new UpdateCategoryCommand(model);
+
+            var request = new UpdateCategoryCommand(model, userName);
             var result = await _mediator.Send(request);
 
             if (result != null)

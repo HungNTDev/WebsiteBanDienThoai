@@ -10,5 +10,7 @@ namespace Application.CategoryManagement.Commands.Update
         public string? Name { get; set; }
         public string? Image { get; set; }
         public IFormFile? FromFileImages { get; set; }
+
+        public DateTime UpdatedDate { get; set; } = DateTime.Now;
     }
 }

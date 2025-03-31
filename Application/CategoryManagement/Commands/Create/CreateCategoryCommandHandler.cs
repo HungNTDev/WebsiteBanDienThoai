@@ -4,6 +4,7 @@ using Application.Abstract.Repository;
 using Application.Abstract.Repository.Base;
 using Domain.Entities;
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace Application.CategoryManagement.Commands.Create
@@ -15,16 +16,19 @@ namespace Application.CategoryManagement.Commands.Create
         private readonly IValidator<CreateCategoryDto> _validator;
         private readonly ICategoryRepository _categoryRepostiory;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public CreateCategoryCommandHandler(IUnitOfWork unitOfWork,
                                             ICategoryRepository categoryRepostiory,
                                             IValidator<CreateCategoryDto> validator,
-                                            ILogger<CreateCategoryCommandHandler> logger)
+                                            ILogger<CreateCategoryCommandHandler> logger,
+                                            UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _categoryRepostiory = categoryRepostiory;
             _validator = validator;
             _logger = logger;
+            _userManager = userManager;
         }
 
         public async Task<ApiResponse<object>> Handle(CreateCategoryCommand request,
@@ -53,6 +57,8 @@ namespace Application.CategoryManagement.Commands.Create
                 {
                     Name = model.Name,
                     Image = model.Image,
+                    CreatedDate = model.CreatedDate,
+                    CreatedBy = request.userEmail,
                 };
                 _categoryRepostiory.Create(categoryDto);
                 await _unitOfWork.SaveChangesAsync();
