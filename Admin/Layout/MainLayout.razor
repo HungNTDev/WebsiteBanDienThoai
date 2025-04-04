@@ -1,16 +1,104 @@
 ﻿@inherits LayoutComponentBase
-<div class="page">
+@using Admin.Services
+@using System.Security.Claims
+@using Blazored.LocalStorage
+@inject IAuthService AuthService
+@inject IJwtParser JwtParser
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+
+<div class="page-wrapper">
     <div class="sidebar">
         <NavMenu />
     </div>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+    <div class="main-content">
+        <header class="main-header">
+            <div class="header-left">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search" />
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-actions">
+                    <button class="action-button">
+                        <i class="fas fa-chart-line"></i>
+                    </button>
+                    <button class="action-button">
+                        <i class="fas fa-envelope"></i>
+                    </button>
+                    <button class="action-button">
+                        <i class="fas fa-th"></i>
+                    </button>
+                </div>
+                <div class="top-row px-4">
+                    <div class="user-profile" @onclick="ToggleProfileMenu">
+                        <img src="/images/profile-avatar.jpg" alt="User Profile" class="profile-avatar" />
+                        <div class="profile-info">
+                            <span class="profile-name">@UserName</span>
+                            <span class="profile-email">@UserEmail</span>
+                        </div>
+                        @if (showProfileMenu)
+                        {
+                            <div class="profile-dropdown">
+                                <div class="dropdown-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>@UserName</span>
+                                </div>
+                                <div class="dropdown-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>@UserEmail</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" @onclick="HandleLogout">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Logout</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+            </div>
+        </header>
+
+        <main class="content-wrapper">
+            <div class="content">
+                @Body
+            </div>
+        </main>
+    </div>
 </div>
+
+@code {
+    private bool showProfileMenu = false;
+    private string UserName { get; set; } = "User";
+    private string UserEmail { get; set; } = "user@example.com";
+    private string UserId { get; set; }
+    private IEnumerable<Claim> Claims { get; set; } = new List<Claim>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await LocalStorage.GetItemAsync<string>("token");
+        if (!string.IsNullOrEmpty(token))
+        {
+            Claims = JwtParser.ParseClaimsFromJwt(token);
+            UserName = Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value ?? "User";
+            UserEmail = Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value ?? "user@example.com";
+            UserId = Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? string.Empty;
+        }
+    }
+
+    private void ToggleProfileMenu()
+    {
+        showProfileMenu = !showProfileMenu;
+    }
+
+    private async Task HandleLogout()
+    {
+        await AuthService.Logout();
+        NavigationManager.NavigateTo("/login");
+    }
+
+}
