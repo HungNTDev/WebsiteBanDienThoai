@@ -1,7 +1,255 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Trang Chủ</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <!-- Main content area -->
+        <div class="col-8">
+            <!-- Main banner -->
+            <div class="main-banner mb-3">
+                <div class="banner-content position-relative">
+                    @foreach (var slide in slides)
+                    {
+                        <div class="slide @(currentSlide == slide.Id ? "active" : "")" 
+                             style="opacity: @(currentSlide == slide.Id ? "1" : "0")">
+                            <img src="@slide.ImageUrl" alt="@slide.Title" class="w-100 rounded" />
+                           @*  <div class="banner-info position-absolute bottom-0 start-0 p-4 text-white">
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <h2 class="mb-0">@slide.Price</h2>
+                                    @if (!string.IsNullOrEmpty(slide.Tag))
+                                    {
+                                        <div class="banner-tag">@slide.Tag</div>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrEmpty(slide.Description))
+                                {
+                                    <p class="mb-2">@slide.Description</p>
+                                }
+                                @if (!string.IsNullOrEmpty(slide.Discount))
+                                {
+                                    <div class="student-discount">@slide.Discount</div>
+                                }
+                                <button class="btn btn-light mt-3">MUA NGAY</button>
+                            </div> *@
+                        </div>
+                    }
+                </div>
+            </div>
 
-Welcome to your new app.
+            <!-- Product slider -->
+            <div class="product-slider">
+                <div class="d-flex gap-3 overflow-auto">
+                    @foreach (var slide in slides)
+                    {
+                    <div class="product-item @(currentSlide == slide.Id ? "active" : "")" 
+                            @onclick="() => ChangeSlide(slide.Id)">
+                        @* <img src="@slide.ImageUrl" alt="@slide.Title" class="w-100 mb-2" /> *@
+                        <h6>@slide.Title</h6>
+                        <p>@slide.SubTitle</p>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .main-banner {
+        border-radius: 8px;
+        overflow: hidden;
+        height: 300px;
+    }
+
+    .banner-content {
+        position: relative;
+        height: 100%;
+    }
+
+    .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    .slide.active {
+        opacity: 1;
+    }
+
+    .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .banner-info {
+        background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+        width: 100%;
+        padding: 20px;
+    }
+
+    .banner-tag {
+        background: rgba(255,255,255,0.2);
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .student-discount {
+        display: inline-block;
+        background: rgba(255,255,255,0.2);
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .product-slider {
+        background: white;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .product-item {
+        min-width: 200px;
+        padding: 8px;
+        text-align: center;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: all 0.2s;
+    }
+
+    .product-item:hover,
+    .product-item.active {
+        transform: translateY(-2px);
+        opacity: 1;
+    }
+
+    .product-item h6 {
+        margin: 8px 0;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .product-item p {
+        color: #666;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    ::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #D70018;
+        border-radius: 3px;
+    }
+</style>
+
+@code {
+    private List<SlideModel> slides = new()
+    {
+        new SlideModel
+        {
+            Id = 1,
+            Title = "SAMSUNG A06 5G",
+            SubTitle = "Điện thoại 5G giá tốt",
+            ImageUrl = "https://cdn2.cellphones.com.vn/insecure/rs:fill:690:300/q:90/plain/https://dashboard.cellphones.com.vn/storage/dien-thoai-samsung-galaxy-a06-5g-home.png",
+            Price = "3.99 Triệu",
+            Tag = "Sạc nhanh 25W 550K",
+            Description = "Mua kèm Sim Viettel 5G Chỉ 100K",
+            Discount = "S-Teacher | S-Student Giảm thêm 6%"
+        },
+        new SlideModel
+        {
+            Id = 2,
+            Title = "IPHONE 16 PRO MAX",
+            SubTitle = "Tặng AirPods 4",
+            ImageUrl = "https://cdn2.cellphones.com.vn/insecure/rs:fill:690:300/q:90/plain/https://dashboard.cellphones.com.vn/storage/iphone-16-pro-max-tang-airpods-4-home-19-3.jpg",
+            Price = "29.99 Triệu",
+            Tag = "Tặng AirPods 4",
+            Description = "Ưu đãi độc quyền"
+        },
+        new SlideModel
+        {
+            Id = 3,
+            Title = "OPPO FIND N5",
+            SubTitle = "Đặt gạch ngay",
+            ImageUrl = "https://cdn2.cellphones.com.vn/insecure/rs:fill:690:300/q:90/plain/https://dashboard.cellphones.com.vn/storage/oppo-find-n5-home.jpg",
+            Price = "19.99 Triệu",
+            Tag = "Quà 2.5 Triệu",
+            Description = "Đặt trước nhận ưu đãi khủng"
+        },
+        new SlideModel
+        {
+            Id = 4,
+            Title = "REDMI NOTE 14 5G",
+            SubTitle = "Ưu đãi tốt chốt ngay",
+            ImageUrl = "https://cdn2.cellphones.com.vn/insecure/rs:fill:690:300/q:90/plain/https://dashboard.cellphones.com.vn/storage/dien-thoai-xiaomi-redmi-note-14-5-home.jpg",
+            Price = "4.99 Triệu",
+            Tag = "Quà 500K",
+            Description = "Rẻ nhất thị trường"
+        },
+        new SlideModel
+        {
+            Id = 5,
+            Title = "GALAXY S25 ULTRA",
+            SubTitle = "Giá tốt chốt ngay",
+            ImageUrl = "https://cdn2.cellphones.com.vn/insecure/rs:fill:690:300/q:90/plain/https://dashboard.cellphones.com.vn/storage/s25-full-maugia-moi-home-1-4.png",
+            Price = "25.99 Triệu",
+            Tag = "Giảm 3 Triệu",
+            Description = "Thu cũ đổi mới - Trợ giá 3 Triệu"
+        }
+    };
+
+    private int currentSlide = 1;
+    private Timer? autoSlideTimer;
+
+    protected override void OnInitialized()
+    {
+        // Tạo timer để tự động chuyển slide mỗi 5 giây
+        autoSlideTimer = new Timer(AutoSlideCallback, null, 0, 5000);
+    }
+
+    private void AutoSlideCallback(object? state)
+    {
+        InvokeAsync(() =>
+        {
+            currentSlide = currentSlide >= slides.Count ? 1 : currentSlide + 1;
+            StateHasChanged();
+        });
+    }
+
+    private void ChangeSlide(int slideId)
+    {
+        currentSlide = slideId;
+    }
+
+    public void Dispose()
+    {
+        autoSlideTimer?.Dispose();
+    }
+
+    public class SlideModel
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = "";
+        public string SubTitle { get; set; } = "";
+        public string ImageUrl { get; set; } = "";
+        public string Price { get; set; } = "";
+        public string Tag { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string Discount { get; set; } = "";
+    }
+}

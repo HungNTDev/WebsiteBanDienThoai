@@ -1,0 +1,384 @@
+@inject NavigationManager NavigationManager
+
+<header class="main-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="d-flex align-items-center">
+                <a href="/" class="logo me-4">
+                    <img src="https://cellphones.com.vn/" alt="CellphoneS" height="40" />
+                </a>
+                <div class="category-button position-relative">
+                    <button class="btn btn-menu" @onclick="ToggleMenu">
+                        <i class="bi bi-list me-2"></i>
+                        Danh mục
+                    </button>
+                    <div class="category-dropdown @(isMenuOpen ? "show" : "")">
+                        <div class="menu-items">
+                            <a href="/dien-thoai" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/dien-thoai"))" @onclick:preventDefault>
+                                <i class="bi bi-phone"></i>
+                                <span>Điện thoại, Tablet</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                            <a href="/laptop" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/laptop"))" @onclick:preventDefault>
+                                <i class="bi bi-laptop"></i>
+                                <span>Laptop</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                            <a href="/am-thanh" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/am-thanh"))" @onclick:preventDefault>
+                                <i class="bi bi-headphones"></i>
+                                <span>Âm thanh, Mic thu âm</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                            <a href="/dong-ho" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/dong-ho"))" @onclick:preventDefault>
+                                <i class="bi bi-smartwatch"></i>
+                                <span>Đồng hồ, Camera</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                            <a href="/gia-dung" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/gia-dung"))" @onclick:preventDefault>
+                                <i class="bi bi-house"></i>
+                                <span>Đồ gia dụng</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                            <a href="/phu-kien" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/phu-kien"))" @onclick:preventDefault>
+                                <i class="bi bi-plug"></i>
+                                <span>Phụ kiện</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                            <a href="/pc-man-hinh" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/pc-man-hinh"))" @onclick:preventDefault>
+                                <i class="bi bi-display"></i>
+                                <span>PC, Màn hình, Máy in</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                            <a href="/tivi" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/tivi"))" @onclick:preventDefault>
+                                <i class="bi bi-tv"></i>
+                                <span>Tivi</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                            <a href="/thu-cu-doi-moi" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/thu-cu-doi-moi"))" @onclick:preventDefault>
+                                <i class="bi bi-arrow-repeat"></i>
+                                <span>Thu cũ đổi mới</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                            <a href="/hang-cu" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/hang-cu"))" @onclick:preventDefault>
+                                <i class="bi bi-phone-flip"></i>
+                                <span>Hàng cũ</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                            <a href="/khuyen-mai" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/khuyen-mai"))" @onclick:preventDefault>
+                                <i class="bi bi-gift"></i>
+                                <span>Khuyến mãi</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                            <a href="/tin-tuc" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/tin-tuc"))" @onclick:preventDefault>
+                                <i class="bi bi-newspaper"></i>
+                                <span>Tin công nghệ</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="location-selector ms-3">
+                    <i class="bi bi-geo-alt"></i>
+                    Xem giá tại
+                    <select class="form-select form-select-sm d-inline-block w-auto border-0">
+                        <option>Hồ Chí Minh</option>
+                        <option>Hà Nội</option>
+                        <option>Đà Nẵng</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="search-box mx-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Bạn cần tìm gì?" />
+                    <button class="btn btn-search">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="action-buttons d-flex align-items-center">
+                <a href="tel:1800.2097" class="action-button">
+                    <i class="bi bi-telephone"></i>
+                    <span>
+                        Gọi mua hàng<br />
+                        <b>1800.2097</b>
+                    </span>
+                </a>
+                <a href="/stores" class="action-button">
+                    <i class="bi bi-shop"></i>
+                    <span>Cửa hàng<br />gần bạn</span>
+                </a>
+                <a href="/track-order" class="action-button">
+                    <i class="bi bi-box-seam"></i>
+                    <span>Tra cứu<br />đơn hàng</span>
+                </a>
+                <a href="/cart" class="action-button cart">
+                    <i class="bi bi-cart3"></i>
+                    <span>Giỏ<br />hàng</span>
+                    <span class="badge">0</span>
+                </a>
+                <a href="/account" class="action-button">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Nguyễn</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<style>
+    .main-header {
+        background-color: #D70018;
+        padding: 8px 0;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        height: 60px;
+        display: flex;
+        align-items: center;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+        width: 100%;
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+    }
+
+    .logo img {
+        height: 32px;
+    }
+
+    .d-flex {
+        gap: 8px;
+    }
+
+    .btn-menu {
+        background-color: rgba(255,255,255,0.2);
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+    }
+
+    .btn-menu:hover {
+        background-color: rgba(255,255,255,0.3);
+        color: white;
+    }
+
+    .location-selector {
+        color: white;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: 8px;
+    }
+
+    .location-selector select {
+        color: white;
+        background-color: transparent;
+        font-size: 13px;
+        padding: 0;
+        padding-left: 4px;
+        height: 32px;
+    }
+
+    .location-selector select option {
+        color: #333;
+    }
+
+    .search-box {
+        flex: 1;
+        max-width: 500px;
+        margin: 0 16px;
+    }
+
+    .search-box .input-group {
+        background: white;
+        border-radius: 4px;
+        overflow: hidden;
+        height: 32px;
+    }
+
+    .search-box .form-control {
+        border: none;
+        font-size: 13px;
+        padding: 0 16px;
+        height: 100%;
+    }
+
+    .search-box .form-control:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .btn-search {
+        background-color: white;
+        border: none;
+        width: 40px;
+        color: #666;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+    .btn-search:hover {
+        color: #D70018;
+    }
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .action-button {
+        display: flex;
+        align-items: center;
+        color: white;
+        text-decoration: none;
+        font-size: 11px;
+        white-space: nowrap;
+        gap: 4px;
+    }
+
+    .action-button:hover {
+        color: rgba(255,255,255,0.9);
+    }
+
+    .action-button i {
+        font-size: 16px;
+    }
+
+    .action-button span {
+        line-height: 1.2;
+    }
+
+    .action-button.cart {
+        position: relative;
+    }
+
+    .action-button .badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background-color: white;
+        color: #D70018;
+        font-size: 10px;
+        padding: 0 4px;
+        border-radius: 8px;
+        border: 1px solid #D70018;
+        min-width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .category-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        width: 280px;
+        background: white;
+        border-radius: 4px;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease;
+        z-index: 1000;
+    }
+
+    .category-dropdown.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .menu-items {
+        padding: 8px 0;
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 16px;
+        color: #333;
+        text-decoration: none;
+        font-size: 13px;
+        transition: all 0.2s;
+    }
+
+    .menu-item:hover {
+        color: #D70018;
+        background-color: #f8f9fa;
+    }
+
+    .menu-item i:first-child {
+        width: 24px;
+        font-size: 16px;
+    }
+
+    .menu-item span {
+        flex: 1;
+        margin-left: 8px;
+    }
+
+    .menu-item i:last-child {
+        font-size: 10px;
+        opacity: 0.5;
+    }
+</style>
+
+@code {
+    private bool isMenuOpen;
+
+    private void ToggleMenu()
+    {
+        isMenuOpen = !isMenuOpen;
+    }
+
+    private async Task NavigateToCategory(MouseEventArgs e, string url)
+    {
+        isMenuOpen = false;
+        NavigationManager.NavigateTo(url);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        NavigationManager.LocationChanged += HandleLocationChanged;
+    }
+
+    private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        isMenuOpen = false;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+    }
+} 

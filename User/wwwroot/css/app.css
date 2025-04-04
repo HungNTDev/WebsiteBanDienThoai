@@ -12,8 +12,13 @@ a, .btn-link {
 
 .btn-primary {
     color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
@@ -100,4 +105,50 @@ a, .btn-link {
 
 code {
     color: #c02d76;
+}
+
+.card {
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.card-img-top {
+    padding: 1rem;
+    object-fit: contain;
+    height: 200px;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.navbar-dark.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.card-text small {
+    color: #6c757d;
+}
+
+/* Price styling */
+.card-text.text-danger {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+}
+
+/* Banner styling */
+.banner img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
 }
