@@ -2,8 +2,11 @@
 using Application.AuthenticationManagement.Commands.Login;
 using Application.AuthenticationManagement.Commands.Register;
 using Application.AuthenticationManagement.Commands.ResetPassword;
+using Application.AuthenticationManagement.Queries.Profile;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace NET1061_Server.Controllers
 {
@@ -60,6 +63,31 @@ namespace NET1061_Server.Controllers
                 return Ok(response);
             }
             return BadRequest(response);
+        }
+
+        [HttpGet("Profile")]
+        [Authorize]
+        public async Task<IActionResult> Profile()
+        {
+            var userId = User.FindFirst("sub")?.Value ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { Message = "User ID not found in token" });
+            }
+
+            // Chuyển đổi User ID sang GUID
+            if (!Guid.TryParse(userId, out Guid userGuid))
+            {
+                return BadRequest(new { Message = "Invalid User ID format" });
+            }
+
+            var request = new GetProfileQuery(userGuid);
+            var result = await _mediator.Send(request);
+            return result.Match(
+                apiResponse => StatusCode(apiResponse.StatusCode, apiResponse),
+                dto => Ok(dto)
+            );
         }
     }
 }

@@ -54,21 +54,55 @@ namespace Persistence
                         .HasKey(ua => new { ua.UserId, ua.AddressId });
 
             builder.Entity<IdentityUserLogin<Guid>>().ToTable("AspNetUserLogins")
-                        .HasKey(l => new { l.LoginProvider, l.ProviderKey });
+        .HasKey(l => new { l.LoginProvider, l.ProviderKey });
 
             builder.Entity<IdentityUserRole<Guid>>().ToTable("AspNetUserRoles")
-                        .HasKey(r => new { r.UserId, r.RoleId });
+                .HasKey(r => new { r.UserId, r.RoleId });
 
             builder.Entity<IdentityUserToken<Guid>>().ToTable("AspNetUserTokens")
-                        .HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
+                .HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
 
             builder.Entity<IdentityRoleClaim<Guid>>().ToTable("AspNetRoleClaims");
-
             builder.Entity<IdentityUserClaim<Guid>>().ToTable("AspNetUserClaims");
-
             builder.Entity<ApplicationRole>().ToTable("AspNetRoles");
-
             builder.Entity<ApplicationUser>().ToTable("AspNetUsers");
+
+            // Cấu hình quan hệ và cascade delete
+            builder.Entity<IdentityRoleClaim<Guid>>()
+                .HasOne<ApplicationRole>()
+                .WithMany()
+                .HasForeignKey(rc => rc.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<IdentityUserClaim<Guid>>()
+                .HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(uc => uc.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<IdentityUserLogin<Guid>>()
+                .HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(ul => ul.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<IdentityUserToken<Guid>>()
+                .HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(ut => ut.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<IdentityUserRole<Guid>>()
+                .HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(ur => ur.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<IdentityUserRole<Guid>>()
+                .HasOne<ApplicationRole>()
+                .WithMany()
+                .HasForeignKey(ur => ur.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         public DbSet<Address> Addresses { get; set; }

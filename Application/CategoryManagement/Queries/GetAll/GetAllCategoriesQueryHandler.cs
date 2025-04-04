@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.CategoryManagement.Queries.GetAll
 {
-    public class GetAllCategoriesQueryHandler : IQueryHandler<GetAllCategoriesQuery,
+    public sealed class GetAllCategoriesQueryHandler : IQueryHandler<GetAllCategoriesQuery,
         ApiResponse<PaginatedResult<GetAllCategoriesDto>>>
     {
         private readonly ICategoryRepository _categoryRepository;
@@ -52,7 +52,7 @@ namespace Application.CategoryManagement.Queries.GetAll
                     cancellationToken);
 
                 var categoriesForView = _mapper.Map<List<GetAllCategoriesDto>>(categoriesPaginated.Items);
-                
+
                 var paginatedCategoriesForView = new PaginatedResult<GetAllCategoriesDto>(
                     categoriesForView,
                     filter.PageIndex,

@@ -18,6 +18,7 @@ namespace NET1061_Server.Extensions
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IVariationRepository, VariationRepository>();
             services.AddScoped<IVariationOptionRepository, VariationOptionRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             return services;
         }
     }
