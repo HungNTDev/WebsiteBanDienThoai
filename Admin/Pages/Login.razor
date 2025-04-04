@@ -1,0 +1,106 @@
+@page "/login"
+@layout LoginLayout
+@using System.ComponentModel.DataAnnotations
+@using Admin.Services
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+
+<div class="login-page">
+    <div class="login-box">
+        <div class="login-header">
+            <div class="login-logo">
+                <img src="https://th.bing.com/th/id/OIP.pAuEV0Xa00NlKbRtueZK3wHaEo?w=297&h=185&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt="CellphoneS" />
+            </div>
+            <h1>Welcome back!</h1>
+            <p>Please sign in to continue</p>
+        </div>
+
+        <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert @(isError ? "alert-danger" : "alert-success")">
+                    @message
+                </div>
+            }
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <InputText id="email" @bind-Value="loginModel.Email" class="form-control" placeholder="Enter your email" />
+                <ValidationMessage For="@(() => loginModel.Email)" />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <InputText type="password" id="password" @bind-Value="loginModel.Password" class="form-control" placeholder="Enter your password" />
+                <ValidationMessage For="@(() => loginModel.Password)" />
+            </div>
+
+            <div class="form-group form-options">
+                <div class="form-check">
+                    <InputCheckbox @bind-Value="loginModel.RememberMe" class="form-check-input" id="rememberMe" />
+                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                </div>
+                <a href="#" class="forgot-password">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span class="ms-2">Signing in...</span>
+                }
+                else
+                {
+                    <span>Sign In</span>
+                }
+            </button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private Admin.Models.LoginModel loginModel = new();
+    private string message;
+    private bool isError;
+    private bool isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isAuthenticated = await AuthService.IsAuthenticated();
+        if (isAuthenticated)
+        {
+            NavigationManager.NavigateTo("/dashboard");
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            isLoading = true;
+            message = null;
+            isError = false;
+
+            var result = await AuthService.Login(loginModel.Email, loginModel.Password);
+            message = result;
+            await Task.Delay(1000); // Đợi 1 giây để hiển thị thông báo thành công
+            NavigationManager.NavigateTo("/dashboard");
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+            isError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
+
+
+
+
+
