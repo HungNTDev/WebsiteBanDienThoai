@@ -1,0 +1,137 @@
+@inject NavigationManager NavigationManager
+
+<div class="category-dropdown @(IsOpen ? "show" : "")">
+    <div class="menu-items">
+        <a href="/dien-thoai" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/dien-thoai"))" @onclick:preventDefault>
+            <i class="bi bi-phone"></i>
+            <span>Điện thoại, Tablet</span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <a href="/laptop" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/laptop"))" @onclick:preventDefault>
+            <i class="bi bi-laptop"></i>
+            <span>Laptop</span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <a href="/am-thanh" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/am-thanh"))" @onclick:preventDefault>
+            <i class="bi bi-headphones"></i>
+            <span>Âm thanh, Mic thu âm</span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <a href="/dong-ho" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/dong-ho"))" @onclick:preventDefault>
+            <i class="bi bi-smartwatch"></i>
+            <span>Đồng hồ, Camera</span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <a href="/gia-dung" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/gia-dung"))" @onclick:preventDefault>
+            <i class="bi bi-house"></i>
+            <span>Đồ gia dụng</span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <a href="/phu-kien" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/phu-kien"))" @onclick:preventDefault>
+            <i class="bi bi-plug"></i>
+            <span>Phụ kiện</span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <a href="/pc-man-hinh" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/pc-man-hinh"))" @onclick:preventDefault>
+            <i class="bi bi-display"></i>
+            <span>PC, Màn hình, Máy in</span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <a href="/tivi" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/tivi"))" @onclick:preventDefault>
+            <i class="bi bi-tv"></i>
+            <span>Tivi</span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <a href="/thu-cu-doi-moi" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/thu-cu-doi-moi"))" @onclick:preventDefault>
+            <i class="bi bi-arrow-repeat"></i>
+            <span>Thu cũ đổi mới</span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <a href="/hang-cu" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/hang-cu"))" @onclick:preventDefault>
+            <i class="bi bi-phone-flip"></i>
+            <span>Hàng cũ</span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <a href="/khuyen-mai" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/khuyen-mai"))" @onclick:preventDefault>
+            <i class="bi bi-gift"></i>
+            <span>Khuyến mãi</span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <a href="/tin-tuc" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/tin-tuc"))" @onclick:preventDefault>
+            <i class="bi bi-newspaper"></i>
+            <span>Tin công nghệ</span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+    </div>
+</div>
+
+<style>
+    .category-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 280px;
+        background: white;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+        .category-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+    .menu-items {
+        padding: 8px 0;
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 16px;
+        color: #333;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+        .menu-item:hover {
+            color: #D70018;
+            background-color: #f8f9fa;
+        }
+
+        .menu-item i:first-child {
+            width: 24px;
+            font-size: 18px;
+        }
+
+        .menu-item span {
+            flex: 1;
+            margin-left: 8px;
+        }
+
+        .menu-item i:last-child {
+            font-size: 12px;
+            opacity: 0.5;
+        }
+</style>
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsOpenChanged { get; set; }
+
+    private async Task NavigateToCategory(MouseEventArgs e, string url)
+    {
+        await IsOpenChanged.InvokeAsync(false);
+        NavigationManager.NavigateTo(url);
+    }
+}

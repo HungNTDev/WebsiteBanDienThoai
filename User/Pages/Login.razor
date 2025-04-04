@@ -1,0 +1,148 @@
+@page "/login"
+@using System.ComponentModel.DataAnnotations
+@using User.Services
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Đăng nhập</PageTitle>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="login-card">
+                <div class="text-center mb-4">
+                    <h3>Đăng nhập</h3>
+                    <p class="text-muted">Vui lòng đăng nhập để tiếp tục</p>
+                </div>
+
+                <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <InputText @bind-Value="loginModel.Email" class="form-control" />
+                        <ValidationMessage For="@(() => loginModel.Email)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Mật khẩu</label>
+                        <InputText @bind-Value="loginModel.Password" type="password" class="form-control" />
+                        <ValidationMessage For="@(() => loginModel.Password)" />
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <InputCheckbox @bind-Value="loginModel.RememberMe" class="form-check-input" />
+                        <label class="form-check-label">Ghi nhớ đăng nhập</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" disabled="@isLoading">
+                        @if (isLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        Đăng nhập
+                    </button>
+
+                    <div class="text-center mt-3">
+                        <a href="/forgot-password" class="text-decoration-none">Quên mật khẩu?</a>
+                    </div>
+                </EditForm>
+
+                <div class="text-center mt-4">
+                    <p class="mb-0">Chưa có tài khoản? <a href="/register" class="text-decoration-none">Đăng ký ngay</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .login-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-top: 2rem;
+    }
+
+    .form-control {
+        padding: 0.75rem;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
+
+    .form-control:focus {
+        border-color: #D70018;
+        box-shadow: 0 0 0 0.2rem rgba(215,0,24,0.25);
+    }
+
+    .btn-primary {
+        background-color: #D70018;
+        border-color: #D70018;
+        padding: 0.75rem;
+        font-weight: 500;
+    }
+
+    .btn-primary:hover {
+        background-color: #b80015;
+        border-color: #b80015;
+    }
+
+    .form-check-input:checked {
+        background-color: #D70018;
+        border-color: #D70018;
+    }
+
+    a {
+        color: #D70018;
+    }
+
+    a:hover {
+        color: #b80015;
+    }
+</style>
+
+@code {
+    private User.Models.LoginModel loginModel = new();
+    private bool isLoading = false;
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            isLoading = true;
+            var result = await AuthService.Login(loginModel);
+            
+            if (result.Success)
+            {
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                // Hiển thị thông báo lỗi
+            }
+        }
+        catch (Exception ex)
+        {
+            // Xử lý lỗi
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "Vui lòng nhập email")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
+        [MinLength(6, ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự")]
+        public string Password { get; set; } = "";
+
+        public bool RememberMe { get; set; }
+    }
+} 
