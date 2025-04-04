@@ -1,0 +1,14 @@
+@using Admin.Services
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var isAuthenticated = await AuthService.IsAuthenticated();
+        if (!isAuthenticated && !NavigationManager.Uri.EndsWith("/login"))
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+} 

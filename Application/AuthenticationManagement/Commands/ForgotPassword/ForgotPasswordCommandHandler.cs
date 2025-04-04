@@ -45,7 +45,7 @@ namespace Application.AuthenticationManagement.Commands.ForgotPassword
                 var userRole = role.FirstOrDefault();
 
                 string frontEndDomain = userRole == "Admin"
-                    ? "http://localhost:5173" : "https://localhost:5174";
+                    ? "https://localhost:7106" : "https://localhost:7210";
 
                 var resetLink = $"{frontEndDomain}/resetpassword?email={model.Email}&token={encodedToken}";
 
