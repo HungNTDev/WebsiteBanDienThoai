@@ -1,6 +1,7 @@
 using Blazored.LocalStorage;
 using System.Net.Http.Json;
 using Admin.Models;
+using Admin.Models.Authentication;
 
 namespace Admin.Services
 {
@@ -62,4 +63,4 @@ namespace Admin.Services
             await _localStorage.RemoveItemAsync("token");
         }
     }
-} 
+}

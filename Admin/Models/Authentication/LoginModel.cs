@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Admin.Models
+namespace Admin.Models.Authentication
 {
+
     public class LoginModel
     {
         [Required(ErrorMessage = "Email is required")]
