@@ -3,7 +3,6 @@ using Application.Abstract.CQRS;
 using Application.Abstract.Repository;
 using AutoMapper;
 using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Application.CategoryManagement.Queries.GetAll
@@ -32,13 +31,17 @@ namespace Application.CategoryManagement.Queries.GetAll
             {
                 var categories = _categoryRepository.GetAll();
                 var searchString = filter.SearchTerm?.Trim().ToLower();
-                if (!string.IsNullOrEmpty(searchString))
+                if (!string.IsNullOrWhiteSpace(searchString))
                 {
-                    _logger.LogInformation(searchString);
-                    categories = categories.Where(x => EF.Functions.Unaccent(x.Name).ToLower().Trim()
-                        .Contains(EF.Functions.Unaccent(searchString))
+                    _logger.LogInformation("Tìm kiếm với chuỗi: {SearchString}", searchString);
+
+                    var normalizedSearch = searchString.Trim().ToLower();
+
+                    categories = categories.Where(x =>
+                        x.Name.ToLower().Contains(normalizedSearch)
                     );
                 }
+
                 if (!categories.Any())
                 {
                     return ApiResponseBuilder.Error<PaginatedResult<GetAllCategoriesDto>>
@@ -51,7 +54,8 @@ namespace Application.CategoryManagement.Queries.GetAll
                     filter.PageSize,
                     cancellationToken);
 
-                var categoriesForView = _mapper.Map<List<GetAllCategoriesDto>>(categoriesPaginated.Items);
+                var categoriesForView = _mapper.Map<List<GetAllCategoriesDto>>
+                    (categoriesPaginated.Items);
 
                 var paginatedCategoriesForView = new PaginatedResult<GetAllCategoriesDto>(
                     categoriesForView,

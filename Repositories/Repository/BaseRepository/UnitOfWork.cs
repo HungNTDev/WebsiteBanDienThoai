@@ -9,15 +9,17 @@ namespace Repositories.Repository.GeneralRepository
         private readonly ApplicationDbContext _context;
         public ICategoryRepository Category { get; }
         public IVariationRepository Variation { get; }
+        public IVariationOptionRepository VariationOption { get; }
         public IProductItemRepository ProductItemRepository { get; }
         public IProductRepository ProductRepository { get; }
 
         public UnitOfWork(ApplicationDbContext context, ICategoryRepository category,
-            IVariationRepository variation)
+            IVariationRepository variation, IVariationOptionRepository variationOption)
         {
             _context = context;
             Category = category;
             Variation = variation;
+            VariationOption = variationOption;
         }
 
         public void Update<T>(T entity) where T : class
