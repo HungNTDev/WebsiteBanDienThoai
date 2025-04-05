@@ -45,13 +45,13 @@ namespace Application.AuthenticationManagement.Commands.ForgotPassword
                 var userRole = role.FirstOrDefault();
 
                 string frontEndDomain = userRole == "Admin"
-                    ? "https://localhost:7106" : "https://localhost:7210";
+                    ? "https://localhost:7210" : "https://localhost:7106";
 
                 var resetLink = $"{frontEndDomain}/resetpassword?email={model.Email}&token={encodedToken}";
 
-                using (var client = new SmtpClient("sandbox.smtp.mailtrap.io", 2555))
+                using (var client = new SmtpClient("sandbox.smtp.mailtrap.io", 2525))
                 {
-                    client.Credentials = new NetworkCredential("3ca04e8645ef89", "b81be814dfa483");
+                    client.Credentials = new NetworkCredential("a62a9b76f3f09f", "29b27b34801af6");
                     client.EnableSsl = true;
 
                     var mailMessage = new MailMessage
@@ -64,7 +64,7 @@ namespace Application.AuthenticationManagement.Commands.ForgotPassword
                     mailMessage.To.Add(user.Email);
                     await client.SendMailAsync(mailMessage);
                 }
-                return ApiResponseBuilder.ValidationError<object>(validationResult.Errors);
+                return ApiResponseBuilder.Success<object>(null, "Email đặt lại mật khẩu đã được gửi.");
             }
             catch (Exception ex)
             {

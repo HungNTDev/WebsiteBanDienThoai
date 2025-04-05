@@ -1,0 +1,221 @@
+@page "/categories"
+@using Admin.Models
+@using Admin.Models.Category
+@using Admin.Services
+@inject IImageService imageService
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Categories</h1>
+        <a href="/categories/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create New
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search categories..."
+                               @bind="searchTerm" @bind:event="oninput" @onkeyup="HandleSearch" />
+                        <button class="btn btn-outline-secondary" type="button" @onclick="HandleSearch">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            @if (isLoading)
+            {
+                <div class="text-center p-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            }
+            else if (categories?.Items == null || !categories.Items.Any())
+            {
+                <div class="alert alert-info">
+                    No categories found.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">Image</th>
+                                <th @onclick="@(() => SortBy("Name"))" style="cursor: pointer">
+                                    Name
+                                    @if (sortColumn == "Name")
+                                    {
+                                        <i class="fas fa-sort-@(isDescending ? "down" : "up")"></i>
+                                    }
+                                </th>
+                                <th @onclick="@(() => SortBy("CreatedBy"))" style="cursor: pointer">
+                                    Created By
+                                    @if (sortColumn == "CreatedBy")
+                                    {
+                                        <i class="fas fa-sort-@(isDescending ? "down" : "up")"></i>
+                                    }
+                                </th>
+                                <th @onclick="@(() => SortBy("CreatedDate"))" style="cursor: pointer">
+                                    Created Date
+                                    @if (sortColumn == "CreatedDate")
+                                    {
+                                        <i class="fas fa-sort-@(isDescending ? "down" : "up")"></i>
+                                    }
+                                </th>
+                                <th style="width: 100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var category in categories.Items)
+                            {
+                            <tr>
+                                <td>
+                                    <img src="@imageService.GetImageUrl(category.Image)" alt="@category.Name"
+                                            class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" />
+                                </td>
+                                <td>@category.Name</td>
+                                <td>@category.CreatedBy</td>
+                                <td>@category.CreatedDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    <div class="btn-group">
+                                            <a href="/categories/update/@category.Id" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteCategory(category.Id)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div>
+                        Showing @((categories.PageIndex - 1) * categories.PageSize + 1) to
+                        @(Math.Min(categories.PageIndex * categories.PageSize, categories.TotalCount))
+                        of @categories.TotalCount entries
+                    </div>
+                    <nav>
+                        <ul class="pagination mb-0">
+                            <li class="page-item @(categories.HasPreviousPage ? "" : "disabled")">
+                                <button class="page-link" @onclick="@(() => LoadData(categories.PageIndex - 1))">
+                                    Previous
+                                </button>
+                            </li>
+                            @for (int i = 1; i <= categories.TotalPages; i++)
+                            {
+                                var pageNumber = i;
+                                <li class="page-item @(pageNumber == categories.PageIndex ? "active" : "")">
+                                    <button class="page-link" @onclick="@(() => LoadData(pageNumber))">
+                                        @i
+                                    </button>
+                                </li>
+                            }
+                            <li class="page-item @(categories.HasNextPage ? "" : "disabled")">
+                                <button class="page-link" @onclick="@(() => LoadData(categories.PageIndex + 1))">
+                                    Next
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private PaginatedList<Category> categories;
+    private bool isLoading = true;
+    private string searchTerm = "";
+    private string sortColumn = "Name";
+    private bool isDescending = false;
+    private int pageSize = 3;
+    private Timer searchTimer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData(1);
+    }
+
+    private async Task LoadData(int pageIndex)
+    {
+        try
+        {
+            isLoading = true;
+            var response = await Http.GetFromJsonAsync<ApiResponse<PaginatedList<Category>>>(
+                $"api/Category?PageIndex={pageIndex}&PageSize={pageSize}&SearchTerm={searchTerm}&SortColumn={sortColumn}&IsDescending={isDescending}");
+
+            if (response.IsSuccess)
+            {
+                categories = response.Data;
+            }
+        }
+        catch (Exception)
+        {
+            // Handle error
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void HandleSearch()
+    {
+        searchTimer?.Dispose();
+        searchTimer = new Timer(async _ =>
+        {
+            await InvokeAsync(async () =>
+            {
+                await LoadData(1);
+                StateHasChanged();
+            });
+        }, null, 500, Timeout.Infinite);
+    }
+
+    private async Task SortBy(string column)
+    {
+        if (sortColumn == column)
+        {
+            isDescending = !isDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            isDescending = false;
+        }
+        await LoadData(1);
+    }
+
+    private async Task DeleteCategory(string id)
+    {
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", new[]
+        { "Are you sure you want to delete this category?" }))
+            return;
+        try
+        {
+            var response = await Http.DeleteAsync($"api/Category/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadData(categories.PageIndex);
+            }
+        }
+        catch (Exception)
+        {
+            // Handle error
+        }
+    }
+} 

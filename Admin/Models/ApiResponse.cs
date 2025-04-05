@@ -1,3 +1,5 @@
+using Admin.Models.Authentication;
+
 namespace Admin.Models
 {
     public class ApiResponse<T>
@@ -14,6 +16,4 @@ namespace Admin.Models
     {
         public LoginModel Model { get; set; }
     }
-
-
 }
