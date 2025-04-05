@@ -1,0 +1,194 @@
+@page "/categories/create"
+@using Admin.Models.Category
+@using System.Net.Http.Headers
+@using Blazored.LocalStorage
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorage
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h3 class="mb-4">Create Category</h3>
+
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert @(isSuccess ? "alert-success" : "alert-danger") alert-dismissible fade show" role="alert">
+                    @message
+                    <button type="button" class="btn-close" @onclick="() => message = null"></button>
+                </div>
+            }
+
+            <EditForm Model="@category" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <InputText @bind-Value="category.Name" class="form-control" />
+                    <ValidationMessage For="@(() => category.Name)" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Image</label>
+                    <InputFile OnChange="OnFileChange" class="form-control" accept="image/*" />
+                    <ValidationMessage For="@(() => category.Image)" />
+                    @if (!string.IsNullOrEmpty(imageDataUrl))
+                    {
+                        <div class="mt-2">
+                            <img src="@imageDataUrl" 
+                                 class="preview-image" 
+                                 @onerror="HandleImageError"
+                                 alt="Category preview" />
+                            <div class="mt-2 text-muted">
+                                Selected file: @category.Image
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary" disabled="@isLoading">
+                        @if (isLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span class="ms-2">Creating...</span>
+                        }
+                        else
+                        {
+                            <span>Create Category</span>
+                        }
+                    </button>
+                    <button type="button" class="btn btn-secondary ms-2" @onclick="NavigateBack">Cancel</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CategoryCreateRequest category = new();
+    private string message;
+    private bool isSuccess;
+    private bool isLoading;
+    private string imageDataUrl;
+    private IBrowserFile selectedFile;
+
+    private void HandleImageError()
+    {
+        // If image fails to load, clear the URL and show error message
+        imageDataUrl = null;
+        message = "Failed to load image preview. Please try again.";
+        isSuccess = false;
+        StateHasChanged();
+    }
+
+    private async Task OnFileChange(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            if (e.File.Size > 2097152) // 2MB in bytes
+            {
+                message = "File size must be less than 2MB";
+                isSuccess = false;
+                return;
+            }
+
+            selectedFile = e.File;
+            category.Image = e.File.Name; // Store the file name in the Image property
+
+            // Preview image
+            var format = e.File.ContentType;
+            var resizedImage = await e.File.RequestImageFileAsync(format, 500, 500);
+            var buffer = new byte[resizedImage.Size];
+            await resizedImage.OpenReadStream().ReadAsync(buffer);
+            imageDataUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+            
+            // Clear any previous error messages
+            message = null;
+        }
+        catch (Exception ex)
+        {
+            message = $"Error processing image: {ex.Message}";
+            isSuccess = false;
+            imageDataUrl = null;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            isLoading = true;
+            message = null;
+
+            if (selectedFile == null)
+            {
+                message = "Please select an image file";
+                isSuccess = false;
+                return;
+            }
+
+            // Get the token from local storage
+            var token = await LocalStorage.GetItemAsync<string>("token");
+            if (string.IsNullOrEmpty(token))
+            {
+                message = "You are not authorized. Please login again.";
+                isSuccess = false;
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            var content = new MultipartFormDataContent();
+            content.Add(new StringContent(category.Name), "Name");
+            content.Add(new StringContent(category.Image), "Image"); // Send the file name
+
+            // Add the file content
+            var fileContent = new StreamContent(selectedFile.OpenReadStream());
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(selectedFile.ContentType);
+            content.Add(fileContent, "FromFileImages", selectedFile.Name);
+
+            content.Add(new StringContent(DateTime.UtcNow.ToString("o")), "CreatedDate");
+
+            // Add authorization header
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await Http.PostAsync("api/Category", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                message = "Category created successfully!";
+                isSuccess = true;
+                await Task.Delay(2000); // Show success message for 2 seconds
+                NavigateBack();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                message = "You are not authorized. Please login again.";
+                isSuccess = false;
+                NavigationManager.NavigateTo("/login");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                message = $"Error: {error}";
+                isSuccess = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Error: {ex.Message}";
+            isSuccess = false;
+        }
+        finally
+        {
+            isLoading = false;
+            // Clear the authorization header after the request
+            Http.DefaultRequestHeaders.Authorization = null;
+        }
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/categories");
+    }
+} 

@@ -13,6 +13,7 @@ namespace NET1061_Server.Extensions
                 c.AddProfile<AuthenticationProfile>();
                 c.AddProfile<CategoryProfile>();
                 c.AddProfile<VariationProfile>();
+                c.AddProfile<VariationOptionProfile>();
             });
             services.AddSingleton<IMapper>(s => config.CreateMapper());
             return services;

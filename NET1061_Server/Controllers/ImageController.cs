@@ -10,7 +10,7 @@ namespace NET1061_Server.Controllers
         [HttpGet("{filename}")]
         public IActionResult GetImage(string filename)
         {
-            var filePath = Path.Combine("F:\\CSharp\\CSharp6\\Project\\PS38090_NguyenTuanHung_ASM\\NET1061_Assignment\\NET1061_Server\\uploads", filename);
+            var filePath = Path.Combine("F:\\CSharp\\CSharp6\\Project\\ASMC6\\NET1061_ASM\\NET1061_Server\\uploads", filename);
             if (!System.IO.File.Exists(filePath))
             {
                 return NotFound();

@@ -1,48 +1,52 @@
 ﻿@using Microsoft.AspNetCore.Components.Web
+@using Admin.Services
+@inject IImageService imageService
 
 <div class="sidebar-wrapper">
     <div class="sidebar-header">
         <a href="" class="logo-brand">
-            <img src="/images/loper-logo.png" alt="Loper" />
+            <img src="https://th.bing.com/th/id/OIP.pAuEV0Xa00NlKbRtueZK3wHaEo?w=244&h=180&c=7&r=0&o=5&pid=1.7" alt="Logo" />
         </a>
     </div>
 
     <div class="sidebar-menu">
         <nav class="nav-menu">
             <div class="nav-item">
-                <NavLink class="nav-link" href="home" Match="NavLinkMatch.All">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </NavLink>
             </div>
+
             <div class="nav-item">
-                <NavLink class="nav-link" href="app-pages">
-                    <i class="fas fa-file"></i>
-                    <span>App Pages</span>
-                    <span class="badge badge-new">New</span>
+                <NavLink class="nav-link" href="categories">
+                    <i class="fas fa-list"></i>
+                    <span>Category</span>
                 </NavLink>
             </div>
-            <div class="nav-item">
+
+           @*  <div class="nav-item">
                 <NavLink class="nav-link" href="auth">
                     <i class="fas fa-lock"></i>
                     <span>Auth</span>
                 </NavLink>
             </div>
             <div class="nav-item">
-                <NavLink class="nav-link" href="user">
-                    <i class="fas fa-user"></i>
+                <NavLink class="nav-link" href="users">
+                    <i class="fas fa-users"></i>
                     <span>User</span>
                 </NavLink>
             </div>
+
             <div class="nav-item">
                 <NavLink class="nav-link" href="layouts">
                     <i class="fas fa-th-large"></i>
                     <span>Layouts</span>
-                    <span class="badge badge-count">+4</span>
                 </NavLink>
             </div>
+
             <div class="nav-item">
-                <NavLink class="nav-link" href="landing-page">
+                <NavLink class="nav-link" href="landing">
                     <i class="fas fa-paper-plane"></i>
                     <span>Landing Page</span>
                 </NavLink>
@@ -78,13 +82,79 @@
             </div>
             <div class="nav-item">
                 <NavLink class="nav-link" href="level-menu">
-                    <i class="fas fa-list"></i>
+                    <i class="fas fa-list-ul"></i>
                     <span>Level Menu</span>
                 </NavLink>
-            </div>
+            </div> *@
         </nav>
     </div>
 </div>
+
+<style>
+    .sidebar-wrapper {
+        height: 100vh;
+        background-color: #C41E3A;
+        color: white;
+        width: 250px;
+    }
+
+    .sidebar-header {
+        padding: 1rem;
+        background-color: #B01B34;
+        text-align: center;
+    }
+
+    .logo-brand img {
+        max-width: 150px;
+        height: auto;
+    }
+
+    .sidebar-menu {
+        padding-top: 1rem;
+    }
+
+    .nav-section {
+        padding: 1rem 1rem 0.5rem;
+    }
+
+    .nav-section-title {
+        color: rgba(255,255,255,0.7);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0;
+    }
+
+    .nav-item {
+        font-size: 0.9rem;
+    }
+
+    .nav-link {
+        color: white;
+        display: flex;
+        align-items: center;
+        padding: 0.8rem 1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .nav-link i {
+        margin-right: 0.8rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .nav-link:hover {
+        background-color: rgba(255,255,255,0.1);
+        color: white;
+        text-decoration: none;
+    }
+
+    .nav-link.active {
+        background-color: rgba(255,255,255,0.15);
+        color: white;
+    }
+</style>
 
 @code {
     private bool collapseNavMenu = true;

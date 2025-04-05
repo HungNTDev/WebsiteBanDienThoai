@@ -6,6 +6,8 @@ using Application.CategoryManagement.Commands.Create;
 using Application.CategoryManagement.Commands.Update;
 using Application.VariationManagement.Commands.Create;
 using Application.VariationManagement.Commands.Update;
+using Application.VariationOptionManagement.Commands.Create;
+using Application.VariationOptionManagement.Commands.Update;
 using FluentValidation;
 
 namespace NET1061_Server.Extensions
@@ -28,6 +30,10 @@ namespace NET1061_Server.Extensions
             //Variation
             services.AddScoped<IValidator<CreateVariationDto>, CreateVariationValidation>();
             services.AddScoped<IValidator<UpdateVariationDto>, UpdateVariationValidation>();
+
+            //Variation Option
+            services.AddScoped<IValidator<CreateVariationOptionDto>, CreateVariationOptionValidation>();
+            services.AddScoped<IValidator<UpdateVariationOptionDto>, UdpateVariationOptionValidation>();
 
             return services;
         }

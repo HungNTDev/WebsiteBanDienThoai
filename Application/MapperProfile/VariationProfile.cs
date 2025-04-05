@@ -22,7 +22,7 @@ namespace Application.MapperProfile
                 opt => opt.MapFrom(src => src.Category.Name));
             CreateMap<UpdateVariationDto, Variation>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
-            CreateMap<GetVariationDto, Variation>();
+            CreateMap<GetVariationOptionDto, Variation>();
         }
     }
 }

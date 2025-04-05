@@ -4,7 +4,9 @@ using Application.VariationManagement.Commands.Update;
 using Application.VariationManagement.Queries.GetAll;
 using Application.VariationManagement.Queries.GetById;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace NET1061_Server.Controllers
 {
@@ -43,9 +45,15 @@ namespace NET1061_Server.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateVariation([FromBody] CreateVariationDto command)
         {
-            var request = new CreateVariationCommand(command);
+            var userName = User.FindFirst(ClaimTypes.Name)?.Value;
+            if (string.IsNullOrEmpty(userName))
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+            var request = new CreateVariationCommand(command, userName);
             var result = await _mediator.Send(request);
             if (result != null)
             {
@@ -55,10 +63,16 @@ namespace NET1061_Server.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateVariation(Guid id, [FromBody] UpdateVariationDto command)
         {
+            var userName = User.FindFirst(ClaimTypes.Name)?.Value;
+            if (string.IsNullOrEmpty(userName))
+            {
+                return Unauthorized("User is not authenticated.");
+            }
             command.Id = id;
-            var request = new UpdateVariationCommand(command);
+            var request = new UpdateVariationCommand(command, userName);
             var result = await _mediator.Send(request);
             if (result != null)
             {
