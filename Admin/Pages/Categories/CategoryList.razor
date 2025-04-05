@@ -20,8 +20,8 @@
                 <div class="col-md-6">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search categories..."
-                               @bind="searchTerm" @bind:event="oninput" 
-                               @onkeyup="@(e => HandleSearchKeyUp(e))" />
+                        @bind="searchTerm" @bind:event="oninput" 
+                        @onkeyup="@(e => HandleSearchKeyUp(e))" />
                         <button class="btn btn-primary" type="button" @onclick="HandleSearch">
                             <i class="fas fa-search"></i>
                         </button>
@@ -93,7 +93,7 @@
                             <tr>
                                 <td>
                                     <img src="@imageService.GetImageUrl(category.Image)" alt="@category.Name"
-                                            class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" />
+                                    class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" />
                                 </td>
                                 <td>@category.Name</td>
                                 <td>@category.CreatedBy</td>
@@ -241,7 +241,7 @@
         }
         catch (Exception)
         {
-            // Handle error
+           
         }
     }
 } 

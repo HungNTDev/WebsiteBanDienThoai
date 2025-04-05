@@ -1,9 +1,9 @@
-﻿namespace Application.VariationManagement.Queries.GetAll
+﻿namespace Application.VariationOptionManagement.Queries.GetAll
 {
-    public class GetAllVariationDto
+    public class GetAllVariationOptionDto
     {
         public Guid Id { get; set; }
-        public string Name { get; set; } = default!;
+        public string Value { get; set; }
         public DateTime CreatedDate { get; set; }
         public string? CreatedBy { get; set; }
     }

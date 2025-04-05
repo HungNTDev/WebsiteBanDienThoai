@@ -26,8 +26,6 @@
     <Folder Include="ProductManagement\Commands\" />
     <Folder Include="ProductManagement\Queries\GetAll\" />
     <Folder Include="ProductManagement\Queries\GetDetail\" />
-    <Folder Include="VariationOptionManagement\Commands\" />
-    <Folder Include="VariationOptionManagement\Queries\" />
   </ItemGroup>
 
 </Project>
