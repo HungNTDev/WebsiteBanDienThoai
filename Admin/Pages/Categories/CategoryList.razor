@@ -20,11 +20,18 @@
                 <div class="col-md-6">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search categories..."
-                               @bind="searchTerm" @bind:event="oninput" @onkeyup="HandleSearch" />
-                        <button class="btn btn-outline-secondary" type="button" @onclick="HandleSearch">
+                               @bind="searchTerm" @bind:event="oninput" 
+                               @onkeyup="@(e => HandleSearchKeyUp(e))" />
+                        <button class="btn btn-primary" type="button" @onclick="HandleSearch">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
+                    @if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        <small class="text-muted mt-1">
+                            Press Enter to search or click the search button
+                        </small>
+                    }
                 </div>
             </div>
 
@@ -39,7 +46,14 @@
             else if (categories?.Items == null || !categories.Items.Any())
             {
                 <div class="alert alert-info">
-                    No categories found.
+                    @if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        <span>No categories found matching "<strong>@searchTerm</strong>"</span>
+                    }
+                    else
+                    {
+                        <span>No categories found.</span>
+                    }
                 </div>
             }
             else
@@ -86,10 +100,13 @@
                                 <td>@category.CreatedDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
                                 <td>
                                     <div class="btn-group">
-                                            <a href="/categories/update/@category.Id" class="btn btn-sm btn-outline-primary">
+                                        <a href="/categories/detail/@category.Id" class="btn btn-sm btn-info" title="View Details">
+                                            <i class="fas fa-info-circle"></i>
+                                        </a>
+                                        <a href="/categories/update/@category.Id" class="btn btn-sm btn-warning" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteCategory(category.Id)">
+                                        <button class="btn btn-sm btn-danger" @onclick="() => DeleteCategory(category.Id)" title="Delete">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
@@ -154,17 +171,26 @@
         try
         {
             isLoading = true;
-            var response = await Http.GetFromJsonAsync<ApiResponse<PaginatedList<Category>>>(
-                $"api/Category?PageIndex={pageIndex}&PageSize={pageSize}&SearchTerm={searchTerm}&SortColumn={sortColumn}&IsDescending={isDescending}");
+            StateHasChanged();
 
-            if (response.IsSuccess)
+            var response = await Http.GetFromJsonAsync<ApiResponse<PaginatedList<Category>>>(
+                $"api/Category?PageIndex={pageIndex}&PageSize={pageSize}&SearchTerm={Uri.EscapeDataString(searchTerm)}&SortColumn={sortColumn}&IsDescending={isDescending}");
+
+            if (response != null && response.IsSuccess)
             {
                 categories = response.Data;
             }
+            else
+            {
+                // Handle API error response
+                await JSRuntime.InvokeVoidAsync("alert", "Error loading categories");
+            }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // Handle error
+            // Log error and show user-friendly message
+            await JSRuntime.InvokeVoidAsync("alert", "Error loading categories");
+            Console.WriteLine($"Error: {ex.Message}");
         }
         finally
         {
@@ -173,17 +199,17 @@
         }
     }
 
-    private void HandleSearch()
+    private async Task HandleSearchKeyUp(KeyboardEventArgs e)
     {
-        searchTimer?.Dispose();
-        searchTimer = new Timer(async _ =>
+        if (e.Key == "Enter")
         {
-            await InvokeAsync(async () =>
-            {
-                await LoadData(1);
-                StateHasChanged();
-            });
-        }, null, 500, Timeout.Infinite);
+            await HandleSearch();
+        }
+    }
+
+    private async Task HandleSearch()
+    {
+        await LoadData(1); // Reset to first page when searching
     }
 
     private async Task SortBy(string column)
