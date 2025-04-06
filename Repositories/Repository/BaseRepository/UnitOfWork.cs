@@ -12,14 +12,24 @@ namespace Repositories.Repository.GeneralRepository
         public IVariationOptionRepository VariationOption { get; }
         public IProductItemRepository ProductItemRepository { get; }
         public IProductRepository ProductRepository { get; }
+        public IBrandRepository BrandRepository { get; }
+        public ISeriesRepository SeriesRepository { get; }
 
-        public UnitOfWork(ApplicationDbContext context, ICategoryRepository category,
-            IVariationRepository variation, IVariationOptionRepository variationOption)
+        public UnitOfWork(ApplicationDbContext context,
+                          ICategoryRepository category,
+                          IVariationRepository variation,
+                          IVariationOptionRepository variationOption,
+                          IProductItemRepository productItemRepository,
+                          IProductRepository productRepository,
+                          IBrandRepository brandRepository)
         {
             _context = context;
             Category = category;
             Variation = variation;
             VariationOption = variationOption;
+            ProductItemRepository = productItemRepository;
+            ProductRepository = productRepository;
+            BrandRepository = brandRepository;
         }
 
         public void Update<T>(T entity) where T : class

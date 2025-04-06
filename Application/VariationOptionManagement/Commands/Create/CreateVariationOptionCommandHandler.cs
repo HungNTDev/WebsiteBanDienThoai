@@ -45,7 +45,6 @@ namespace Application.VariationOptionManagement.Commands.Create
                 {
                     Value = model.Name,
                     VariationId = model.VariationId,
-
                     CreatedBy = request.userName
                 };
                 await _unitOfWork.VariationOption.CreateAsync(variationOption);

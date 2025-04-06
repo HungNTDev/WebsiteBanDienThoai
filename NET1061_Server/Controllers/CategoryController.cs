@@ -63,10 +63,6 @@ namespace NET1061_Server.Controllers
             {
                 return Unauthorized("User is not authenticated.");
             }
-
-            // Gán email của người tạo
-
-
             string contentRootPath = _webHostEnvironment.ContentRootPath;
 
             if (string.IsNullOrEmpty(contentRootPath))

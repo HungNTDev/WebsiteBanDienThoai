@@ -17,7 +17,6 @@ namespace Application.MapperProfile
             CreateMap<Category, GetAllCategoriesDto>();
             CreateMap<Category, GetCategoryDto>();
             CreateMap<UpdateCategoryDto, Category>();
-
         }
     }
 }
