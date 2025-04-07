@@ -7,6 +7,8 @@
         IProductItemRepository ProductItemRepository { get; }
         IProductRepository ProductRepository { get; }
         IVariationOptionRepository VariationOption { get; }
+        IBrandRepository BrandRepository { get; }
+        ISeriesRepository SeriesRepository { get; }
         void Update<T>(T entity) where T : class;
         int SaveChanges();
         Task<int> SaveChangesAsync();

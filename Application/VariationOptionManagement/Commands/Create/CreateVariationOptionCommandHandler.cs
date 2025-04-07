@@ -1,4 +1,4 @@
-﻿using Application.Abstract;
+﻿using Application.Abstract.BaseClass;
 using Application.Abstract.CQRS;
 using Application.Abstract.Repository;
 using Application.Abstract.Repository.Base;
@@ -45,7 +45,6 @@ namespace Application.VariationOptionManagement.Commands.Create
                 {
                     Value = model.Name,
                     VariationId = model.VariationId,
-
                     CreatedBy = request.userName
                 };
                 await _unitOfWork.VariationOption.CreateAsync(variationOption);

@@ -1,4 +1,4 @@
-﻿using Application.Abstract;
+﻿using Application.Abstract.BaseClass;
 using Application.Abstract.CQRS;
 using Application.Abstract.Repository;
 using AutoMapper;

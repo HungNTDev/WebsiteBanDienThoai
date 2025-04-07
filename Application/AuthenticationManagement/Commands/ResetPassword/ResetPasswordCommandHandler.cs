@@ -1,4 +1,4 @@
-﻿using Application.Abstract;
+﻿using Application.Abstract.BaseClass;
 using Application.Abstract.CQRS;
 using AutoMapper;
 using Domain.Entities;
@@ -27,7 +27,7 @@ namespace Application.AuthenticationManagement.Commands.ResetPassword
 
         public async Task<ApiResponse<object>> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
-            var model  = request.Model;
+            var model = request.Model;
             try
             {
                 var validationResult = await _validator.ValidateAsync(model, cancellationToken);
@@ -37,7 +37,7 @@ namespace Application.AuthenticationManagement.Commands.ResetPassword
                 }
 
                 var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user == null) 
+                if (user == null)
                 {
                     return ApiResponseBuilder.ValidationError<object>(validationResult.Errors);
                 }
