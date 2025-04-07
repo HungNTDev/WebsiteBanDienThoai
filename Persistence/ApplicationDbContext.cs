@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace Persistence
 {
@@ -127,6 +126,8 @@ namespace Persistence
         public DbSet<Variation> Variations { get; set; }
         public DbSet<VariationOption> VariationOptions { get; set; }
         public DbSet<ProductConfig> ProductConfigs { get; set; }
+        public DbSet<Brand> Brands { get; set; }
+        public DbSet<Series> Series { get; set; }
 
     }
 }

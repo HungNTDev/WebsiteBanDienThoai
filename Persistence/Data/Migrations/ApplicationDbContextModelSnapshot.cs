@@ -174,7 +174,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brand");
+                    b.ToTable("Brands");
                 });
 
             modelBuilder.Entity("Domain.Entities.Cart", b =>
@@ -594,9 +594,6 @@ namespace Persistence.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("BrandId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
@@ -621,6 +618,9 @@ namespace Persistence.Data.Migrations
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid>("SeriesId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -629,9 +629,9 @@ namespace Persistence.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BrandId");
-
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("SeriesId");
 
                     b.ToTable("Products");
                 });
@@ -643,6 +643,24 @@ namespace Persistence.Data.Migrations
 
                     b.Property<Guid>("VariationOptionId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("ProductItemId", "VariationOptionId");
 
@@ -799,6 +817,41 @@ namespace Persistence.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Series", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("BrandId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BrandId");
+
+                    b.ToTable("Series");
                 });
 
             modelBuilder.Entity("Domain.Entities.ShippingMethod", b =>
@@ -1212,21 +1265,21 @@ namespace Persistence.Data.Migrations
 
             modelBuilder.Entity("Domain.Entities.Product", b =>
                 {
-                    b.HasOne("Domain.Entities.Brand", "Brand")
-                        .WithMany("Products")
-                        .HasForeignKey("BrandId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Brand");
+                    b.HasOne("Domain.Entities.Series", "SeriesName")
+                        .WithMany("Products")
+                        .HasForeignKey("SeriesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Category");
+
+                    b.Navigation("SeriesName");
                 });
 
             modelBuilder.Entity("Domain.Entities.ProductConfig", b =>
@@ -1303,6 +1356,15 @@ namespace Persistence.Data.Migrations
                     b.Navigation("OrderItem");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Series", b =>
+                {
+                    b.HasOne("Domain.Entities.Brand", "Brand")
+                        .WithMany("Series")
+                        .HasForeignKey("BrandId");
+
+                    b.Navigation("Brand");
                 });
 
             modelBuilder.Entity("Domain.Entities.UserAddress", b =>
@@ -1444,7 +1506,7 @@ namespace Persistence.Data.Migrations
                 {
                     b.Navigation("CategoryBrands");
 
-                    b.Navigation("Products");
+                    b.Navigation("Series");
                 });
 
             modelBuilder.Entity("Domain.Entities.Cart", b =>
@@ -1509,6 +1571,11 @@ namespace Persistence.Data.Migrations
             modelBuilder.Entity("Domain.Entities.Promotion", b =>
                 {
                     b.Navigation("PromotionCategories");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Series", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Domain.Entities.ShippingMethod", b =>

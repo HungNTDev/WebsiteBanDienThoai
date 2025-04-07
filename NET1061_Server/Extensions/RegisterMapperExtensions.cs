@@ -1,4 +1,4 @@
-﻿using Application.MapperProfile;
+﻿using Application.Abstract.MapperProfile;
 using AutoMapper;
 
 namespace NET1061_Server.Extensions
@@ -14,6 +14,9 @@ namespace NET1061_Server.Extensions
                 c.AddProfile<CategoryProfile>();
                 c.AddProfile<VariationProfile>();
                 c.AddProfile<VariationOptionProfile>();
+                c.AddProfile<ProductProfile>();
+                c.AddProfile<BrandProfile>();
+                c.AddProfile<SeriesProfile>();
             });
             services.AddSingleton<IMapper>(s => config.CreateMapper());
             return services;

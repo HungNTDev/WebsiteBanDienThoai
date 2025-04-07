@@ -10,15 +10,16 @@ namespace NET1061_Server.Extensions
     {
         public static IServiceCollection AddRegistration(this IServiceCollection services)
         {
-            services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IProductItemRepository, ProductItemRepository>();
-            services.AddScoped<IUploadHelper, UploadHelper>();
-            services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IVariationRepository, VariationRepository>();
             services.AddScoped<IVariationOptionRepository, VariationOptionRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductItemRepository, ProductItemRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUploadHelper, UploadHelper>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IBrandRepository, BrandRepository>();
+            services.AddScoped<ISeriesRepository, SeriesRepository>();
             return services;
         }
     }

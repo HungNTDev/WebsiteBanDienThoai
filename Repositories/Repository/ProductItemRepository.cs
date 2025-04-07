@@ -20,7 +20,7 @@ namespace Repositories.Repository
         public async Task<ProductItem?> GetProductItemByOptionsAsync(Guid productId, List<Guid> optionIds)
         {
             return await _context.ProductItems
-               .Where(pi => pi.ProductId == productId) //productId
+               .Where(pi => pi.ProductId == productId)
                .Where(pi => pi.ProductConfigs
                    .Select(pc => pc.VariationOptionId)
                    .Count() == optionIds.Count

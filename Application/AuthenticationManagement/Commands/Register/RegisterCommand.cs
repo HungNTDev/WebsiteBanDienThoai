@@ -1,5 +1,5 @@
 ﻿using Application.Abstract.CQRS;
-using Application.Abstract;
+using Application.Abstract.BaseClass;
 
 namespace Application.AuthenticationManagement.Commands.Register
 {
