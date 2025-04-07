@@ -1,7 +1,6 @@
 ﻿using Application.Abstract.BaseClass;
 using Application.Abstract.CQRS;
 using Application.Abstract.Repository;
-using Application.Abstract.Repository.Base;
 using AutoMapper;
 using Domain.Entities;
 using Microsoft.Extensions.Logging;
@@ -14,14 +13,12 @@ namespace Application.ProductManagement.Queries.GetAll
         private readonly IProductRepository _productRepository;
         private readonly ILogger<GetAllProductQueryHandler> _logger;
         private readonly IMapper _mapper;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public GetAllProductQueryHandler(IUnitOfWork unitOfWork,
+        public GetAllProductQueryHandler(
                                          IMapper mapper,
                                          IProductRepository productRepository,
                                          ILogger<GetAllProductQueryHandler> logger)
         {
-            _unitOfWork = unitOfWork;
             _mapper = mapper;
             _productRepository = productRepository;
             _logger = logger;

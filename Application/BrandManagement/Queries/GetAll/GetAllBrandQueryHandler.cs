@@ -59,9 +59,10 @@ namespace Application.BrandManagement.Queries.GetAll
 
                 var paginatedBrandsForView = new PaginatedResult<GetAllBrandDto>(
                     brandsForView,
-                    brandPaginated.TotalCount,
                     brandPaginated.PageIndex,
-                    brandPaginated.PageSize);
+                    brandPaginated.PageSize,
+                    brandPaginated.TotalCount
+                    );
 
                 return ApiResponseBuilder.Success(paginatedBrandsForView,
                     "Lấy danh sách thương hiệu thành công");

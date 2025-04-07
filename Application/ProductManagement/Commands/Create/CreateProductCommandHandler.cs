@@ -1,11 +1,10 @@
-﻿using Application.Abstract.CQRS;
-using Application.Abstract.Repository.Base;
+﻿using Application.Abstract.BaseClass;
+using Application.Abstract.CQRS;
 using Application.Abstract.Repository;
-using AutoMapper;
+using Application.Abstract.Repository.Base;
+using Domain.Entities;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using Domain.Entities;
-using Application.Abstract.BaseClass;
 
 namespace Application.ProductManagement.Commands.Create
 {
@@ -15,17 +14,14 @@ namespace Application.ProductManagement.Commands.Create
         private readonly IUnitOfWork _unitOfWork;
         private readonly IProductRepository _productRepository;
         private readonly IValidator<CreateProductDto> _validator;
-        private readonly IMapper _mapper;
         private readonly ILogger<CreateProductCommandHandler> _logger;
 
         public CreateProductCommandHandler(ILogger<CreateProductCommandHandler> logger,
-                                           IMapper mapper,
                                            IValidator<CreateProductDto> validator,
                                            IProductRepository productRepository,
                                            IUnitOfWork unitOfWork)
         {
             _logger = logger;
-            _mapper = mapper;
             _validator = validator;
             _productRepository = productRepository;
             _unitOfWork = unitOfWork;

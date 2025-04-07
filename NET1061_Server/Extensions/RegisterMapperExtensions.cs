@@ -17,6 +17,8 @@ namespace NET1061_Server.Extensions
                 c.AddProfile<ProductProfile>();
                 c.AddProfile<BrandProfile>();
                 c.AddProfile<SeriesProfile>();
+                c.AddProfile<InventoryProfile>();
+                c.AddProfile<ProductItemProfile>();
             });
             services.AddSingleton<IMapper>(s => config.CreateMapper());
             return services;
