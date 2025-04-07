@@ -1,0 +1,121 @@
+@page "/brands/detail/{Id}"
+@using Admin.Models
+@using Admin.Models.Brand
+@using Admin.Services
+@inject IHttpService HttpService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IImageService ImageService
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Brand Details</h1>
+        <div>
+            <a href="/brands" class="btn btn-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+            <a href="/brands/update/@Id" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center p-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (brand == null)
+    {
+        <div class="alert alert-danger">
+            Brand not found.
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Name</dt>
+                            <dd class="col-sm-8">@brand.Name</dd>
+
+                            @if (!string.IsNullOrEmpty(brand.Image))
+                            {
+                                <dt class="col-sm-4">Image</dt>
+                                <dd class="col-sm-8">
+                                    <img src="@ImageService.GetImageUrl(brand.Image)" alt="@brand.Name" 
+                                         class="img-thumbnail" style="max-width: 200px;" />
+                                </dd>
+                            }
+
+                            <dt class="col-sm-4">Created By</dt>
+                            <dd class="col-sm-8">@brand.CreatedBy</dd>
+
+                            <dt class="col-sm-4">Created Date</dt>
+                            <dd class="col-sm-8">@brand.CreatedDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
+
+                            @if (!string.IsNullOrEmpty(brand.UpdatedBy))
+                            {
+                                <dt class="col-sm-4">Updated By</dt>
+                                <dd class="col-sm-8">@brand.UpdatedBy</dd>
+
+                                <dt class="col-sm-4">Updated Date</dt>
+                                <dd class="col-sm-8">@brand.UpdatedDate?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
+                            }
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private Brand brand;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBrandDetails();
+    }
+
+    private async Task LoadBrandDetails()
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            var response = await HttpService.GetAsync<Brand>($"api/Brand/detail/{Id}");
+
+            if (response.IsSuccess && response.Data != null)
+            {
+                brand = response.Data;
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", response.Message ?? "Error loading brand details");
+                NavigationManager.NavigateTo("/brands");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Error loading brand details");
+            Console.WriteLine($"Error: {ex.Message}");
+            NavigationManager.NavigateTo("/brands");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+} 
