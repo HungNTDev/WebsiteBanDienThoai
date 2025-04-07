@@ -19,6 +19,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtParser, JwtParser>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+builder.Services.AddScoped<IHttpService, HttpService>();
 builder.Services.AddAuthorizationCore();
 var app = builder.Build();
 await app.RunAsync();
