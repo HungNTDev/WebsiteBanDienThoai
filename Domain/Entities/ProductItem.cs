@@ -9,7 +9,7 @@ namespace Domain.Entities
         public string? SKU { get; set; }
         public string? Image { get; set; }
         public int? View_Count { get; set; }
-
+        public string? Name { get; set; }
         [NotMapped]
         public IFormFile? FromFileImages { get; set; }
         public decimal? Price { get; set; }
