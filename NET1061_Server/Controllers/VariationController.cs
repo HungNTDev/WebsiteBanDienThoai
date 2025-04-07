@@ -1,4 +1,4 @@
-﻿using Application.Abstract;
+﻿using Application.Abstract.BaseClass;
 using Application.VariationManagement.Commands.Create;
 using Application.VariationManagement.Commands.Update;
 using Application.VariationManagement.Queries.GetAll;

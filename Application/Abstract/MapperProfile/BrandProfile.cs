@@ -4,7 +4,7 @@ using Application.BrandManagement.Queries.GetDetail;
 using AutoMapper;
 using Domain.Entities;
 
-namespace Application.MapperProfile
+namespace Application.Abstract.MapperProfile
 {
     public class BrandProfile : Profile
     {

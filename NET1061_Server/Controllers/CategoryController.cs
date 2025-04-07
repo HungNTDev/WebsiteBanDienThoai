@@ -1,4 +1,4 @@
-﻿using Application.Abstract;
+﻿using Application.Abstract.BaseClass;
 using Application.Abstract.Repository.Base;
 using Application.CategoryManagement.Commands.Create;
 using Application.CategoryManagement.Commands.Update;

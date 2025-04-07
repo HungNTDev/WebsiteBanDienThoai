@@ -6,7 +6,7 @@ using AutoMapper;
 using AutoMapper.Configuration.Conventions;
 using Domain.Entities;
 
-namespace Application.MapperProfile
+namespace Application.Abstract.MapperProfile
 {
     public class VariationProfile : Profile
     {

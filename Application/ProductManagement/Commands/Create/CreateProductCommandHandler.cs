@@ -1,11 +1,11 @@
-﻿using Application.Abstract;
-using Application.Abstract.CQRS;
+﻿using Application.Abstract.CQRS;
 using Application.Abstract.Repository.Base;
 using Application.Abstract.Repository;
 using AutoMapper;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Domain.Entities;
+using Application.Abstract.BaseClass;
 
 namespace Application.ProductManagement.Commands.Create
 {

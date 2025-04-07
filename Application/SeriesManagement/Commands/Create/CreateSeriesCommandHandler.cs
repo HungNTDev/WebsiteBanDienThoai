@@ -1,4 +1,4 @@
-﻿using Application.Abstract;
+﻿using Application.Abstract.BaseClass;
 using Application.Abstract.CQRS;
 using Application.Abstract.Repository;
 using Application.Abstract.Repository.Base;
@@ -39,6 +39,7 @@ namespace Application.SeriesManagement.Commands.Create
                 var series = new Domain.Entities.Series
                 {
                     Name = model.Name,
+                    CreatedDate = model.CreatedDate,
                     CreatedBy = request.userName
                 };
                 await _unitOfWork.SeriesRepository.CreateAsync(series);

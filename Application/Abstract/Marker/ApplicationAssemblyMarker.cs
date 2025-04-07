@@ -1,4 +1,4 @@
-﻿namespace Application.Marker
+﻿namespace Application.Abstract.Marker
 {
     public class ApplicationAssemblyMarker
     {

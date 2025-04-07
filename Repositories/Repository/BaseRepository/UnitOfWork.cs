@@ -21,7 +21,8 @@ namespace Repositories.Repository.GeneralRepository
                           IVariationOptionRepository variationOption,
                           IProductItemRepository productItemRepository,
                           IProductRepository productRepository,
-                          IBrandRepository brandRepository)
+                          IBrandRepository brandRepository,
+                          ISeriesRepository seriesRepository)
         {
             _context = context;
             Category = category;
@@ -30,6 +31,7 @@ namespace Repositories.Repository.GeneralRepository
             ProductItemRepository = productItemRepository;
             ProductRepository = productRepository;
             BrandRepository = brandRepository;
+            SeriesRepository = seriesRepository;
         }
 
         public void Update<T>(T entity) where T : class

@@ -8,6 +8,5 @@ namespace Application.SeriesManagement.Commands.Create
         [JsonIgnore]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public Guid BrandId { get; set; }
-
     }
 }

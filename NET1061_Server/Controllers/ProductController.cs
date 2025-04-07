@@ -1,4 +1,4 @@
-﻿using Application.Abstract;
+﻿using Application.Abstract.BaseClass;
 using Application.Abstract.Repository.Base;
 using Application.ProductManagement.Commands.Create;
 using Application.ProductManagement.Commands.Update;
@@ -93,7 +93,7 @@ namespace NET1061_Server.Controllers
 
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Put(Guid id, [FromBody] UpdateProductDto model)
+        public async Task<IActionResult> Put(Guid id, [FromForm] UpdateProductDto model)
         {
             var userName = User.FindFirst(ClaimTypes.Name)?.Value;
             if (string.IsNullOrEmpty(userName))

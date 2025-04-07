@@ -5,7 +5,7 @@ using Application.ProductManagement.Queries.GetDetail;
 using AutoMapper;
 using Domain.Entities;
 
-namespace Application.MapperProfile
+namespace Application.Abstract.MapperProfile
 {
     public class ProductProfile : Profile
     {
@@ -16,7 +16,7 @@ namespace Application.MapperProfile
         private void Init()
         {
             CreateMap<Product, GetAllProductDto>();
-            CreateMap<Product, UpdateProductDto>();
+            CreateMap<UpdateProductDto, Product>();
             //CreateMap<CreateProductDto, Product>();
             CreateMap<Product, GetDetailProductDto>()
             .ForMember(dest => dest.Variations, opt => opt.MapFrom(src =>

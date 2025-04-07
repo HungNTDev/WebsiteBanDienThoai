@@ -1,4 +1,4 @@
-﻿using Application.Abstract;
+﻿using Application.Abstract.BaseClass;
 using Application.BrandManagement.Commands.Create;
 using Application.BrandManagement.Commands.Update;
 using Application.BrandManagement.Queries.GetAll;

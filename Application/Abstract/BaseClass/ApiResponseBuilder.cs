@@ -1,6 +1,6 @@
 ﻿using FluentValidation.Results;
 
-namespace Application.Abstract
+namespace Application.Abstract.BaseClass
 {
     public static class ApiResponseBuilder
     {

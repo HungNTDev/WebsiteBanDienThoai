@@ -8,6 +8,8 @@ using Application.CategoryManagement.Commands.Create;
 using Application.CategoryManagement.Commands.Update;
 using Application.ProductManagement.Commands.Create;
 using Application.ProductManagement.Commands.Update;
+using Application.SeriesManagement.Commands.Create;
+using Application.SeriesManagement.Commands.Update;
 using Application.VariationManagement.Commands.Create;
 using Application.VariationManagement.Commands.Update;
 using Application.VariationOptionManagement.Commands.Create;
@@ -46,6 +48,10 @@ namespace NET1061_Server.Extensions
             //Product
             services.AddScoped<IValidator<CreateProductDto>, CreateProductValidation>();
             services.AddScoped<IValidator<UpdateProductDto>, UpdateProductValidation>();
+
+            //Series
+            services.AddScoped<IValidator<CreateSeriesDto>, CreateSeriesValidation>();
+            services.AddScoped<IValidator<UpdateSeriesDto>, UpdateSeriesValidation>();
 
             return services;
         }

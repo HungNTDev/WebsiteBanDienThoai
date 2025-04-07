@@ -1,4 +1,4 @@
-﻿namespace Application.Abstract
+﻿namespace Application.Abstract.BaseClass
 {
     public class Filter
     {

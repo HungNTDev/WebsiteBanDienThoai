@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Application.Abstract
+namespace Application.Abstract.BaseClass
 {
     public class PaginatedResult<T> where T : class
     {

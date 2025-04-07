@@ -19,6 +19,7 @@ namespace NET1061_Server.Extensions
             services.AddScoped<IUploadHelper, UploadHelper>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IBrandRepository, BrandRepository>();
+            services.AddScoped<ISeriesRepository, SeriesRepository>();
             return services;
         }
     }

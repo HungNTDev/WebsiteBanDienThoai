@@ -4,7 +4,7 @@ using Application.VariationOptionManagement.Queries.GetAll;
 using AutoMapper;
 using Domain.Entities;
 
-namespace Application.MapperProfile
+namespace Application.Abstract.MapperProfile
 {
     public class VariationOptionProfile : Profile
     {
