@@ -7,7 +7,9 @@ namespace Application.BrandManagement.Commands.Create
     public class CreateBrandDto
     {
         public string? Name { get; set; }
+
         [JsonIgnore]
+
         public string? Image { get; set; }
 
         public IFormFile formFile { get; set; }

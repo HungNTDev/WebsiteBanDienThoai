@@ -12,7 +12,7 @@ namespace NET1061_Server.Extensions
         {
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IVariationRepository, VariationRepository>();
-            services.AddScoped<IVariationOptionRepository, VariationOptionRepository>();
+            services.AddScoped<IVariationOptionRepository, VariationOptionRespository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IProductItemRepository, ProductItemRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
