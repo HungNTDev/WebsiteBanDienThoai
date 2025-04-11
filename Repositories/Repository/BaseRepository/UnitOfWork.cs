@@ -14,7 +14,7 @@ namespace Repositories.Repository.GeneralRepository
         public IProductRepository ProductRepository { get; }
         public IBrandRepository BrandRepository { get; }
         public ISeriesRepository SeriesRepository { get; }
-        public IInventoryRepository InventoryRepository { get; }
+        //public IInventoryRepository InventoryRepository { get; }
 
         public UnitOfWork(ApplicationDbContext context,
                           ICategoryRepository category,

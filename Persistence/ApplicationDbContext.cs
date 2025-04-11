@@ -11,10 +11,7 @@ namespace Persistence
         { }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Inventory>()
-                .HasOne(i => i.ProductItem)
-                .WithOne(pi => pi.Inventory)
-                .HasForeignKey<ProductItem>(pi => pi.InventoryId);
+
 
             builder.Entity<ProductConfig>()
                 .HasOne(pc => pc.ProductItem)
@@ -110,7 +107,7 @@ namespace Persistence
         public DbSet<Category> Categories { get; set; }
         public DbSet<Combo> Comboes { get; set; }
         public DbSet<ComboProduct> ComboProducts { get; set; }
-        public DbSet<Inventory> Inventories { get; set; }
+        //public DbSet<Inventory> Inventories { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Payment> Payments { get; set; }

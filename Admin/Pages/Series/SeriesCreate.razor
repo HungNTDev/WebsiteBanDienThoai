@@ -1,0 +1,179 @@
+@page "/series/create"
+@using Admin.Models
+@using Admin.Models.Series
+@using System.Net.Http.Headers
+@using Blazored.LocalStorage
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorage
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h3 class="mb-4">Create Series</h3>
+
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert @(isSuccess ? "alert-success" : "alert-danger") alert-dismissible fade show" role="alert">
+                    @message
+                    <button type="button" class="btn-close" @onclick="() => message = null"></button>
+                </div>
+            }
+
+            <EditForm Model="@series" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <InputText @bind-Value="series.Name" class="form-control" />
+                    <ValidationMessage For="@(() => series.Name)" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Brand</label>
+                    <InputSelect @bind-Value="series.BrandId" class="form-control">
+                        <option value="">Select a brand</option>
+                        @foreach (var brand in brands)
+                        {
+                            <option value="@brand.Id">@brand.Name</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => series.BrandId)" />
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary" disabled="@isLoading">
+                        @if (isLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span class="ms-2">Creating...</span>
+                        }
+                        else
+                        {
+                            <span>Create Series</span>
+                        }
+                    </button>
+                    <button type="button" class="btn btn-secondary ms-2" @onclick="NavigateBack">Cancel</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Models.Series.SeriesCreateRequest series = new();
+    private List<Brand> brands = new();
+    private string message;
+    private bool isSuccess;
+    private bool isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBrands();
+    }
+
+    private async Task LoadBrands()
+    {
+        try
+        {
+            var token = await LocalStorage.GetItemAsync<string>("token");
+            if (string.IsNullOrEmpty(token))
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await Http.GetAsync("api/Brand");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<PaginatedList<Brand>>>();
+                if (result != null && result.IsSuccess)
+                {
+                    brands = result.Data.Items;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Error loading brands: {ex.Message}";
+            isSuccess = false;
+        }
+        finally
+        {
+            Http.DefaultRequestHeaders.Authorization = null;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            isLoading = true;
+            message = null;
+
+            if (string.IsNullOrEmpty(series.BrandId))
+            {
+                message = "Please select a brand";
+                isSuccess = false;
+                return;
+            }
+
+            var token = await LocalStorage.GetItemAsync<string>("token");
+            if (string.IsNullOrEmpty(token))
+            {
+                message = "You are not authorized. Please login again.";
+                isSuccess = false;
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await Http.PostAsJsonAsync("api/Series/create", series);
+
+            if (response.IsSuccessStatusCode)
+            {
+                message = "Series created successfully!";
+                isSuccess = true;
+                await Task.Delay(2000);
+                NavigateBack();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                message = "You are not authorized. Please login again.";
+                isSuccess = false;
+                NavigationManager.NavigateTo("/login");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                message = $"Error: {error}";
+                isSuccess = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Error: {ex.Message}";
+            isSuccess = false;
+        }
+        finally
+        {
+            isLoading = false;
+            Http.DefaultRequestHeaders.Authorization = null;
+        }
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/series");
+    }
+
+    public class Brand
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+    }
+} 

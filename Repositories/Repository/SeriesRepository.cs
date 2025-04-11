@@ -15,7 +15,7 @@ namespace Repositories.Repository
         }
         public async Task<Series?> GetByIdAsync(Guid id)
         {
-            return await _context.Series.Include(x => x.Products)
+            return await _context.Series.Include(x => x.Brand)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
         public async Task<List<Series>> GetAllAsync()

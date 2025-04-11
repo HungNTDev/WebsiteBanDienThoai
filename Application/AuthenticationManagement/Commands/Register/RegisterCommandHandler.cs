@@ -55,7 +55,6 @@ namespace Application.AuthenticationManagement.Commands.Register
                 var user = _mapper.Map<ApplicationUser>(model);
                 user.UserName = model.Email;
                 var result = await _userManager.CreateAsync(user, model.Password);
-                Console.WriteLine(result);
                 if (result.Succeeded)
                 {
                     var roles = await _signInManager.UserManager.GetRolesAsync(user);

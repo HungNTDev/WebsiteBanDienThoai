@@ -52,9 +52,9 @@ namespace Application.SeriesManagement.Queries.GetAll
 
                 var paginatedSeriesForView = new PaginatedResult<GetAllSeriesDto>(
                     seriesForView,
-                    seriesPaginated.Result.TotalCount,
                     seriesPaginated.Result.PageIndex,
-                    seriesPaginated.Result.PageSize);
+                    seriesPaginated.Result.PageSize,
+                    seriesPaginated.Result.TotalCount);
 
                 return ApiResponseBuilder.Success(paginatedSeriesForView, "");
             }

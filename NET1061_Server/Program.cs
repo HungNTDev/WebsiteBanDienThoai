@@ -1,7 +1,11 @@
-﻿using Domain.Entities;
+﻿using Application.Abstract.Services;
+using CloudinaryDotNet;
+using Domain.Abstract;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NET1061_Server.Extensions;
@@ -89,7 +93,17 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("CloudinarySettings"));
 
+builder.Services.AddSingleton(sp =>
+{
+    var settings = sp.GetRequiredService<IOptions<CloudinarySettings>>().Value;
+    var account = new Account(settings.CloudName, settings.ApiKey, settings.ApiSecret);
+    return new Cloudinary(account);
+});
+
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddRegistration();
 builder.Services.AddRegistrationFluentValidations();
 builder.Services.AddRegistrationMapper();

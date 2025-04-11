@@ -84,7 +84,7 @@ namespace NET1061_Server.Controllers
 
             var request = new CreateProductCommand(model, userName);
             var result = await _mediator.Send(request);
-            if (result != null)
+            if (result.IsSuccess)
             {
                 return Ok(result);
             }

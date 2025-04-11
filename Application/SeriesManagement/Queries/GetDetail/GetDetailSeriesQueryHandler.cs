@@ -33,7 +33,7 @@ namespace Application.SeriesManagement.Queries.GetDetail
             var seriesId = request.Id;
             try
             {
-                var series = _seriesRepository.GetByIdAsync(seriesId);
+                var series = await _seriesRepository.GetByIdAsync(seriesId);
                 if (series == null)
                 {
                     return
@@ -41,6 +41,7 @@ namespace Application.SeriesManagement.Queries.GetDetail
                         statusCode: 404);
                 }
                 var seriesForView = _mapper.Map<GetDetailSeriesDto>(series);
+                Console.WriteLine(seriesForView);
                 return seriesForView;
             }
             catch (Exception ex)

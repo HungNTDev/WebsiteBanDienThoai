@@ -35,7 +35,10 @@ namespace NET1061_Server.Controllers
         {
             var request = new GetDetailSeriesQuery(id);
             var result = await _mediator.Send(request);
-            return Ok(result);
+            return result.Match(
+                apiResponse => StatusCode(apiResponse.StatusCode, apiResponse),
+                dto => Ok(dto)
+            );
         }
 
         [HttpPost("create")]
@@ -56,15 +59,16 @@ namespace NET1061_Server.Controllers
             return BadRequest(result);
         }
 
-        [HttpPut("update")]
+        [HttpPut("update/{id}")]
         [Authorize]
-        public async Task<IActionResult> Update([FromBody] UpdateSeriesDto command)
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSeriesDto command)
         {
             var userName = User.FindFirst(ClaimTypes.Name)?.Value;
             if (string.IsNullOrEmpty(userName))
             {
                 return Unauthorized("User is not authenticated.");
             }
+            command.Id = id;
             var request = new UpdateSeriesCommand(command, userName);
             var result = await _mediator.Send(request);
             if (result != null)

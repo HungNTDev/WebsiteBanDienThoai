@@ -9,7 +9,7 @@
         IVariationOptionRepository VariationOption { get; }
         IBrandRepository BrandRepository { get; }
         ISeriesRepository SeriesRepository { get; }
-        IInventoryRepository InventoryRepository { get; }
+        //IInventoryRepository InventoryRepository { get; }
         void Update<T>(T entity) where T : class;
         int SaveChanges();
         Task<int> SaveChangesAsync();
