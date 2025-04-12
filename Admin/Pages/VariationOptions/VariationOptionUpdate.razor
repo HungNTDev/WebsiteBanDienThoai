@@ -109,7 +109,7 @@
             Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var response = await Http.GetAsync("api/Variation");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<ApiResponse<PaginatedList<Variation>>>();
@@ -145,7 +145,7 @@
             Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var response = await Http.GetAsync($"api/VariationOption/{Id}");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<VariationOptionDetailResponse>();
@@ -153,11 +153,11 @@
                 {
                     variationOptionDetail = result;
                     variationOption = new VariationOptionUpdateRequest
-                    {
-                        Id = result.Id,
-                        Value = result.Value,
-                        VariationId = result.VariationId
-                    };
+                        {
+                            Id = result.Id,
+                            Value = result.Value,
+                            VariationId = result.VariationId
+                        };
                 }
             }
         }

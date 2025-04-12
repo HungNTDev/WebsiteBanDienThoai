@@ -46,12 +46,7 @@ namespace Application.ProductManagement.Commands.Update
                 {
                     return ApiResponseBuilder.Error<object>("Product not found", statusCode: 404);
                 }
-                var isProductExists = await _productRepository
-                    .IsProductExistsAsync(model.Name, cancellationToken);
-                if (!isProductExists)
-                {
-                    return ApiResponseBuilder.Error<object>("Product already exists", statusCode: 409);
-                }
+
                 var productToUpdate = _mapper.Map(model, product);
                 productToUpdate.UpdatedBy = request.userName;
                 _productRepository.Update(productToUpdate);

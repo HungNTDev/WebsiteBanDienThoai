@@ -50,7 +50,7 @@ namespace Application.ProductManagement.Commands.Create
                     Description = model.Description,
                     Price = model.Price,
                     Image = model.Image,
-                    CreatedDate = DateTime.UtcNow,
+                    CreatedDate = model.CreatedDate,
                     SeriesId = model.SeriesId,
                     CategoryId = model.CategoryId,
                     CreatedBy = request.userName,
