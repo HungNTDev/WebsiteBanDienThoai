@@ -5,5 +5,5 @@ using OneOf;
 namespace Application.VariationManagement.Queries.GetById
 {
     public record class GetVariationByIdQuery(Guid Id)
-        : IQuery<OneOf<ApiResponse<GetVariationOptionDto>, GetVariationOptionDto>>;
+        : IQuery<OneOf<ApiResponse<GetVariationDto>, GetVariationDto>>;
 }

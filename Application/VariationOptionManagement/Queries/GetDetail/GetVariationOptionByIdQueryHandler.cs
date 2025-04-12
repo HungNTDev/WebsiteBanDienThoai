@@ -1,6 +1,7 @@
 ﻿using Application.Abstract.BaseClass;
 using Application.Abstract.CQRS;
 using Application.Abstract.Repository;
+using Application.ProductManagement.Queries.GetDetail;
 using Application.VariationManagement.Queries.GetById;
 using AutoMapper;
 using Domain.Entities;

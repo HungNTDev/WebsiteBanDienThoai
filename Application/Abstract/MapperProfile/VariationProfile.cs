@@ -17,12 +17,12 @@ namespace Application.Abstract.MapperProfile
         private void Init()
         {
             CreateMap<Variation, GetAllVariationDto>();
-            CreateMap<Variation, CreateVariationDto>()
-                .ForMember(dest => dest.CategoryName,
-                opt => opt.MapFrom(src => src.Category.Name));
+            CreateMap<Variation, CreateVariationDto>();
+            //.ForMember(dest => dest.CategoryName,
+            //opt => opt.MapFrom(src => src.Category.Name));
             CreateMap<UpdateVariationDto, Variation>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
-            CreateMap<GetVariationOptionDto, Variation>();
+            CreateMap<Variation, GetVariationDto>();
         }
     }
 }

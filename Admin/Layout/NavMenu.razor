@@ -13,86 +13,39 @@
         <nav class="nav-menu">
             <div class="nav-item">
                 <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                    <i class="fas fa-home"></i>
+                    <i class="fas fa-tachometer-alt"></i> <!-- Dashboard icon -->
                     <span>Dashboard</span>
                 </NavLink>
             </div>
 
             <div class="nav-item">
                 <NavLink class="nav-link" href="categories">
-                    <i class="fas fa-list"></i>
+                    <i class="fas fa-folder-open"></i> <!-- Category icon -->
                     <span>Category</span>
                 </NavLink>
             </div>
 
             <div class="nav-item">
                 <NavLink class="nav-link" href="brands">
-                    <i class="fas fa-trademark"></i>
+                    <i class="fas fa-tags"></i> <!-- Brand icon -->
                     <span>Brand</span>
                 </NavLink>
             </div>
 
-             <div class="nav-item">
+            <div class="nav-item">
                 <NavLink class="nav-link" href="series">
-                    <i class="fas fa-trademark"></i>
+                    <i class="fas fa-stream"></i> <!-- Series icon -->
                     <span>Series</span>
                 </NavLink>
             </div>
-            @* <div class="nav-item">
-                <NavLink class="nav-link" href="users">
-                    <i class="fas fa-users"></i>
-                    <span>User</span>
+
+            <div class="nav-item">
+                <NavLink class="nav-link" href="variations">
+                    <i class="fas fa-sliders-h"></i> <!-- Variation icon -->
+                    <span>Variation</span>
                 </NavLink>
             </div>
 
-            <div class="nav-item">
-                <NavLink class="nav-link" href="layouts">
-                    <i class="fas fa-th-large"></i>
-                    <span>Layouts</span>
-                </NavLink>
-            </div>
-
-            <div class="nav-item">
-                <NavLink class="nav-link" href="landing">
-                    <i class="fas fa-paper-plane"></i>
-                    <span>Landing Page</span>
-                </NavLink>
-            </div>
-
-            <div class="nav-section">
-                <h6 class="nav-section-title">INTERFACES</h6>
-            </div>
-
-            <div class="nav-item">
-                <NavLink class="nav-link" href="components">
-                    <i class="fas fa-cube"></i>
-                    <span>Components</span>
-                </NavLink>
-            </div>
-            <div class="nav-item">
-                <NavLink class="nav-link" href="forms">
-                    <i class="fas fa-edit"></i>
-                    <span>Forms</span>
-                </NavLink>
-            </div>
-            <div class="nav-item">
-                <NavLink class="nav-link" href="tables">
-                    <i class="fas fa-table"></i>
-                    <span>Tables</span>
-                </NavLink>
-            </div>
-            <div class="nav-item">
-                <NavLink class="nav-link" href="collections">
-                    <i class="fas fa-layer-group"></i>
-                    <span>Collections</span>
-                </NavLink>
-            </div>
-            <div class="nav-item">
-                <NavLink class="nav-link" href="level-menu">
-                    <i class="fas fa-list-ul"></i>
-                    <span>Level Menu</span>
-                </NavLink>
-            </div> *@
         </nav>
     </div>
 </div>
@@ -145,22 +98,22 @@
         transition: all 0.3s ease;
     }
 
-    .nav-link i {
-        margin-right: 0.8rem;
-        width: 20px;
-        text-align: center;
-    }
+        .nav-link i {
+            margin-right: 0.8rem;
+            width: 20px;
+            text-align: center;
+        }
 
-    .nav-link:hover {
-        background-color: rgba(255,255,255,0.1);
-        color: white;
-        text-decoration: none;
-    }
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            text-decoration: none;
+        }
 
-    .nav-link.active {
-        background-color: rgba(255,255,255,0.15);
-        color: white;
-    }
+        .nav-link.active {
+            background-color: rgba(255,255,255,0.15);
+            color: white;
+        }
 </style>
 
 @code {

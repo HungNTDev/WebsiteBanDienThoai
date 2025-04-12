@@ -19,8 +19,6 @@ namespace NET1061_Server.Controllers
             _mediator = mediator;
         }
 
-
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductItemById(Guid id)
         {

@@ -1,5 +1,6 @@
 ﻿using Application.Abstract.BaseClass;
 using Application.Abstract.CQRS;
+using Application.ProductManagement.Queries.GetDetail;
 using Application.VariationManagement.Queries.GetById;
 using OneOf;
 

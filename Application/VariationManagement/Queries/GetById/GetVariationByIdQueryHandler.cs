@@ -10,7 +10,7 @@ namespace Application.VariationManagement.Queries.GetById
 {
     public record GetVariationByIdQueryHandler :
         IQueryHandler<GetVariationByIdQuery,
-            OneOf<ApiResponse<GetVariationOptionDto>, GetVariationOptionDto>>
+            OneOf<ApiResponse<GetVariationDto>, GetVariationDto>>
     {
         private readonly IMapper _mapper;
         private readonly IVariationRepository _variationRepository;
@@ -25,7 +25,7 @@ namespace Application.VariationManagement.Queries.GetById
             _mapper = mapper;
         }
 
-        public async Task<OneOf<ApiResponse<GetVariationOptionDto>, GetVariationOptionDto>> Handle(
+        public async Task<OneOf<ApiResponse<GetVariationDto>, GetVariationDto>> Handle(
             GetVariationByIdQuery request, CancellationToken cancellationToken)
         {
             try
@@ -33,10 +33,10 @@ namespace Application.VariationManagement.Queries.GetById
                 Variation variation = await _variationRepository.GetByIdAsync(request.Id);
                 if (variation == null)
                 {
-                    return ApiResponseBuilder.Error<GetVariationOptionDto>($"Không tìm thấy biến thể",
+                    return ApiResponseBuilder.Error<GetVariationDto>($"Không tìm thấy biến thể",
                         statusCode: 404);
                 }
-                GetVariationOptionDto dto = _mapper.Map<GetVariationOptionDto>(variation);
+                GetVariationDto dto = _mapper.Map<GetVariationDto>(variation);
                 return dto;
             }
             catch (Exception ex)
