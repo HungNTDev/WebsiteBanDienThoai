@@ -1,6 +1,6 @@
-@page "/variations/create"
+@page "/variation-options/create"
 @using Admin.Models
-@using Admin.Models.Variation
+@using Admin.Models.VariationOption
 @using System.Net.Http.Headers
 @using Blazored.LocalStorage
 @inject HttpClient Http
@@ -10,7 +10,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-8 offset-md-2">
-            <h3 class="mb-4">Create Variation</h3>
+            <h3 class="mb-4">Create Variation Option</h3>
 
             @if (!string.IsNullOrEmpty(message))
             {
@@ -20,25 +20,25 @@
                 </div>
             }
 
-            <EditForm Model="@variation" OnValidSubmit="HandleValidSubmit">
+            <EditForm Model="@variationOption" OnValidSubmit="HandleValidSubmit">
                 <DataAnnotationsValidator />
 
                 <div class="mb-3">
-                    <label class="form-label">Name</label>
-                    <InputText @bind-Value="variation.Name" class="form-control" />
-                    <ValidationMessage For="@(() => variation.Name)" />
+                    <label class="form-label">Value</label>
+                    <InputText @bind-Value="variationOption.Value" class="form-control" />
+                    <ValidationMessage For="@(() => variationOption.Value)" />
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Category</label>
-                    <InputSelect @bind-Value="variation.CategoryId" class="form-control">
-                        <option value="">Select a category</option>
-                        @foreach (var category in categories)
+                    <label class="form-label">Variation</label>
+                    <InputSelect @bind-Value="variationOption.VariationId" class="form-control">
+                        <option value="">Select a variation</option>
+                        @foreach (var variation in variations)
                         {
-                            <option value="@category.Id">@category.Name</option>
+                            <option value="@variation.Id">@variation.Name</option>
                         }
                     </InputSelect>
-                    <ValidationMessage For="@(() => variation.CategoryId)" />
+                    <ValidationMessage For="@(() => variationOption.VariationId)" />
                 </div>
 
                 <div class="mb-3">
@@ -50,7 +50,7 @@
                         }
                         else
                         {
-                            <span>Create Variation</span>
+                            <span>Create Variation Option</span>
                         }
                     </button>
                     <button type="button" class="btn btn-secondary ms-2" @onclick="NavigateBack">Cancel</button>
@@ -61,18 +61,18 @@
 </div>
 
 @code {
-    private VariationCreateRequest variation = new();
-    private List<Category> categories = new();
+    private VariationOptionCreateRequest variationOption = new();
+    private List<Variation> variations = new();
     private string message;
     private bool isSuccess;
     private bool isLoading;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadCategories();
+        await LoadVariations();
     }
 
-    private async Task LoadCategories()
+    private async Task LoadVariations()
     {
         try
         {
@@ -85,20 +85,20 @@
 
             Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var response = await Http.GetAsync("api/Category");
+            var response = await Http.GetAsync("api/Variation");
             
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<ApiResponse<PaginatedList<Category>>>();
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<PaginatedList<Variation>>>();
                 if (result != null && result.IsSuccess)
                 {
-                    categories = result.Data.Items;
+                    variations = result.Data.Items;
                 }
             }
         }
         catch (Exception ex)
         {
-            message = $"Error loading categories: {ex.Message}";
+            message = $"Error loading variations: {ex.Message}";
             isSuccess = false;
         }
         finally
@@ -114,9 +114,9 @@
             isLoading = true;
             message = null;
 
-            if (string.IsNullOrEmpty(variation.CategoryId))
+            if (string.IsNullOrEmpty(variationOption.VariationId))
             {
-                message = "Please select a category";
+                message = "Please select a variation";
                 isSuccess = false;
                 return;
             }
@@ -132,7 +132,7 @@
 
             Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var response = await Http.PostAsJsonAsync("api/Variation", variation);
+            var response = await Http.PostAsJsonAsync("api/VariationOption", variationOption);
 
             if (response.IsSuccessStatusCode)
             {
@@ -172,10 +172,9 @@
 
     private void NavigateBack()
     {
-        NavigationManager.NavigateTo("/variations");
+        NavigationManager.NavigateTo("/variation-options");
     }
-
-    public class Category
+    public class Variation
     {
         public string Id { get; set; }
         public string Name { get; set; }

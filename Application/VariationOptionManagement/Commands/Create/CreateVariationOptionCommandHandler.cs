@@ -43,7 +43,7 @@ namespace Application.VariationOptionManagement.Commands.Create
                 }
                 var variationOption = new VariationOption
                 {
-                    Value = model.Name,
+                    Value = model.Value,
                     VariationId = model.VariationId,
                     CreatedBy = request.userName
                 };
