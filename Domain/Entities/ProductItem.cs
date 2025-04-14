@@ -18,5 +18,6 @@ namespace Domain.Entities
         public Guid ProductId { get; set; }
         public Product? Product { get; set; }
         public ICollection<ProductConfig>? ProductConfigs { get; set; }
+        public ICollection<ProductImages>? ProductImages { get; set; }
     }
 }

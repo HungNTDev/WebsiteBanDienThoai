@@ -115,5 +115,6 @@ namespace Persistence
         public DbSet<ProductConfig> ProductConfigs { get; set; }
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Series> Series { get; set; }
+        public DbSet<ProductImages> ProductImages { get; set; }
     }
 }
