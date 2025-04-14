@@ -14,8 +14,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -23,10 +21,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-//using var scope = builder.Services.BuildServiceProvider().CreateScope();
-//var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-//dbContext.Database.Migrate();
-//dbContext.Database.ExecuteSqlRaw("CREATE EXTENSION IF NOT EXISTS unaccent;");
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()

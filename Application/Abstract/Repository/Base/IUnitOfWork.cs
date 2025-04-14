@@ -2,6 +2,7 @@
 {
     public interface IUnitOfWork
     {
+        IUserRepository UserRepository { get; }
         ICategoryRepository Category { get; }
         IVariationRepository Variation { get; }
         IProductItemRepository ProductItemRepository { get; }

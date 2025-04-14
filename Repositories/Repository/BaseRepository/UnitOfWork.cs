@@ -14,6 +14,7 @@ namespace Repositories.Repository.GeneralRepository
         public IProductRepository ProductRepository { get; }
         public IBrandRepository BrandRepository { get; }
         public ISeriesRepository SeriesRepository { get; }
+        public IUserRepository UserRepository { get; }
         //public IInventoryRepository InventoryRepository { get; }
 
         public UnitOfWork(ApplicationDbContext context,
@@ -23,7 +24,8 @@ namespace Repositories.Repository.GeneralRepository
                           IProductItemRepository productItemRepository,
                           IProductRepository productRepository,
                           IBrandRepository brandRepository,
-                          ISeriesRepository seriesRepository)
+                          ISeriesRepository seriesRepository,
+                          IUserRepository userRepository)
         {
             _context = context;
             Category = category;
@@ -33,6 +35,7 @@ namespace Repositories.Repository.GeneralRepository
             ProductRepository = productRepository;
             BrandRepository = brandRepository;
             SeriesRepository = seriesRepository;
+            UserRepository = userRepository;
         }
 
         public void Update<T>(T entity) where T : class

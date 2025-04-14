@@ -1,4 +1,5 @@
-﻿using Application.AuthenticationManagement.Commands.ForgotPassword;
+﻿using Application.AuthenticationManagement.Commands.EditProfile;
+using Application.AuthenticationManagement.Commands.ForgotPassword;
 using Application.AuthenticationManagement.Commands.Login;
 using Application.AuthenticationManagement.Commands.Register;
 using Application.AuthenticationManagement.Commands.ResetPassword;
@@ -30,6 +31,7 @@ namespace NET1061_Server.Extensions
             services.AddScoped<IValidator<LoginModel>, LoginModelValidator>();
             services.AddScoped<IValidator<ForgotPasswordModel>, ForgotPasswordValidator>();
             services.AddScoped<IValidator<ResetPasswordModels>, ResetPasswordModelValidator>();
+            services.AddScoped<IValidator<EditProfileDto>, EditProfileValidation>();
 
             //Brand
             services.AddScoped<IValidator<CreateBrandDto>, CreateBrandValidation>();

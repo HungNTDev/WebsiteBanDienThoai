@@ -1,6 +1,6 @@
-﻿namespace Application.AuthenticationManagement.Queries.Profile
+﻿namespace Admin.Models.Authentication
 {
-    public class GetProfileDto
+    public class ProfileResponse
     {
         public string Name { get; set; }
         public string Email { get; set; }
