@@ -302,16 +302,6 @@
                 content.Add(fileContent, "ImageFile", selectedFile.Name);
             }
 
-            Console.WriteLine("📦 Logging product values before sending to API:");
-            Console.WriteLine($"➡️ Id: {product?.Id}");
-            Console.WriteLine($"➡️ Name: {product?.Name}");
-            Console.WriteLine($"➡️ Description: {product?.Description}");
-            Console.WriteLine($"➡️ Price: {product?.Price}");
-            Console.WriteLine($"➡️ CategoryId: {product?.CategoryId}");
-            Console.WriteLine($"➡️ SeriesId: {product?.SeriesId}");
-            Console.WriteLine($"➡️ UpdateDate: {DateTime.UtcNow.ToString("o")}");
-            Console.WriteLine($"➡️ Has selectedFile: {(selectedFile != null ? "Yes" : "No")}");
-
             if (selectedFile != null)
             {
                 Console.WriteLine($"📁 File Name: {selectedFile.Name}");

@@ -94,8 +94,10 @@ namespace Repositories.Repository
             {
                 Id = item.Id,
                 SKU = item.SKU,
+                Image = item.Image,
                 Price = item.Price,
                 ProductName = item.Product?.Name ?? "",
+                ProductId = item.ProductId,
                 VariationOptions = item.ProductConfigs.Select(c => c.VariationOptionId).ToList()
             };
         }
