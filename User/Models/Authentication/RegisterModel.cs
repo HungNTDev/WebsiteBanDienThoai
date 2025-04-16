@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace User.Models
+namespace User.Models.Authentication
 {
     public class RegisterModel
     {
@@ -25,4 +25,4 @@ namespace User.Models
 
         public string Address { get; set; } = "";
     }
-} 
+}

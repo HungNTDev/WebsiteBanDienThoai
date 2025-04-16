@@ -5,6 +5,10 @@ using Application.AuthenticationManagement.Commands.Register;
 using Application.AuthenticationManagement.Commands.ResetPassword;
 using Application.BrandManagement.Commands.Create;
 using Application.BrandManagement.Commands.Update;
+using Application.CartManagement.Commands.AddCart;
+using Application.CartManagement.Commands.DeleteCart;
+using Application.CartManagement.Commands.DeleteCartItem;
+using Application.CartManagement.Commands.UpdateCart;
 using Application.CategoryManagement.Commands.Create;
 using Application.CategoryManagement.Commands.Update;
 using Application.ProductItemManagement.Commands.Create;
@@ -64,6 +68,12 @@ namespace NET1061_Server.Extensions
             //Product Item
             services.AddScoped<IValidator<CreateProductItemDto>, CreateProductItemValidation>();
             services.AddScoped<IValidator<UpdateProductItemDto>, UpdateProductItemValidation>();
+
+            //Cart
+            services.AddScoped<IValidator<CreateCartDto>, CreateCartValidation>();
+            services.AddScoped<IValidator<UpdateCartDto>, UpdateCartValidation>();
+            services.AddScoped<IValidator<DeleteCartDto>, DeleteCartValidation>();
+            services.AddScoped<IValidator<DeleteCartItemDto>, DeleteCartItemValidator>();
 
             return services;
         }

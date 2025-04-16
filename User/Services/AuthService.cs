@@ -1,5 +1,8 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Json;
+using System.Security.Claims;
 using User.Models;
+using User.Models.Authentication;
 
 namespace User.Services
 {
@@ -16,27 +19,49 @@ namespace User.Services
             _localStorage = localStorage;
         }
 
-        public async Task<AuthResult> Login(LoginModel model)
+        public async Task<ApiResponse<string>> LoginAsync(LoginModel model)
         {
-            try
+            var request = new LoginRequest
             {
-                var response = await _httpClient.PostAsJsonAsync("api/auth/login", model);
-                var result = await response.Content.ReadFromJsonAsync<AuthResult>();
+                Model = model
+            };
 
-                if (result?.Success == true)
+            var response = await _httpClient.PostAsJsonAsync("api/Authentication/login", request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new ApiResponse<string>
                 {
-                    await _localStorage.SetItemAsync(TokenKey, result.Token);
-                    // Lưu thông tin user vào localStorage
-                    var userInfo = await GetUserInfo(result.Token);
-                    await _localStorage.SetItemAsync(UserKey, userInfo);
-                }
+                    IsSuccess = false,
+                    Message = "Lỗi kết nối đến máy chủ."
+                };
+            }
 
-                return result ?? new AuthResult { Success = false, Message = "Đăng nhập thất bại" };
-            }
-            catch (Exception ex)
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<string>>();
+
+            if (result == null || !result.IsSuccess || string.IsNullOrEmpty(result.Data))
             {
-                return new AuthResult { Success = false, Message = ex.Message };
+                return new ApiResponse<string>
+                {
+                    IsSuccess = false,
+                    Message = result?.Message ?? "Đăng nhập thất bại."
+                };
             }
+
+            // Lưu token vào localStorage
+            await _localStorage.SetItemAsync("authToken", result.Data);
+
+            return new ApiResponse<string>
+            {
+                IsSuccess = true,
+                Message = result.Message,
+                Data = result.Data
+            };
+        }
+
+        public async Task Logout()
+        {
+            await _localStorage.RemoveItemAsync("token");
         }
 
         public async Task<AuthResult> Register(RegisterModel model)
@@ -44,7 +69,7 @@ namespace User.Services
             try
             {
                 var response = await _httpClient.PostAsJsonAsync("api/auth/register", model);
-                return await response.Content.ReadFromJsonAsync<AuthResult>() 
+                return await response.Content.ReadFromJsonAsync<AuthResult>()
                     ?? new AuthResult { Success = false, Message = "Đăng ký thất bại" };
             }
             catch (Exception ex)
@@ -53,11 +78,7 @@ namespace User.Services
             }
         }
 
-        public async Task Logout()
-        {
-            await _localStorage.RemoveItemAsync(TokenKey);
-            await _localStorage.RemoveItemAsync(UserKey);
-        }
+
 
         public async Task<bool> IsAuthenticated()
         {
@@ -70,18 +91,46 @@ namespace User.Services
             return await _localStorage.GetItemAsync<UserInfo>(UserKey) ?? new UserInfo();
         }
 
-        private async Task<UserInfo> GetUserInfo(string token)
+        //private async Task<UserInfo> GetUserInfo(string token)
+        //{
+        //    try
+        //    {
+        //        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        //        var response = await _httpClient.GetAsync("api/auth/user-info");
+        //        return await response.Content.ReadFromJsonAsync<UserInfo>() ?? new UserInfo();
+        //    }
+        //    catch
+        //    {
+        //        return new UserInfo();
+        //    }
+        //}
+        public async Task<UserInfo?> GetCurrentUserAsync()
         {
+            var token = await _localStorage.GetItemAsync<string>("authToken");
+            if (string.IsNullOrEmpty(token)) return null;
+
+            var handler = new JwtSecurityTokenHandler();
+            JwtSecurityToken jwt;
+
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                var response = await _httpClient.GetAsync("api/auth/user-info");
-                return await response.Content.ReadFromJsonAsync<UserInfo>() ?? new UserInfo();
+                jwt = handler.ReadJwtToken(token);
             }
             catch
             {
-                return new UserInfo();
+                return null;
             }
+
+            var email = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email")?.Value;
+            var name = jwt.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+
+            if (string.IsNullOrEmpty(email)) return null;
+
+            return new UserInfo
+            {
+                Email = email,
+                FullName = name
+            };
         }
     }
-} 
+}

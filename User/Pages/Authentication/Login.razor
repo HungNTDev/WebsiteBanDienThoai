@@ -52,6 +52,12 @@
                 <div class="text-center mt-4">
                     <p class="mb-0">Chưa có tài khoản? <a href="/register" class="text-decoration-none">Đăng ký ngay</a></p>
                 </div>
+                @if (!string.IsNullOrEmpty(Message))
+                {
+                    <div class="alert alert-danger mt-3">
+                        @Message
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -104,23 +110,18 @@
 </style>
 
 @code {
-    private User.Models.LoginModel loginModel = new();
+    private User.Models.Authentication.LoginModel loginModel = new();
     private bool isLoading = false;
-
+    private string Message = "";
     private async Task HandleLogin()
     {
         try
         {
             isLoading = true;
-            var result = await AuthService.Login(loginModel);
-            
-            if (result.Success)
+            var result = await AuthService.LoginAsync(loginModel);
+            if (result.IsSuccess)
             {
                 NavigationManager.NavigateTo("/");
-            }
-            else
-            {
-                // Hiển thị thông báo lỗi
             }
         }
         catch (Exception ex)
@@ -133,16 +134,5 @@
         }
     }
 
-    public class LoginModel
-    {
-        [Required(ErrorMessage = "Vui lòng nhập email")]
-        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
-        public string Email { get; set; } = "";
-
-        [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
-        [MinLength(6, ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự")]
-        public string Password { get; set; } = "";
-
-        public bool RememberMe { get; set; }
-    }
+   
 } 

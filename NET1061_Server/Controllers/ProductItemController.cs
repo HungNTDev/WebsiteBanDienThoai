@@ -40,8 +40,9 @@ namespace NET1061_Server.Controllers
         [HttpPost("by-options")]
         public async Task<IActionResult> GetByOptions([FromBody] GetProductItemQuery query)
         {
-            var result = await _mediator.Send(query);
-            return result is null ? NotFound() : Ok(result);
+            var request = new GetProductItemQuery(query.ProductId, query.OptionIds);
+            var result = await _mediator.Send(request);
+            return result.IsSuccess ? Ok(result) : NotFound();
         }
 
         [HttpPost("create")]

@@ -1,5 +1,7 @@
 ﻿using Application.Abstract.Repository;
 using Application.Abstract.Repository.Base;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Persistence;
 
 namespace Repositories.Repository.GeneralRepository
@@ -15,6 +17,7 @@ namespace Repositories.Repository.GeneralRepository
         public IBrandRepository BrandRepository { get; }
         public ISeriesRepository SeriesRepository { get; }
         public IUserRepository UserRepository { get; }
+        public ICartRepository CartRepository { get; }
         //public IInventoryRepository InventoryRepository { get; }
 
         public UnitOfWork(ApplicationDbContext context,
@@ -25,7 +28,8 @@ namespace Repositories.Repository.GeneralRepository
                           IProductRepository productRepository,
                           IBrandRepository brandRepository,
                           ISeriesRepository seriesRepository,
-                          IUserRepository userRepository)
+                          IUserRepository userRepository,
+                          ICartRepository cartRepository)
         {
             _context = context;
             Category = category;
@@ -36,6 +40,15 @@ namespace Repositories.Repository.GeneralRepository
             BrandRepository = brandRepository;
             SeriesRepository = seriesRepository;
             UserRepository = userRepository;
+            CartRepository = cartRepository;
+        }
+        public void Entry<TEntity>(TEntity entity, EntityState state) where TEntity : class
+        {
+            _context.Entry(entity).State = state;
+        }
+        public EntityEntry Entry<TEntity>(TEntity entity) where TEntity : class
+        {
+            return _context.Entry(entity);
         }
 
         public void Update<T>(T entity) where T : class

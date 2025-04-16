@@ -1,0 +1,244 @@
+@page "/products"
+@using Admin.Models.Product
+@using Admin.Models.ProductItem
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Bộ lọc tìm kiếm</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Khoảng giá</label>
+                        <div class="d-flex align-items-center">
+                            <input type="number" class="form-control" placeholder="Từ" @bind="minPrice" />
+                            <span class="mx-2">-</span>
+                            <input type="number" class="form-control" placeholder="Đến" @bind="maxPrice" />
+                        </div>
+                    </div>
+                    <button class="btn btn-primary w-100" @onclick="ApplyFilters">
+                        <i class="fas fa-filter me-2"></i>Lọc
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            @if (isLoading)
+            {
+                <div class="text-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                </div>
+            }
+            else if (products == null || !products.Any())
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>Không tìm thấy sản phẩm nào
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var product in products)
+                    {
+                        <div class="col-md-4 col-lg-3">
+                            <div class="card h-100 shadow-sm product-card">
+                                <div class="position-relative">
+                                    @if (!string.IsNullOrEmpty(product.Image))
+                                    {
+                                        <img src="@product.Image" class="card-img-top" alt="@product.Name"
+                                            style="height: 200px; object-fit: contain;" />
+                                    }
+                                    @if (product.Discount > 0)
+                                    {
+                                        <div class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 m-2 rounded">
+                                            Giảm @(product.Discount)%
+                                        </div>
+                                    }
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <h6 class="card-title mb-2 text-truncate">@product.Name</h6>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="text-danger fw-bold me-2">
+                                            @product.Price.ToString("N0")₫
+                                        </div>
+                                        @if (product.OriginalPrice > product.Price)
+                                        {
+                                            <div class="text-muted text-decoration-line-through small">
+                                                @product.OriginalPrice.ToString("N0")₫
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="mt-auto">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="text-warning me-1">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    if (i <= product.Rating)
+                                                    {
+                                                        <i class="fas fa-star"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="far fa-star"></i>
+                                                    }
+                                                }
+                                            </div>
+                                            <small class="text-muted">(@product.RatingCount)</small>
+                                        </div>
+                                        <div class="small text-muted mb-2">
+                                            @if (product.InstallmentAvailable)
+                                            {
+                                                <div>
+                                                    <i class="fas fa-credit-card me-1"></i>
+                                                    Trả góp 0%
+                                                </div>
+                                            }
+                                        </div>
+                                        <a href="/products/@product.Id" class="btn btn-outline-primary w-100">
+                                            <i class="fas fa-info-circle me-2"></i>Chi tiết
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (totalPages > 1)
+                {
+                    <div class="d-flex justify-content-center mt-4">
+                        <nav>
+                            <ul class="pagination">
+                                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                    <button class="page-link" @onclick="() => LoadPage(currentPage - 1)">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                </li>
+                                @for (int i = 1; i <= totalPages; i++)
+                                {
+                                    var pageNumber = i;
+                                    <li class="page-item @(pageNumber == currentPage ? "active" : "")">
+                                        <button class="page-link" @onclick="() => LoadPage(pageNumber)">@i</button>
+                                    </li>
+                                }
+                                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                    <button class="page-link" @onclick="() => LoadPage(currentPage + 1)">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-card {
+        transition: transform 0.2s;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-img-top {
+        padding: 1rem;
+        background-color: #fff;
+    }
+</style>
+
+@code {
+    private List<ProductViewModel> products;
+    private bool isLoading = true;
+    private int currentPage = 1;
+    private int totalPages = 1;
+    private decimal? minPrice;
+    private decimal? maxPrice;
+    private const int PageSize = 12;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            var queryParams = new List<string>();
+            queryParams.Add($"pageIndex={currentPage}");
+            queryParams.Add($"pageSize={PageSize}");
+
+            if (minPrice.HasValue)
+            {
+                queryParams.Add($"minPrice={minPrice.Value}");
+            }
+            if (maxPrice.HasValue)
+            {
+                queryParams.Add($"maxPrice={maxPrice.Value}");
+            }
+
+            var url = $"api/ProductItem?{string.Join("&", queryParams)}";
+            var response = await Http.GetFromJsonAsync<ApiResponse<PaginatedList<ProductViewModel>>>(url);
+
+            if (response != null && response.IsSuccess)
+            {
+                products = response.Data.Items;
+                totalPages = (int)Math.Ceiling(response.Data.TotalCount / (double)PageSize);
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Không thể tải danh sách sản phẩm");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Đã có lỗi xảy ra khi tải danh sách sản phẩm");
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadPage(int page)
+    {
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        await LoadProducts();
+    }
+
+    private async Task ApplyFilters()
+    {
+        currentPage = 1;
+        await LoadProducts();
+    }
+
+    public class ProductViewModel
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Image { get; set; }
+        public decimal Price { get; set; }
+        public decimal OriginalPrice { get; set; }
+        public int Discount { get; set; }
+        public int Rating { get; set; }
+        public int RatingCount { get; set; }
+        public bool InstallmentAvailable { get; set; }
+    }
+} 
