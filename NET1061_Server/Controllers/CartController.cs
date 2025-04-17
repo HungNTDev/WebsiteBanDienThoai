@@ -2,6 +2,7 @@
 using Application.CartManagement.Commands.DeleteCart;
 using Application.CartManagement.Commands.DeleteCartItem;
 using Application.CartManagement.Commands.UpdateCart;
+using Application.CartManagement.Queries.GetCarByUser;
 using Application.CartManagement.Queries.GetCartById;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -32,6 +33,14 @@ namespace NET1061_Server.Controllers
             }
             return Ok(result.AsT0);
         }
+
+        [HttpGet("my")]
+        public async Task<IActionResult> GetMyCart([FromQuery] Guid userId)
+        {
+            var result = await _mediator.Send(new GetCartByUserQuery(userId));
+            return Ok(result);
+        }
+
 
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateCartDto model)

@@ -26,8 +26,8 @@
                                 {
                                     <a href="@($"/{category.Slug}")"
                                        class="menu-item"
-                                       @onclick="@((e) => NavigateToCategory(category.Slug))"
-                                    @onclick:preventDefault>
+                                       @onclick="@(() => NavigateToCategory(category.Slug))"
+                                       @onclick:preventDefault>
                                         <i class="@category.Icon"></i>
                                         <span>@category.Name</span>
                                         <i class="bi bi-chevron-right"></i>
@@ -69,17 +69,18 @@
                     <i class="bi bi-shop"></i>
                     <span>Cửa hàng<br />gần bạn</span>
                 </a>
-                <a href="/track-order" class="action-button">
-                    <i class="bi bi-box-seam"></i>
-                    <span>Tra cứu<br />đơn hàng</span>
-                </a>
-                <a href="/cart" class="action-button cart">
-                    <i class="bi bi-cart3"></i>
-                    <span>Giỏ<br />hàng</span>
-                    <span class="badge">0</span>
-                </a>
+             
                 @if (IsLoggedIn)
                 {
+                       <a href="/track-order" class="action-button">
+                        <i class="bi bi-box-seam"></i>
+                        <span>Tra cứu<br />đơn hàng</span>
+                    </a>
+                    <a href="/cart" class="action-button cart">
+                        <i class="bi bi-cart3"></i>
+                        <span>Giỏ<br />hàng</span>
+                        <span class="badge">0</span>
+                    </a>
                     <div class="dropdown">
                         <a class="action-button dropdown-toggle" role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle"></i>

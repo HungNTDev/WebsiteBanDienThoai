@@ -12,5 +12,6 @@ namespace Application.Abstract.Repository
         void UpdateCartItem(CartItem cartItem);
         Task<Cart> GetCartByIdAsync(Guid cartId);
         Task<bool> DeleteCartItemAsync(Guid cartItemId);
+        Task<Cart?> GetCartByUserIdAsync(Guid userId);
     }
 }

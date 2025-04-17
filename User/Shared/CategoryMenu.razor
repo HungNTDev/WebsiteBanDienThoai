@@ -9,8 +9,8 @@
             {
                 <a href="@($"/{category.Slug}")"
                    class="menu-item"
-                   @onclick="@((e) => NavigateToCategory(category.Slug))"
-                @onclick:preventDefault>
+                   @onclick="@(() => NavigateToCategory(category.Slug))"
+                   @onclick:preventDefault>
                     <i class="@category.Icon"></i>
                     <span>@category.Name</span>
                     <i class="bi bi-chevron-right"></i>

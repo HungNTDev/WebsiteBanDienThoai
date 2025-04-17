@@ -1,15 +1,19 @@
-﻿namespace Application.CartManagement.Queries.GetCartById
+﻿namespace User.Models.Cart
 {
     public class GetCartByIdDto
     {
         public Guid Id { get; set; }
+        public string? Code { get; set; }
         public string? UserName { get; set; }
+        public string? Address { get; set; }
         public Guid UserId { get; set; }
-        public List<GetCartItem> CartItems { get; set; } = new List<GetCartItem>();
+        public List<GetCartItem> CartItems { get; set; } = new();
     }
+
     public class GetCartItem
     {
         public Guid Id { get; set; }
+        public string? Name { get; set; }
         public int Quantity { get; set; }
         public double UnitPrice { get; set; }
         public double TotalPrice { get; set; }
@@ -18,4 +22,3 @@
         public string? ProductItemName { get; set; }
     }
 }
-

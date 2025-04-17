@@ -4,6 +4,7 @@ using Application.ProductManagement.Commands.Create;
 using Application.ProductManagement.Commands.Update;
 using Application.ProductManagement.Queries.GetAll;
 using Application.ProductManagement.Queries.GetDetail;
+using Application.ProductManagement.Queries.GetWithOptions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +50,13 @@ namespace NET1061_Server.Controllers
             {
                 return NotFound($"Product with ID {id} not found.");
             }
+            return Ok(result);
+        }
+
+        [HttpGet("{id}/with-variations")]
+        public async Task<IActionResult> GetProductWithVariations(Guid id)
+        {
+            var result = await _mediator.Send(new GetProductWithVariationQuery(id));
             return Ok(result);
         }
 
