@@ -1,0 +1,107 @@
+@page "/login"
+@layout LoginLayout
+@using System.ComponentModel.DataAnnotations
+@using Admin.Models.Authentication
+@using Admin.Services
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+
+<div class="container">
+    <div class="login-box">
+        <div class="login-header">
+            <div class="login-logo">
+                <img src="https://static-account.cellphones.com.vn/_nuxt/img/Shipper_CPS3.77d4065.png" alt="CellphoneS" />
+            </div>
+            <h1>Welcome back!</h1>
+            <p>Please sign in to continue</p>
+        </div>
+
+        <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert @(isError ? "alert-danger" : "alert-success")">
+                    @message
+                </div>
+            }
+
+            <div class="form-group">
+                <InputText class="form-control" @bind-Value="loginModel.Email" placeholder="Enter your email" />
+                <ValidationMessage For="@(() => loginModel.Email)" />
+            </div>
+
+            <div class="form-group">
+                <InputText type="password" class="form-control" @bind-Value="loginModel.Password" placeholder="Enter your password" />
+                <ValidationMessage For="@(() => loginModel.Password)" />
+            </div>
+
+            <div class="form-options">
+                <div class="form-check">
+                    <InputCheckbox class="form-check-input" @bind-Value="loginModel.RememberMe" />
+                    <label class="form-check-label">Remember me</label>
+                </div>
+                <a href="/forgot-password" class="forgot-password">Forgot Password?</a>
+            </div>
+
+            <div class="form-submit">
+                <button type="submit" class="btn btn-primary w-100" disabled="@isLoading">
+                    @if (isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span class="ms-2">Signing in...</span>
+                    }
+                    else
+                    {
+                        <span>Sign In</span>
+                    }
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private LoginModel loginModel = new();
+    private string message;
+    private bool isError;
+    private bool isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isAuthenticated = await AuthService.IsAuthenticated();
+        if (isAuthenticated)
+        {
+            NavigationManager.NavigateTo("/dashboard");
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            isLoading = true;
+            message = null;
+            isError = false;
+
+            var result = await AuthService.Login(loginModel.Email, loginModel.Password);
+            message = result;
+            await Task.Delay(1000); // Đợi 1 giây để hiển thị thông báo thành công
+            NavigationManager.NavigateTo("/dashboard");
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+            isError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
+
+
+
+
+

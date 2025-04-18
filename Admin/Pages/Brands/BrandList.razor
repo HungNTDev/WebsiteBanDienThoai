@@ -1,0 +1,263 @@
+@page "/brands"
+@using Admin.Models
+@using Admin.Models.Brand
+@using Admin.Models.Category
+@using Admin.Services
+@inject IImageService imageService
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Brands</h1>
+        <a href="/brands/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create New
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search brands..."
+                               @bind="searchTerm" @bind:event="oninput" 
+                               @onkeyup="HandleSearchKeyUp" />
+                        <button class="btn btn-primary" type="button" @onclick="HandleSearch">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    @if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        <small class="text-muted mt-1">
+                            Press Enter to search or click the search button
+                        </small>
+                    }
+                </div>
+            </div>
+
+            @if (isLoading)
+            {
+                <div class="text-center p-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            }
+            else if (brands?.Items == null || !brands.Items.Any())
+            {
+                <div class="alert alert-info">
+                    @if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        <span>No brands found matching "<strong>@searchTerm</strong>"</span>
+                    }
+                    else
+                    {
+                        <span>No brands found.</span>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Image</th>
+                                <th @onclick="@(() => SortBy("Name"))" style="cursor: pointer">
+                                    Name
+                                    @if (sortColumn == "Name")
+                                    {
+                                        <i class="fas fa-sort-@(isDescending ? "down" : "up")"></i>
+                                    }
+                                </th>
+                                <th @onclick="@(() => SortBy("CreatedBy"))" style="cursor: pointer">
+                                    Created By
+                                    @if (sortColumn == "CreatedBy")
+                                    {
+                                        <i class="fas fa-sort-@(isDescending ? "down" : "up")"></i>
+                                    }
+                                </th>
+                                <th @onclick="@(() => SortBy("CreatedDate"))" style="cursor: pointer">
+                                    Created Date
+                                    @if (sortColumn == "CreatedDate")
+                                    {
+                                        <i class="fas fa-sort-@(isDescending ? "down" : "up")"></i>
+                                    }
+                                </th>
+                                <th style="width: 100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var brand in brands.Items)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(brand.Image))
+                                        {
+                                            <img src="@imageService.GetImageUrl(brand.Image)" alt="@brand.Name" 
+                                                 class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="bg-secondary text-white d-flex align-items-center justify-content-center" 
+                                                 style="width: 50px; height: 50px;">
+                                                <i class="fas fa-image"></i>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>@brand.Name</td>
+                                    <td>@brand.CreatedBy</td>
+                                    <td>@brand.CreatedDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="/brands/detail/@brand.Id" class="btn btn-sm btn-info" title="View Details">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                            <a href="/brands/update/@brand.Id" class="btn btn-sm btn-warning" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-danger" @onclick="() => DeleteBrand(brand.Id)" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div>
+                        Showing @((brands.PageIndex - 1) * brands.PageSize + 1) to
+                        @(Math.Min(brands.PageIndex * brands.PageSize, brands.TotalCount))
+                        of @brands.TotalCount entries
+                    </div>
+                    <nav>
+                        <ul class="pagination mb-0">
+                            <li class="page-item @(brands.HasPreviousPage ? "" : "disabled")">
+                                <button class="page-link" @onclick="@(() => LoadData(brands.PageIndex - 1))">
+                                    Previous
+                                </button>
+                            </li>
+                            @for (int i = 1; i <= brands.TotalPages; i++)
+                            {
+                                var pageNumber = i;
+                                <li class="page-item @(pageNumber == brands.PageIndex ? "active" : "")">
+                                    <button class="page-link" @onclick="@(() => LoadData(pageNumber))">
+                                        @i
+                                    </button>
+                                </li>
+                            }
+                            <li class="page-item @(brands.HasNextPage ? "" : "disabled")">
+                                <button class="page-link" @onclick="@(() => LoadData(brands.PageIndex + 1))">
+                                    Next
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private PaginatedList<Brand> brands;
+    private bool isLoading = true;
+    private string searchTerm = "";
+    private string sortColumn = "Name";
+    private bool isDescending = false;
+    private int pageSize = 3;
+    private Timer searchTimer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData(1);
+    }
+
+    private async Task LoadData(int pageIndex)
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            var response = await Http.GetFromJsonAsync<ApiResponse<PaginatedList<Brand>>>(
+                $"api/Brand?PageIndex={pageIndex}&PageSize={pageSize}&SearchTerm={Uri.EscapeDataString(searchTerm)}&SortColumn={sortColumn}&IsDescending={isDescending}");
+
+            if (response != null && response.IsSuccess)
+            {
+                brands = response.Data;
+            }
+            else
+            {
+                // Handle API error response
+                await JSRuntime.InvokeVoidAsync("alert", "Error loading brands");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log error and show user-friendly message
+            await JSRuntime.InvokeVoidAsync("alert", "Error loading brands");
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleSearchKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await HandleSearch();
+        }
+    }
+
+    private async Task HandleSearch()
+    {
+        await LoadData(1); // Reset to first page when searching
+    }
+
+    private async Task SortBy(string column)
+    {
+        if (sortColumn == column)
+        {
+            isDescending = !isDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            isDescending = false;
+        }
+        await LoadData(1);
+    }
+
+    private async Task DeleteBrand(string id)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this brand?");
+        if (!confirmed) return;
+
+        try
+        {
+            var response = await Http.DeleteAsync($"api/Brand/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadData(brands.PageIndex);
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Error deleting brand");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Error deleting brand");
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+} 

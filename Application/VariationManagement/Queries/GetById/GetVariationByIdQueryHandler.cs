@@ -1,4 +1,4 @@
-﻿using Application.Abstract;
+﻿using Application.Abstract.BaseClass;
 using Application.Abstract.CQRS;
 using Application.Abstract.Repository;
 using AutoMapper;
@@ -9,7 +9,8 @@ using OneOf;
 namespace Application.VariationManagement.Queries.GetById
 {
     public record GetVariationByIdQueryHandler :
-        IQueryHandler<GetVariationByIdQuery, OneOf<ApiResponse<GetVariationDto>, GetVariationDto>>
+        IQueryHandler<GetVariationByIdQuery,
+            OneOf<ApiResponse<GetVariationDto>, GetVariationDto>>
     {
         private readonly IMapper _mapper;
         private readonly IVariationRepository _variationRepository;

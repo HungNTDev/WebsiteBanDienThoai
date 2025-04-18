@@ -14,10 +14,6 @@ namespace Domain.Entities
         public Guid ProductItemId { get; set; }
         public ProductItem? ProductItem { get; set; }
 
-        [ForeignKey("Combo")]
-        public Guid ComboId { get; set; }
-        public Combo? Combo { get; set; }
-
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal TotalPrice => UnitPrice * Quantity;

@@ -1,0 +1,192 @@
+@page "/variation-options/detail/{Id}"
+@using Admin.Models
+@using Admin.Models.Variation
+@using Admin.Models.VariationOption
+@using System.Net.Http.Headers
+@using System.Net.Http.Json
+@using Blazored.LocalStorage
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorage
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">Variation Option Details</h3>
+                <div>
+                    <button type="button" class="btn btn-primary me-2" @onclick="NavigateToUpdate">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" @onclick="NavigateBack">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </button>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert @(isSuccess ? "alert-success" : "alert-danger") alert-dismissible fade show" role="alert">
+                    @message
+                    <button type="button" class="btn-close" @onclick="() => message = null"></button>
+                </div>
+            }
+
+            @if (isLoading)
+            {
+                <div class="text-center">
+                    <div class="spinner-border text-danger" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            }
+            else if (variationOption != null)
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h5>Variation Option Information</h5>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Value:</strong> @variationOption.Value</p>
+                                    <p><strong>Variation:</strong> @variationName</p>
+                                    <p><strong>Created By:</strong> @variationOption.CreatedBy</p>
+                                    <p><strong>Created Date:</strong> @variationOption.CreatedDate.ToString("dd/MM/yyyy HH:mm")</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Updated By:</strong> @(variationOption.UpdatedBy ?? "Not updated yet")</p>
+                                    <p><strong>Updated Date:</strong> @(variationOption.UpdatedDate?.ToString("dd/MM/yyyy HH:mm") ?? "Not updated yet")</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private VariationOptionDetailResponse variationOption;
+    private string variationName;
+    private string message;
+    private bool isSuccess;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadVariationOption();
+    }
+
+    private async Task LoadVariationOption()
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            if (!Guid.TryParse(Id, out Guid variationOptionId))
+            {
+                message = "Invalid variation option ID";
+                isSuccess = false;
+                return;
+            }
+
+            var token = await LocalStorage.GetItemAsync<string>("token");
+            if (string.IsNullOrEmpty(token))
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await Http.GetAsync($"api/VariationOption/{variationOptionId}");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<VariationOptionDetailResponse>();
+                if (result != null)
+                {
+                    variationOption = result;
+                    await LoadVariationName(result.VariationId);
+                    isSuccess = true;
+                }
+                else
+                {
+                    message = "Failed to load variation option data";
+                    isSuccess = false;
+                }
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                message = "Variation option not found";
+                isSuccess = false;
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                message = $"Error loading variation option: {error}";
+                isSuccess = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Error: {ex.Message}";
+            isSuccess = false;
+        }
+        finally
+        {
+            isLoading = false;
+            Http.DefaultRequestHeaders.Authorization = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadVariationName(string variationId)
+    {
+        try
+        {
+            var token = await LocalStorage.GetItemAsync<string>("token");
+            if (string.IsNullOrEmpty(token))
+            {
+                return;
+            }
+
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await Http.GetAsync($"api/Variation/{variationId}");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<VariationDetailResponse>();
+                if (result != null)
+                {
+                    variationName = result.Name;
+                }
+            }
+        }
+        catch (Exception)
+        {
+            variationName = "Unknown";
+        }
+        finally
+        {
+            Http.DefaultRequestHeaders.Authorization = null;
+        }
+    }
+
+    private void NavigateToUpdate()
+    {
+        NavigationManager.NavigateTo($"/variation-options/update/{Id}");
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/variation-options");
+    }
+} 

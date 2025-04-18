@@ -1,0 +1,239 @@
+@page "/variations"
+@using Admin.Models
+@using Admin.Models.Variation
+@using Admin.Services
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Variations</h1>
+        <a href="/variations/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create New
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search variations..."
+                        @bind="searchTerm" @bind:event="oninput"
+                        @onkeyup="HandleSearchKeyUp" />
+                        <button class="btn btn-primary" type="button" @onclick="HandleSearch">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    @if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        <small class="text-muted mt-1">
+                            Press Enter to search or click the search button
+                        </small>
+                    }
+                </div>
+            </div>
+
+            @if (isLoading)
+            {
+                <div class="text-center p-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            }
+            else if (variations?.Items == null || !variations.Items.Any())
+            {
+                <div class="alert alert-info">
+                    @if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        <span>No variations found matching "<strong>@searchTerm</strong>"</span>
+                    }
+                    else
+                    {
+                        <span>No variations found.</span>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th @onclick="@(() => SortBy("Name"))" style="cursor: pointer">
+                                    Name
+                                    @if (sortColumn == "Name")
+                                    {
+                                        <i class="fas fa-sort-@(isDescending ? "down" : "up")"></i>
+                                    }
+                                </th>
+                                <th @onclick="@(() => SortBy("CreatedBy"))" style="cursor: pointer">
+                                    Created By
+                                    @if (sortColumn == "CreatedBy")
+                                    {
+                                        <i class="fas fa-sort-@(isDescending ? "down" : "up")"></i>
+                                    }
+                                </th>
+                                <th @onclick="@(() => SortBy("CreatedDate"))" style="cursor: pointer">
+                                    Created Date
+                                    @if (sortColumn == "CreatedDate")
+                                    {
+                                        <i class="fas fa-sort-@(isDescending ? "down" : "up")"></i>
+                                    }
+                                </th>
+                                <th style="width: 100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var variation in variations.Items)
+                            {
+                                <tr>
+                                    <td>@variation.Name</td>
+                                    <td>@variation.CreatedBy</td>
+                                    <td>@variation.CreatedDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="/variations/detail/@variation.Id" class="btn btn-sm btn-info" title="View Details">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                            <a href="/variations/update/@variation.Id" class="btn btn-sm btn-warning" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-danger" @onclick="() => DeleteVariation(variation.Id)" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div>
+                        Showing @((variations.PageIndex - 1) * variations.PageSize + 1) to
+                        @(Math.Min(variations.PageIndex * variations.PageSize, variations.TotalCount))
+                        of @variations.TotalCount entries
+                    </div>
+                    <nav>
+                        <ul class="pagination mb-0">
+                            <li class="page-item @(variations.HasPreviousPage ? "" : "disabled")">
+                                <button class="page-link" @onclick="@(() => LoadData(variations.PageIndex - 1))">
+                                    Previous
+                                </button>
+                            </li>
+                            @for (int i = 1; i <= variations.TotalPages; i++)
+                            {
+                                var pageNumber = i;
+                                <li class="page-item @(pageNumber == variations.PageIndex ? "active" : "")">
+                                    <button class="page-link" @onclick="@(() => LoadData(pageNumber))">
+                                        @i
+                                    </button>
+                                </li>
+                            }
+                            <li class="page-item @(variations.HasNextPage ? "" : "disabled")">
+                                <button class="page-link" @onclick="@(() => LoadData(variations.PageIndex + 1))">
+                                    Next
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private PaginatedList<Variation> variations;
+    private bool isLoading = true;
+    private string searchTerm = "";
+    private string sortColumn = "Name";
+    private bool isDescending = false;
+    private int pageSize = 3;
+    private Timer searchTimer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData(1);
+    }
+
+    private async Task LoadData(int pageIndex)
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            var response = await Http.GetFromJsonAsync<ApiResponse<PaginatedList<Variation>>>(
+                $"api/Variation?PageIndex={pageIndex}&PageSize={pageSize}&SearchTerm={Uri.EscapeDataString(searchTerm)}&SortColumn={sortColumn}&IsDescending={isDescending}");
+
+            if (response != null && response.IsSuccess)
+            {
+                variations = response.Data;
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Error loading variations");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Error loading variations");
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleSearchKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await HandleSearch();
+        }
+    }
+
+    private async Task HandleSearch()
+    {
+        await LoadData(1);
+    }
+
+    private async Task SortBy(string column)
+    {
+        if (sortColumn == column)
+        {
+            isDescending = !isDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            isDescending = false;
+        }
+        await LoadData(1);
+    }
+
+    private async Task DeleteVariation(string id)
+    {
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", new[]
+        { "Are you sure you want to delete this variation?" }))
+            return;
+        try
+        {
+            var response = await Http.DeleteAsync($"api/Variation/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadData(variations.PageIndex);
+            }
+        }
+        catch (Exception)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Error deleting variation");
+        }
+    }
+} 

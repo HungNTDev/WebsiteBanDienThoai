@@ -1,4 +1,4 @@
-﻿using Application.Abstract;
+﻿using Application.Abstract.BaseClass;
 using Application.Abstract.Repository.Base;
 using Application.CategoryManagement.Commands.Create;
 using Application.CategoryManagement.Commands.Update;
@@ -63,10 +63,6 @@ namespace NET1061_Server.Controllers
             {
                 return Unauthorized("User is not authenticated.");
             }
-
-            // Gán email của người tạo
-
-
             string contentRootPath = _webHostEnvironment.ContentRootPath;
 
             if (string.IsNullOrEmpty(contentRootPath))

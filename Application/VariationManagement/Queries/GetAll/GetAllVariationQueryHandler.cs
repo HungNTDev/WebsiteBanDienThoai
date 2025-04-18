@@ -1,9 +1,8 @@
-﻿using Application.Abstract;
+﻿using Application.Abstract.BaseClass;
 using Application.Abstract.CQRS;
 using Application.Abstract.Repository;
 using AutoMapper;
 using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Application.VariationManagement.Queries.GetAll
@@ -36,8 +35,11 @@ namespace Application.VariationManagement.Queries.GetAll
                 if (!string.IsNullOrEmpty(searchingVariations))
                 {
                     _logger.LogInformation(searchingVariations);
-                    variations = variations.Where(x => EF.Functions.Unaccent(x.Name.ToLower())
-                        .Contains(EF.Functions.Unaccent(searchingVariations)));
+                    var normalizedSearch = searchingVariations.Trim().ToLower();
+
+                    variations = variations.Where(x =>
+                        x.Name.ToLower().Contains(normalizedSearch)
+                    );
                 }
 
                 if (!variations.Any())
@@ -62,7 +64,6 @@ namespace Application.VariationManagement.Queries.GetAll
 
                 return ApiResponseBuilder.Success(paginatedVariationsForView, "");
             }
-
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "Lỗi");

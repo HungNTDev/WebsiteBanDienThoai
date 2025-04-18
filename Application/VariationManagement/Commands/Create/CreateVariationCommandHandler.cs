@@ -1,4 +1,4 @@
-﻿using Application.Abstract;
+﻿using Application.Abstract.BaseClass;
 using Application.Abstract.CQRS;
 using Application.Abstract.Repository;
 using Application.Abstract.Repository.Base;
@@ -49,9 +49,10 @@ namespace Application.VariationManagement.Commands.Create
                 var variation = new Variation
                 {
                     Name = model.Name,
+                    CreatedDate = model.CreatedDate,
+                    CreatedBy = request.userName,
                     CategoryId = model.CategoryId,
                 };
-
                 await _unitOfWork.Variation.CreateAsync(variation);
                 await _unitOfWork.SaveChangesAsync();
                 return ApiResponseBuilder.Success<object>("",

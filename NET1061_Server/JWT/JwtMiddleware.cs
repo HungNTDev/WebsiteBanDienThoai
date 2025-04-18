@@ -53,7 +53,7 @@ namespace NET1061_Server.JWT
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex);
             }
         }
     }

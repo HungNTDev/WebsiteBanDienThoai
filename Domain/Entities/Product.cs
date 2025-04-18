@@ -17,9 +17,9 @@ namespace Domain.Entities
         public Guid CategoryId { get; set; }
         public Category? Category { get; set; }
 
-        [ForeignKey("Brand")]
-        public Guid BrandId { get; set; }
-        public Brand? Brand { get; set; }
+        [ForeignKey("Series")]
+        public Guid SeriesId { get; set; }
+        public Series? SeriesName { get; set; }
 
         public ICollection<ProductItem>? ProductItems { get; set; }
     }

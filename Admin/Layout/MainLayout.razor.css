@@ -1,77 +1,170 @@
-.page {
+.page-wrapper {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    height: 100%;
+    background-image: linear-gradient(180deg, #dc3545 0%, #9a1c28 70%);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.header-left {
+    flex: 1;
+}
+
+.search-container {
     position: relative;
+    max-width: 600px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    background-color: #f8f9fa;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.action-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: #fff5f5;
+    color: #dc3545;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.action-button:hover {
+    background-color: #dc3545;
+    color: #ffffff;
+}
+
+.user-profile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.user-profile:hover {
+    background-color: #f8f9fa;
+}
+
+.profile-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-info {
     display: flex;
     flex-direction: column;
 }
 
-main {
-    flex: 1;
+.profile-name {
+    font-weight: 600;
+    color: #dc3545;
+    font-size: 0.875rem;
 }
 
-.sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+.profile-role {
+    color: #6c757d;
+    font-size: 0.75rem;
 }
 
-.top-row {
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #d6d5d5;
-    justify-content: flex-end;
-    height: 3.5rem;
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: 220px;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.dropdown-item {
     display: flex;
     align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #495057;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
 }
 
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-        text-decoration: none;
-    }
-
-    .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-        text-decoration: underline;
-    }
-
-    .top-row ::deep a:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-@media (max-width: 640.98px) {
-    .top-row {
-        justify-content: space-between;
-    }
-
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        margin-left: 0;
-    }
+.dropdown-item:hover {
+    background-color: #fff5f5;
+    color: #dc3545;
 }
 
-@media (min-width: 641px) {
-    .page {
-        flex-direction: row;
-    }
+.dropdown-item i {
+    width: 16px;
+    color: #dc3545;
+}
 
-    .sidebar {
-        width: 250px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
-    }
+.dropdown-divider {
+    height: 1px;
+    background-color: #e9ecef;
+    margin: 0.5rem 0;
+}
 
-    .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
+.content-wrapper {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+}
 
-    .top-row.auth ::deep a:first-child {
-        flex: 1;
-        text-align: right;
-        width: 0;
-    }
-
-    .top-row, article {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
+.content {
+    max-width: 1200px;
+    margin: 0 auto;
 }

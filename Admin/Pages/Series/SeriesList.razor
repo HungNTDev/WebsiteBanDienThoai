@@ -1,0 +1,243 @@
+@page "/series"
+@using Admin.Models
+@using Admin.Models.Category
+@using Admin.Models.Series
+@using Admin.Services
+@inject IImageService imageService
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Series</h1>
+        <a href="/series/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create New
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search series..."
+                        @bind="searchTerm" @bind:event="oninput"
+                               @onkeyup="HandleSearchKeyUp" />
+                        <button class="btn btn-primary" type="button" @onclick="HandleSearch">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    @if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        <small class="text-muted mt-1">
+                            Press Enter to search or click the search button
+                        </small>
+                    }
+                </div>
+            </div>
+
+            @if (isLoading)
+            {
+                <div class="text-center p-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            }
+            else if (series?.Items == null || !series.Items.Any())
+            {
+                <div class="alert alert-info">
+                    @if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        <span>No series found matching "<strong>@searchTerm</strong>"</span>
+                    }
+                    else
+                    {
+                        <span>No series found.</span>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th @onclick="@(() => SortBy("Name"))" style="cursor: pointer">
+                                    Name
+                                    @if (sortColumn == "Name")
+                                    {
+                                        <i class="fas fa-sort-@(isDescending ? "down" : "up")"></i>
+                                    }
+                                </th>
+                                <th @onclick="@(() => SortBy("CreatedBy"))" style="cursor: pointer">
+                                    Created By
+                                    @if (sortColumn == "CreatedBy")
+                                    {
+                                        <i class="fas fa-sort-@(isDescending ? "down" : "up")"></i>
+                                    }
+                                </th>
+                                <th @onclick="@(() => SortBy("CreatedDate"))" style="cursor: pointer">
+                                    Created Date
+                                    @if (sortColumn == "CreatedDate")
+                                    {
+                                        <i class="fas fa-sort-@(isDescending ? "down" : "up")"></i>
+                                    }
+                                </th>
+                                <th style="width: 100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in series.Items)
+                            {
+                            <tr>
+                                <td>@item.Name</td>
+                                <td>@item.CreatedBy</td>
+                                <td>@item.CreatedDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="/series/detail/@item.Id" class="btn btn-sm btn-info" title="View Details">
+                                            <i class="fas fa-info-circle"></i>
+                                        </a>
+                                        <a href="/series/update/@item.Id" class="btn btn-sm btn-warning" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-danger" @onclick="() => DeleteSeries(item.Id)" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div>
+                        Showing @((series.PageIndex - 1) * series.PageSize + 1) to
+                        @(Math.Min(series.PageIndex * series.PageSize, series.TotalCount))
+                        of @series.TotalCount entries
+                    </div>
+                    <nav>
+                        <ul class="pagination mb-0">
+                            <li class="page-item @(series.HasPreviousPage ? "" : "disabled")">
+                                <button class="page-link" @onclick="@(() => LoadData(series.PageIndex - 1))">
+                                    Previous
+                                </button>
+                            </li>
+                            @for (int i = 1; i <= series.TotalPages; i++)
+                            {
+                                var pageNumber = i;
+                                <li class="page-item @(pageNumber == series.PageIndex ? "active" : "")">
+                                    <button class="page-link" @onclick="@(() => LoadData(pageNumber))">
+                                        @i
+                                    </button>
+                                </li>
+                            }
+                            <li class="page-item @(series.HasNextPage ? "" : "disabled")">
+                                <button class="page-link" @onclick="@(() => LoadData(series.PageIndex + 1))">
+                                    Next
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private PaginatedList<Series> series;
+    private bool isLoading = true;
+    private string searchTerm = "";
+    private string sortColumn = "Name";
+    private bool isDescending = false;
+    private int pageSize = 3;
+    private Timer searchTimer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData(1);
+    }
+
+    private async Task LoadData(int pageIndex)
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            var response = await Http.GetFromJsonAsync<ApiResponse<PaginatedList<Series>>>(
+                $"api/Series/getAll?PageIndex={pageIndex}&PageSize={pageSize}&SearchTerm={Uri.EscapeDataString(searchTerm)}&SortColumn={sortColumn}&IsDescending={isDescending}");
+
+            if (response != null && response.IsSuccess)
+            {
+                series = response.Data;
+            }
+            else
+            {
+                // Handle API error response
+                await JSRuntime.InvokeVoidAsync("alert", "Error loading series");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log error and show user-friendly message
+            await JSRuntime.InvokeVoidAsync("alert", "Error loading series");
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleSearchKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await HandleSearch();
+        }
+    }
+
+    private async Task HandleSearch()
+    {
+        await LoadData(1); // Reset to first page when searching
+    }
+
+    private async Task SortBy(string column)
+    {
+        if (sortColumn == column)
+        {
+            isDescending = !isDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            isDescending = false;
+        }
+        await LoadData(1);
+    }
+
+    private async Task DeleteSeries(string id)
+    {
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", new[]
+        { "Are you sure you want to delete this series?" }))
+            return;
+        try
+        {
+            var response = await Http.DeleteAsync($"api/Series/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadData(series.PageIndex);
+            }
+        }
+        catch (Exception)
+        {
+           
+        }
+    }
+} 

@@ -1,0 +1,19 @@
+@page "/"
+@using Admin.Services
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var isAuthenticated = await AuthService.IsAuthenticated();
+        if (!isAuthenticated)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/dashboard");
+        }
+    }
+} 

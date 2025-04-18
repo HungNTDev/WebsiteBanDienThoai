@@ -1,4 +1,4 @@
-﻿using Application.Abstract;
+﻿using Application.Abstract.BaseClass;
 using Application.Abstract.CQRS;
 using AutoMapper;
 using Domain.Entities;
@@ -55,7 +55,6 @@ namespace Application.AuthenticationManagement.Commands.Register
                 var user = _mapper.Map<ApplicationUser>(model);
                 user.UserName = model.Email;
                 var result = await _userManager.CreateAsync(user, model.Password);
-                Console.WriteLine(result);
                 if (result.Succeeded)
                 {
                     var roles = await _signInManager.UserManager.GetRolesAsync(user);

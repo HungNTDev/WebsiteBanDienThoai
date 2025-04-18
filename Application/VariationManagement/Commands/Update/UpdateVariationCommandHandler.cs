@@ -1,4 +1,4 @@
-﻿using Application.Abstract;
+﻿using Application.Abstract.BaseClass;
 using Application.Abstract.CQRS;
 using Application.Abstract.Repository;
 using Application.Abstract.Repository.Base;
@@ -29,7 +29,8 @@ namespace Application.VariationManagement.Commands.Update
             _variationRepository = variationRepository;
         }
 
-        public async Task<ApiResponse<object>> Handle(UpdateVariationCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponse<object>> Handle(UpdateVariationCommand request,
+            CancellationToken cancellationToken)
         {
             var model = request.model;
             try
@@ -46,7 +47,8 @@ namespace Application.VariationManagement.Commands.Update
                     return ApiResponseBuilder.Error<object>("Không tìm thấy biến thể", statusCode: 404);
                 }
 
-                _mapper.Map(model, variation);
+                var updateVariation = _mapper.Map(model, variation);
+                updateVariation.UpdatedBy = request.userName;
                 _variationRepository.Update(variation);
                 await _unitOfWork.SaveChangesAsync();
                 return ApiResponseBuilder.Success<object>("", $"Cập nhật biến thể sản phẩm  thành công");
