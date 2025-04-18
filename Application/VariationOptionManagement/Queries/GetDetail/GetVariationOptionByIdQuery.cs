@@ -1,10 +1,10 @@
 ﻿using Application.Abstract.BaseClass;
 using Application.Abstract.CQRS;
-using Application.VariationManagement.Queries.GetById;
+using Application.VariationOptionManagement.Queries.GetById;
 using OneOf;
 
 namespace Application.VariationOptionManagement.Queries.GetById
 {
     public record GetVariationOptionByIdQuery(Guid Id)
-        : IQuery<OneOf<ApiResponse<GetVariationOptionDto>, GetVariationOptionDto>>;
+        : IQuery<OneOf<ApiResponse<GetVariationOptionByIdDto>, GetVariationOptionByIdDto>>;
 }

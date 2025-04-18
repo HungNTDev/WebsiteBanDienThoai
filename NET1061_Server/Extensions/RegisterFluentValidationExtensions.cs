@@ -6,9 +6,8 @@ using Application.BrandManagement.Commands.Create;
 using Application.BrandManagement.Commands.Update;
 using Application.CategoryManagement.Commands.Create;
 using Application.CategoryManagement.Commands.Update;
-using Application.InventoryManagement.Commands.Create;
-using Application.InventoryManagement.Commands.Update;
 using Application.ProductItemManagement.Commands.Create;
+using Application.ProductItemManagement.Commands.Update;
 using Application.ProductManagement.Commands.Create;
 using Application.ProductManagement.Commands.Update;
 using Application.SeriesManagement.Commands.Create;
@@ -57,11 +56,12 @@ namespace NET1061_Server.Extensions
             services.AddScoped<IValidator<UpdateSeriesDto>, UpdateSeriesValidation>();
 
             //Inventory
-            services.AddScoped<IValidator<CreateInventoryDto>, CreateInventoryValidation>();
-            services.AddScoped<IValidator<UpdateInventoryDto>, UpdateInventoryValidation>();
+            //services.AddScoped<IValidator<CreateInventoryDto>, CreateInventoryValidation>();
+            //services.AddScoped<IValidator<UpdateInventoryDto>, UpdateInventoryValidation>();
 
             //Product Item
             services.AddScoped<IValidator<CreateProductItemDto>, CreateProductItemValidation>();
+            services.AddScoped<IValidator<UpdateProductItemDto>, UpdateProductItemValidation>();
 
             return services;
         }

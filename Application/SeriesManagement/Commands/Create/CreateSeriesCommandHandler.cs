@@ -39,6 +39,7 @@ namespace Application.SeriesManagement.Commands.Create
                 var series = new Domain.Entities.Series
                 {
                     Name = model.Name,
+                    BrandId = model.BrandId,
                     CreatedDate = model.CreatedDate,
                     CreatedBy = request.userName
                 };

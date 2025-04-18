@@ -7,5 +7,6 @@ namespace Application.Abstract.Repository
     {
         Task<Brand> GetByIdAsync(Guid id);
         Task<bool> IsBrandExistsAsync(string name);
+        Task<List<Product>> GetProductsByBrandIdAsync(Guid brandId);
     }
 }

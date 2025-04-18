@@ -17,12 +17,6 @@ namespace Domain.Entities
         [ForeignKey("Product")]
         public Guid ProductId { get; set; }
         public Product? Product { get; set; }
-
-
-        public Guid InventoryId { get; set; }
-        public Inventory? Inventory { get; set; }
-
         public ICollection<ProductConfig>? ProductConfigs { get; set; }
-        public ICollection<ComboProduct>? ComboProducts { get; set; }
     }
 }

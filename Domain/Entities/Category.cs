@@ -11,7 +11,6 @@ namespace Domain.Entities
         public IFormFile? FromFileImages { get; set; }
         public ICollection<Product>? Products { get; set; }
         public ICollection<Variation>? Variations { get; set; }
-        public ICollection<PromotionCategory>? PromotionCategories { get; set; }
         public ICollection<CategoryBrand> categoryBrands { get; set; }
     }
 }

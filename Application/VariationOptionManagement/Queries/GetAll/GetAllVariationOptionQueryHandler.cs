@@ -54,9 +54,10 @@ namespace Application.VariationOptionManagement.Queries.GetAll
 
                 var paginatedVariationOptionsForView = new PaginatedResult<GetAllVariationOptionDto>(
                     variationOptionsForView,
-                    variationOptionPaginated.TotalCount,
                     variationOptionPaginated.PageIndex,
-                    variationOptionPaginated.PageSize);
+                    variationOptionPaginated.PageSize,
+                    variationOptionPaginated.TotalCount);
+
                 return ApiResponseBuilder.Success(paginatedVariationOptionsForView, "");
             }
             catch (Exception ex)

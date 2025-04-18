@@ -6,10 +6,11 @@ using AutoMapper;
 using Domain.Entities;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Application.ProductItemManagement.Commands.Create
 {
-    class CreateProductItemCommandHandler : ICommandHandler<CreateProductItemCommand, ApiResponse<object>>
+    public class CreateProductItemCommandHandler : ICommandHandler<CreateProductItemCommand, ApiResponse<object>>
     {
         private readonly ILogger<CreateProductItemCommandHandler> _logger;
         private readonly IProductItemRepository _productItemRepository;
@@ -56,9 +57,18 @@ namespace Application.ProductItemManagement.Commands.Create
                 {
                     return ApiResponseBuilder.Error<object>("Sản phẩm này không tồn tại!");
                 }
-
-                var productItem = _mapper.Map<ProductItem>(model);
-                await _productItemRepository.CreateAsync(productItem);
+                var productItem = new ProductItem
+                {
+                    SKU = model.SKU,
+                    Name = model.Name,
+                    Price = model.Price,
+                    ProductId = model.ProductId,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = request.userName,
+                    Image = model.Image,
+                };
+                var optionIds = model.Options.Select(o => o.OptionId ?? Guid.Empty).ToList();
+                await _productItemRepository.CreateAsync(productItem, optionIds);
                 await _unitOfWork.SaveChangesAsync();
 
                 return ApiResponseBuilder.Success<object>("", $"Thêm sản phẩm {model.SKU} thành công",

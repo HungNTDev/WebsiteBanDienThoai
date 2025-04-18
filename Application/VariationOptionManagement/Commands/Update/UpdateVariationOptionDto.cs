@@ -15,6 +15,5 @@ namespace Application.VariationOptionManagement.Commands.Update
         [JsonIgnore]
         public DateTime UpdatedDate { get; set; } = DateTime.Now;
         public Guid VariationId { get; set; }
-        public string? VariationName { get; set; }
     }
 }

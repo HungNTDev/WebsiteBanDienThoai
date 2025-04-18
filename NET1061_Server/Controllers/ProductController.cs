@@ -33,7 +33,7 @@ namespace NET1061_Server.Controllers
         {
             var request = new GetAllProductQuery(query);
             var result = await _mediator.Send(request);
-            if (result == null)
+            if (!result.IsSuccess)
             {
                 return NotFound("No products found.");
             }
@@ -45,7 +45,7 @@ namespace NET1061_Server.Controllers
         {
             var request = new GetDetailProductQuery(id);
             var result = await _mediator.Send(request);
-            if (result == null)
+            if (!result.IsSuccess)
             {
                 return NotFound($"Product with ID {id} not found.");
             }
@@ -84,7 +84,7 @@ namespace NET1061_Server.Controllers
 
             var request = new CreateProductCommand(model, userName);
             var result = await _mediator.Send(request);
-            if (result != null)
+            if (result.IsSuccess)
             {
                 return Ok(result);
             }
@@ -123,7 +123,7 @@ namespace NET1061_Server.Controllers
             model.Id = id;
             var request = new UpdateProductCommand(model, userName);
             var result = await _mediator.Send(request);
-            if (result != null)
+            if (result.IsSuccess)
             {
                 return Ok(result);
             }

@@ -6,7 +6,7 @@ namespace Application.VariationOptionManagement.Commands.Create
     {
         public CreateVariationOptionValidation()
         {
-            RuleFor(x => x.Name)
+            RuleFor(x => x.Value)
                 .NotEmpty()
                 .WithMessage("Name is required.")
                 .MaximumLength(100)

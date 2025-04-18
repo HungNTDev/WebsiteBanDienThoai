@@ -10,6 +10,5 @@ namespace Application.VariationManagement.Commands.Update
         [JsonIgnore]
         public DateTime UpdatedDate { get; set; } = DateTime.Now;
         public Guid CategoryId { get; set; }
-        public string? CategoryName { get; set; }
     }
 }

@@ -76,7 +76,7 @@ namespace NET1061_Server.Controllers
                 return Unauthorized(new { Message = "User ID not found in token" });
             }
 
-            // Chuyển đổi User ID sang GUID
+
             if (!Guid.TryParse(userId, out Guid userGuid))
             {
                 return BadRequest(new { Message = "Invalid User ID format" });

@@ -15,7 +15,9 @@ namespace Application.Abstract.MapperProfile
         private void Init()
         {
             CreateMap<Series, GetAllSeriesDto>();
-            CreateMap<Series, GetDetailSeriesDto>();
+            CreateMap<Series, GetDetailSeriesDto>()
+            .ForMember(dest => dest.BrandName,
+                opt => opt.MapFrom(src => src.Brand != null ? src.Brand.Name : null));
             CreateMap<UpdateSeriesDto, Series>();
         }
     }

@@ -13,6 +13,7 @@ namespace Application.ProductManagement.Commands.Create
         public decimal? Price { get; set; }
         public Guid CategoryId { get; set; }
         public Guid SeriesId { get; set; }
+        [JsonIgnore]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
     }
 }

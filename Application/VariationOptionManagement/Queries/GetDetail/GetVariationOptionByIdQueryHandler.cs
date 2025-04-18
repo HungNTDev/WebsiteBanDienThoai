@@ -1,7 +1,6 @@
 ﻿using Application.Abstract.BaseClass;
 using Application.Abstract.CQRS;
 using Application.Abstract.Repository;
-using Application.VariationManagement.Queries.GetById;
 using AutoMapper;
 using Domain.Entities;
 using Microsoft.Extensions.Logging;
@@ -10,7 +9,7 @@ using OneOf;
 namespace Application.VariationOptionManagement.Queries.GetById
 {
     public record GetVariationOptionByIdQueryHandler : IQueryHandler<GetVariationOptionByIdQuery,
-        OneOf<ApiResponse<GetVariationOptionDto>, GetVariationOptionDto>>
+        OneOf<ApiResponse<GetVariationOptionByIdDto>, GetVariationOptionByIdDto>>
     {
         private readonly IVariationOptionRepository _variationOptionRepository;
         private readonly IMapper _mapper;
@@ -23,16 +22,16 @@ namespace Application.VariationOptionManagement.Queries.GetById
             _variationOptionRepository = variationOptionRepository;
             _mapper = mapper;
         }
-        public async Task<OneOf<ApiResponse<GetVariationOptionDto>, GetVariationOptionDto>> Handle(GetVariationOptionByIdQuery request, CancellationToken cancellationToken)
+        public async Task<OneOf<ApiResponse<GetVariationOptionByIdDto>, GetVariationOptionByIdDto>> Handle(GetVariationOptionByIdQuery request, CancellationToken cancellationToken)
         {
             try
             {
                 VariationOption variationOption = await _variationOptionRepository.GetByIdAsync(request.Id);
                 if (variationOption == null)
                 {
-                    return ApiResponseBuilder.Error<GetVariationOptionDto>("Không tìm thấy biến thể", statusCode: 404);
+                    return ApiResponseBuilder.Error<GetVariationOptionByIdDto>("Không tìm thấy biến thể", statusCode: 404);
                 }
-                GetVariationOptionDto variationOptionForView = _mapper.Map<GetVariationOptionDto>(variationOption);
+                GetVariationOptionByIdDto variationOptionForView = _mapper.Map<GetVariationOptionByIdDto>(variationOption);
                 return variationOptionForView;
             }
             catch (Exception ex)

@@ -19,5 +19,12 @@ namespace Repositories.Repository
             return await _context.Brands.AsNoTracking().Include(c => c.Series)
                 .SingleOrDefaultAsync(x => x.Id == id);
         }
+        public async Task<List<Product>> GetProductsByBrandIdAsync(Guid brandId)
+        {
+            return await _context.Products
+                .Include(p => p.SeriesName)
+                .Where(p => p.SeriesName.BrandId == brandId)
+                .ToListAsync();
+        }
     }
 }

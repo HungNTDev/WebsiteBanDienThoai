@@ -217,9 +217,6 @@ namespace Persistence.Data.Migrations
                     b.Property<Guid>("CartId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ComboId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -247,8 +244,6 @@ namespace Persistence.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CartId");
-
-                    b.HasIndex("ComboId");
 
                     b.HasIndex("ProductItemId");
 
@@ -300,118 +295,6 @@ namespace Persistence.Data.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("CategoryBrand");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Combo", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Comboes");
-                });
-
-            modelBuilder.Entity("Domain.Entities.ComboProduct", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ComboId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("ProductItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ComboId");
-
-                    b.HasIndex("ProductItemId");
-
-                    b.ToTable("ComboProducts");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Inventory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("ProductItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("ReservedQuantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StockQuantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Inventories");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
@@ -470,9 +353,6 @@ namespace Persistence.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ComboId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -501,8 +381,6 @@ namespace Persistence.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ComboId");
 
                     b.HasIndex("OrderId");
 
@@ -684,9 +562,6 @@ namespace Persistence.Data.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("InventoryId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -716,68 +591,9 @@ namespace Persistence.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InventoryId")
-                        .IsUnique();
-
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductItems");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Promotion", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DiscountRate")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Promotions");
-                });
-
-            modelBuilder.Entity("Domain.Entities.PromotionCategory", b =>
-                {
-                    b.Property<Guid>("PromotionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("PromotionId", "CategoryId");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("PromotionCategories");
                 });
 
             modelBuilder.Entity("Domain.Entities.Review", b =>
@@ -1138,12 +954,6 @@ namespace Persistence.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Combo", "Combo")
-                        .WithMany("CartItems")
-                        .HasForeignKey("ComboId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.ProductItem", "ProductItem")
                         .WithMany()
                         .HasForeignKey("ProductItemId")
@@ -1151,8 +961,6 @@ namespace Persistence.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Cart");
-
-                    b.Navigation("Combo");
 
                     b.Navigation("ProductItem");
                 });
@@ -1174,25 +982,6 @@ namespace Persistence.Data.Migrations
                     b.Navigation("Brand");
 
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("Domain.Entities.ComboProduct", b =>
-                {
-                    b.HasOne("Domain.Entities.Combo", "Combo")
-                        .WithMany("ComboProducts")
-                        .HasForeignKey("ComboId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.ProductItem", "ProductItem")
-                        .WithMany("ComboProducts")
-                        .HasForeignKey("ProductItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Combo");
-
-                    b.Navigation("ProductItem");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
@@ -1222,12 +1011,6 @@ namespace Persistence.Data.Migrations
 
             modelBuilder.Entity("Domain.Entities.OrderItem", b =>
                 {
-                    b.HasOne("Domain.Entities.Combo", "Combo")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("ComboId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
@@ -1239,8 +1022,6 @@ namespace Persistence.Data.Migrations
                         .HasForeignKey("ProductItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Combo");
 
                     b.Navigation("Order");
 
@@ -1306,40 +1087,13 @@ namespace Persistence.Data.Migrations
 
             modelBuilder.Entity("Domain.Entities.ProductItem", b =>
                 {
-                    b.HasOne("Domain.Entities.Inventory", "Inventory")
-                        .WithOne("ProductItem")
-                        .HasForeignKey("Domain.Entities.ProductItem", "InventoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.Product", "Product")
                         .WithMany("ProductItems")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Inventory");
-
                     b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Domain.Entities.PromotionCategory", b =>
-                {
-                    b.HasOne("Domain.Entities.Category", "Category")
-                        .WithMany("PromotionCategories")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Promotion", "Promotion")
-                        .WithMany("PromotionCategories")
-                        .HasForeignKey("PromotionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Promotion");
                 });
 
             modelBuilder.Entity("Domain.Entities.Review", b =>
@@ -1521,25 +1275,9 @@ namespace Persistence.Data.Migrations
                 {
                     b.Navigation("Products");
 
-                    b.Navigation("PromotionCategories");
-
                     b.Navigation("Variations");
 
                     b.Navigation("categoryBrands");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Combo", b =>
-                {
-                    b.Navigation("CartItems");
-
-                    b.Navigation("ComboProducts");
-
-                    b.Navigation("OrderItems");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Inventory", b =>
-                {
-                    b.Navigation("ProductItem");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
@@ -1566,14 +1304,7 @@ namespace Persistence.Data.Migrations
 
             modelBuilder.Entity("Domain.Entities.ProductItem", b =>
                 {
-                    b.Navigation("ComboProducts");
-
                     b.Navigation("ProductConfigs");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Promotion", b =>
-                {
-                    b.Navigation("PromotionCategories");
                 });
 
             modelBuilder.Entity("Domain.Entities.Series", b =>

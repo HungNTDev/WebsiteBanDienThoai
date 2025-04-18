@@ -24,6 +24,12 @@ namespace Repositories.Repository
                 cancellationToken);
         }
 
+        public async Task<List<VariationOption>> GetByVariationIdsAsync(List<Guid> variationIds, CancellationToken cancellationToken)
+        {
+            return await _context.VariationOptions
+                .Where(vo => variationIds.Contains(vo.VariationId))
+                .ToListAsync(cancellationToken);
+        }
 
     }
 }

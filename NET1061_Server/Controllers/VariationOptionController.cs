@@ -5,9 +5,7 @@ using Application.VariationOptionManagement.Queries.GetAll;
 using Application.VariationOptionManagement.Queries.GetById;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Configuration;
 using System.Security.Claims;
 
 namespace NET1061_Server.Controllers
@@ -55,7 +53,7 @@ namespace NET1061_Server.Controllers
             }
             var request = new CreateVariationOptionCommand(command, userName);
             var result = await _mediator.Send(request);
-            if (result != null)
+            if (result.IsSuccess)
             {
                 return Ok(result);
             }
