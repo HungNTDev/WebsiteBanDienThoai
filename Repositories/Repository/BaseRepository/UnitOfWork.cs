@@ -18,6 +18,8 @@ namespace Repositories.Repository.GeneralRepository
         public ISeriesRepository SeriesRepository { get; }
         public IUserRepository UserRepository { get; }
         public ICartRepository CartRepository { get; }
+        public IOrderRepository OrderRepository { get; }
+        public IPaymentRepository PaymentRepository { get; }
         //public IInventoryRepository InventoryRepository { get; }
 
         public UnitOfWork(ApplicationDbContext context,
@@ -29,7 +31,9 @@ namespace Repositories.Repository.GeneralRepository
                           IBrandRepository brandRepository,
                           ISeriesRepository seriesRepository,
                           IUserRepository userRepository,
-                          ICartRepository cartRepository)
+                          ICartRepository cartRepository,
+                          IOrderRepository orderRepository,
+                          IPaymentRepository paymentRepository)
         {
             _context = context;
             Category = category;
@@ -41,6 +45,8 @@ namespace Repositories.Repository.GeneralRepository
             SeriesRepository = seriesRepository;
             UserRepository = userRepository;
             CartRepository = cartRepository;
+            OrderRepository = orderRepository;
+            PaymentRepository = paymentRepository;
         }
         public void Entry<TEntity>(TEntity entity, EntityState state) where TEntity : class
         {

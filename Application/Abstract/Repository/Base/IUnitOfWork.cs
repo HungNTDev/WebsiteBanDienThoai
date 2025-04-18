@@ -1,5 +1,4 @@
-﻿using Domain.Abstract;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Application.Abstract.Repository.Base
@@ -15,6 +14,7 @@ namespace Application.Abstract.Repository.Base
         IBrandRepository BrandRepository { get; }
         ISeriesRepository SeriesRepository { get; }
         ICartRepository CartRepository { get; }
+        IPaymentRepository PaymentRepository { get; }
         //IInventoryRepository InventoryRepository { get; }
         void Update<T>(T entity) where T : class;
         int SaveChanges();

@@ -11,6 +11,7 @@ using Application.CartManagement.Commands.DeleteCartItem;
 using Application.CartManagement.Commands.UpdateCart;
 using Application.CategoryManagement.Commands.Create;
 using Application.CategoryManagement.Commands.Update;
+using Application.OrderManagement.Commands.Create;
 using Application.ProductItemManagement.Commands.Create;
 using Application.ProductItemManagement.Commands.Update;
 using Application.ProductManagement.Commands.Create;
@@ -75,6 +76,8 @@ namespace NET1061_Server.Extensions
             services.AddScoped<IValidator<DeleteCartDto>, DeleteCartValidation>();
             services.AddScoped<IValidator<DeleteCartItemDto>, DeleteCartItemValidator>();
 
+            //Order
+            services.AddScoped<IValidator<CreateOrderDto>, CreateOrderValidator>();
             return services;
         }
     }

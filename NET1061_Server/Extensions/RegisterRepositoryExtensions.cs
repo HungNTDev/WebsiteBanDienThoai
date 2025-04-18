@@ -21,6 +21,7 @@ namespace NET1061_Server.Extensions
             services.AddScoped<IBrandRepository, BrandRepository>();
             services.AddScoped<ISeriesRepository, SeriesRepository>();
             services.AddScoped<ICartRepository, CartRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
             //services.AddScoped<IInventoryRepository, InventoryRepostiory>();
             return services;
         }
