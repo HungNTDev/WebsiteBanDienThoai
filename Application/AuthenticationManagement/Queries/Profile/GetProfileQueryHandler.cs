@@ -48,7 +48,7 @@ namespace Application.AuthenticationManagement.Queries.Profile
 
                 var dto = new GetProfileDto
                 {
-                    Name = user.UserName,
+                    Name = user.FullName,
                     Email = user.Email,
                     Phone = user.PhoneNumber,
                     Image = user.Image

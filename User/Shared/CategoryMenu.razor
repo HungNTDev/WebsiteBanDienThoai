@@ -1,67 +1,22 @@
+@inject HttpClient Http
 @inject NavigationManager NavigationManager
 
 <div class="category-dropdown @(IsOpen ? "show" : "")">
     <div class="menu-items">
-        <a href="/dien-thoai" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/dien-thoai"))" @onclick:preventDefault>
-            <i class="bi bi-phone"></i>
-            <span>Điện thoại, Tablet</span>
-            <i class="bi bi-chevron-right"></i>
-        </a>
-        <a href="/laptop" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/laptop"))" @onclick:preventDefault>
-            <i class="bi bi-laptop"></i>
-            <span>Laptop</span>
-            <i class="bi bi-chevron-right"></i>
-        </a>
-        <a href="/am-thanh" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/am-thanh"))" @onclick:preventDefault>
-            <i class="bi bi-headphones"></i>
-            <span>Âm thanh, Mic thu âm</span>
-            <i class="bi bi-chevron-right"></i>
-        </a>
-        <a href="/dong-ho" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/dong-ho"))" @onclick:preventDefault>
-            <i class="bi bi-smartwatch"></i>
-            <span>Đồng hồ, Camera</span>
-            <i class="bi bi-chevron-right"></i>
-        </a>
-        <a href="/gia-dung" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/gia-dung"))" @onclick:preventDefault>
-            <i class="bi bi-house"></i>
-            <span>Đồ gia dụng</span>
-            <i class="bi bi-chevron-right"></i>
-        </a>
-        <a href="/phu-kien" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/phu-kien"))" @onclick:preventDefault>
-            <i class="bi bi-plug"></i>
-            <span>Phụ kiện</span>
-            <i class="bi bi-chevron-right"></i>
-        </a>
-        <a href="/pc-man-hinh" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/pc-man-hinh"))" @onclick:preventDefault>
-            <i class="bi bi-display"></i>
-            <span>PC, Màn hình, Máy in</span>
-            <i class="bi bi-chevron-right"></i>
-        </a>
-        <a href="/tivi" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/tivi"))" @onclick:preventDefault>
-            <i class="bi bi-tv"></i>
-            <span>Tivi</span>
-            <i class="bi bi-chevron-right"></i>
-        </a>
-        <a href="/thu-cu-doi-moi" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/thu-cu-doi-moi"))" @onclick:preventDefault>
-            <i class="bi bi-arrow-repeat"></i>
-            <span>Thu cũ đổi mới</span>
-            <i class="bi bi-chevron-right"></i>
-        </a>
-        <a href="/hang-cu" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/hang-cu"))" @onclick:preventDefault>
-            <i class="bi bi-phone-flip"></i>
-            <span>Hàng cũ</span>
-            <i class="bi bi-chevron-right"></i>
-        </a>
-        <a href="/khuyen-mai" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/khuyen-mai"))" @onclick:preventDefault>
-            <i class="bi bi-gift"></i>
-            <span>Khuyến mãi</span>
-            <i class="bi bi-chevron-right"></i>
-        </a>
-        <a href="/tin-tuc" class="menu-item" @onclick="@((e) => NavigateToCategory(e, "/tin-tuc"))" @onclick:preventDefault>
-            <i class="bi bi-newspaper"></i>
-            <span>Tin công nghệ</span>
-            <i class="bi bi-chevron-right"></i>
-        </a>
+        @if (Categories != null)
+        {
+            @foreach (var category in Categories)
+            {
+                <a href="@($"/{category.Slug}")"
+                   class="menu-item"
+                   @onclick="@(() => NavigateToCategory(category.Slug))"
+                   @onclick:preventDefault>
+                    <i class="@category.Icon"></i>
+                    <span>@category.Name</span>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            }
+        }
     </div>
 </div>
 
@@ -133,5 +88,36 @@
     {
         await IsOpenChanged.InvokeAsync(false);
         NavigationManager.NavigateTo(url);
+    }
+
+    private List<CategoryDto> Categories = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Đúng route thực tế: GET /api/Category
+            var response = await Http.GetFromJsonAsync<List<CategoryDto>>("api/Category");
+            if (response != null)
+            {
+                Categories = response;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Lỗi lấy danh mục: {ex.Message}");
+        }
+    }
+
+    private void NavigateToCategory(string slug)
+    {
+        NavigationManager.NavigateTo($"/{slug}");
+    }
+
+    public class CategoryDto
+    {
+        public string Name { get; set; }
+        public string Slug { get; set; }
+        public string Icon { get; set; } // optional
     }
 }

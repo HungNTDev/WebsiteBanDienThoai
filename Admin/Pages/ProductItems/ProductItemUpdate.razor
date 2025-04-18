@@ -1,0 +1,467 @@
+@page "/product-items/update/{id}"
+@using Admin.Models
+@using Admin.Models.Product
+@using Admin.Models.ProductItem
+@using Admin.Models.Variation
+@using Microsoft.AspNetCore.Components.Forms
+@using Blazored.LocalStorage
+@using System.Text.Json
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorage
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Update Product Item</h1>
+        <a href="/product-items" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Product Information</h5>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="@model" OnValidSubmit="HandleValidSubmit">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="sku" class="form-label">SKU</label>
+                                    <InputText id="sku" class="form-control" @bind-Value="model.Sku" />
+                                    <ValidationMessage For="@(() => model.Sku)" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productId" class="form-label">Product</label>
+                                    <InputSelect id="productId" class="form-control" @bind-Value="model.ProductId">
+                                        <option value="">Select a product...</option>
+                                        @if (products != null)
+                                        {
+                                            @foreach (var product in products)
+                                            {
+                                                <option value="@product.Id">@product.Name</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => model.ProductId)" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="productName" class="form-label">Product Name</label>
+                            <InputText id="productName" class="form-control" @bind-Value="model.Name" />
+                            <ValidationMessage For="@(() => model.Name)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₫</span>
+                                <InputNumber id="price" class="form-control" @bind-Value="model.Price" />
+                            </div>
+                            <ValidationMessage For="@(() => model.Price)" />
+                        </div>
+                        <div class="card shadow-sm mt-4">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Product Image</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="text-center">
+                                    @if (!string.IsNullOrEmpty(model.Image))
+                                    {
+                                        <div class="mb-3">
+                                            <img src="@model.Image" class="img-thumbnail" style="max-height: 300px; max-width: 100%;" />
+                                        </div>
+                                    }
+                                    <div class="mb-3">
+                                        <InputFile id="image" OnChange="OnFileSelected" class="form-control" accept="image/*" />
+                                        <small class="text-muted d-block mt-1">Maximum file size: 10MB. Supported formats: JPG, PNG, GIF</small>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(imageError))
+                                    {
+                                        <div class="alert alert-danger">@imageError</div>
+                                    }
+                                    @if (isUploading)
+                                    {
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                                                <span class="visually-hidden">Uploading...</span>
+                                            </div>
+                                            <span>Uploading image...</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm mt-4">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Variation Options</h5>
+                            </div>
+                            <div class="card-body">
+                                @if (variationsWithOptions != null && variationsWithOptions.Any())
+                                {
+                                    <div class="row">
+                                        @foreach (var group in variationsWithOptions)
+                                        {
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">@group.Name</label>
+                                                <select class="form-select"
+                                                @onchange="e => OnVariationSelected(group.Id, e.Value?.ToString())">
+                                                    <option value="">-- Select @group.Name --</option>
+                                                    @foreach (var option in group.Options)
+                                                    {
+                                                        <option value="@option.Id"
+                                                        selected="@(
+                                selectedVariationOptions.TryGetValue(group.Id, out var selectedId)
+                                && selectedId == option.Id)">
+                                                            @option.Value
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        No variations available for this product.
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" class="btn btn-primary" disabled="@(isSubmitting || isUploading)">
+                                @if (isSubmitting)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    <span>Updating...</span>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-save me-2"></i>
+                                    <span>Update Product Item</span>
+                                }
+                            </button>
+                            <a href="/product-items" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Cancel
+                            </a>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private ProductItemUpdateRequest model = new();
+    private List<Product> products;
+    private List<VariationWithOptions> variationsWithOptions = new();
+    private Dictionary<string, string> selectedVariationOptions = new();
+    private bool isSubmitting;
+    private bool isUploading;
+    private string imageError;
+    private const int MaxFileSize = 10 * 1024 * 1024; // 10MB
+    private string token;
+
+    protected override async Task OnInitializedAsync()
+    {
+        token = await LocalStorage.GetItemAsync<string>("token");
+        if (string.IsNullOrEmpty(token))
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+        Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        await LoadProducts();
+        await LoadProductItem();
+        await LoadVariationsAndOptions();
+    }
+
+    private async Task LoadProducts()
+    {
+        try
+        {
+            var response = await Http.GetFromJsonAsync<ApiResponse<PaginatedList<Product>>>("api/Product");
+            if (response != null && response.IsSuccess)
+            {
+                products = response.Data.Items;
+            }
+            else
+            {
+                if (response?.StatusCode == 401)
+                {
+                    await LocalStorage.RemoveItemAsync("token");
+                    NavigationManager.NavigateTo("/login");
+                    return;
+                }
+                await JSRuntime.InvokeVoidAsync("alert", "Error loading products");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("401"))
+            {
+                await LocalStorage.RemoveItemAsync("token");
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+            await JSRuntime.InvokeVoidAsync("alert", "Error loading products");
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private async Task LoadProductItem()
+    {
+        try
+        {
+            var response = await Http.GetFromJsonAsync<ApiResponse<ProductItemDetailUpdateResponse>>($"api/ProductItem/{Id}");
+            if (response != null && response.IsSuccess)
+            {
+                var productItem = response.Data;
+                model = new ProductItemUpdateRequest
+                    {
+                        Id = productItem.Id,
+                        Sku = productItem.Sku,
+                        Name = productItem.ProductName,
+                        Price = productItem.Price,
+                        Image = productItem.Image,
+                        ProductId = productItem.ProductId
+                    };
+
+                // Load selected variation options
+                if (productItem.Options != null)
+                {
+                    foreach (var option in productItem.Options)
+                    {
+                        selectedVariationOptions[option.VariationId] = option.Id;
+                    }
+                }
+            }
+            else
+            {
+                if (response?.StatusCode == 401)
+                {
+                    await LocalStorage.RemoveItemAsync("token");
+                    NavigationManager.NavigateTo("/login");
+                    return;
+                }
+                await JSRuntime.InvokeVoidAsync("alert", "Error loading product item");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("401"))
+            {
+                await LocalStorage.RemoveItemAsync("token");
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+            await JSRuntime.InvokeVoidAsync("alert", "Error loading product item");
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private async Task LoadVariationsAndOptions()
+    {
+        var variationRes = await Http.GetFromJsonAsync<ApiResponse<PaginatedList<Variation>>>("api/Variation");
+        var optionRes = await Http.GetFromJsonAsync<ApiResponse<PaginatedList<VariationOption>>>("api/VariationOption");
+
+        if (variationRes == null || !variationRes.IsSuccess ||
+            optionRes == null || !optionRes.IsSuccess)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Error loading variations.");
+            return;
+        }
+
+        var variations = variationRes.Data.Items;
+        var options = optionRes.Data.Items;
+
+        variationsWithOptions.Clear();
+
+        foreach (var variation in variations)
+        {
+            var groupedOptions = options.Where(o => o.VariationId == variation.Id).ToList();
+
+            variationsWithOptions.Add(new VariationWithOptions
+                {
+                    Id = variation.Id,
+                    Name = variation.Name,
+                    Options = groupedOptions
+                });
+        }
+    }
+
+    private void OnVariationSelected(string variationId, string optionId)
+    {
+        if (!string.IsNullOrEmpty(optionId))
+        {
+            selectedVariationOptions[variationId] = optionId;
+        }
+        else
+        {
+            selectedVariationOptions.Remove(variationId);
+        }
+    }
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var file = e.File;
+            if (file == null)
+            {
+                imageError = "Please select a file.";
+                return;
+            }
+
+            if (file.Size > MaxFileSize)
+            {
+                imageError = "File size must be less than 10MB.";
+                return;
+            }
+
+            if (!file.ContentType.StartsWith("image/"))
+            {
+                imageError = "Only image files are allowed.";
+                return;
+            }
+
+            isUploading = true;
+            imageError = null;
+            StateHasChanged();
+
+            var content = new MultipartFormDataContent();
+            var fileContent = new StreamContent(file.OpenReadStream(MaxFileSize));
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+            content.Add(fileContent, "file", file.Name);
+
+            var response = await Http.PostAsync("api/Image/upload-image", content);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ImageUploadResponse>();
+                if (result != null && !string.IsNullOrEmpty(result.ImageUrl))
+                {
+                    model.Image = result.ImageUrl;
+                }
+                else
+                {
+                    imageError = "Failed to get image URL.";
+                }
+            }
+            else
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await LocalStorage.RemoveItemAsync("token");
+                    NavigationManager.NavigateTo("/login");
+                    return;
+                }
+                imageError = "Failed to upload image.";
+            }
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("401"))
+            {
+                await LocalStorage.RemoveItemAsync("token");
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+            imageError = "An error occurred while uploading the image.";
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            isUploading = false;
+            StateHasChanged();
+        }
+    }
+
+    public class ImageUploadResponse
+    {
+        public string ImageUrl { get; set; }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            isSubmitting = true;
+            StateHasChanged();
+
+            model.Options = selectedVariationOptions
+                   .Select(x => new UpdateOptionRequest { OptionId = x.Value })
+                   .ToList();
+
+            var response = await Http.PutAsJsonAsync($"api/ProductItem/update/{model.Id}", model);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<string>>();
+                if (result != null && result.IsSuccess)
+                {
+                    NavigationManager.NavigateTo("/product-items");
+                    return;
+                }
+                else
+                {
+                    if (result?.StatusCode == 401)
+                    {
+                        await LocalStorage.RemoveItemAsync("token");
+                        NavigationManager.NavigateTo("/login");
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await LocalStorage.RemoveItemAsync("token");
+                    NavigationManager.NavigateTo("/login");
+                    return;
+                }
+            }
+
+            await JSRuntime.InvokeVoidAsync("alert", "Failed to update product item");
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("401"))
+            {
+                await LocalStorage.RemoveItemAsync("token");
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+            await JSRuntime.InvokeVoidAsync("alert", "Error updating product item");
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+} 

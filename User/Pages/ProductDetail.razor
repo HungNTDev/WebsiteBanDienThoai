@@ -1,0 +1,183 @@
+﻿@page "/product/{ProductId:guid}"
+@using Admin.Services
+@using User.Services
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject ICartService CartService
+@inject IImageService ImageService
+
+<PageTitle>Chi tiết sản phẩm</PageTitle>
+
+@if (Product == null)
+{
+    <p>Đang tải...</p>
+}
+else
+{
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Hình ảnh -->
+            <div class="col-md-6">
+                <img src="@ImageService.GetImageUrl(Product.ImageUrl)" class="img-fluid rounded border" alt="@Product.Name" />
+            </div>
+
+            <!-- Thông tin sản phẩm -->
+            <div class="col-md-6">
+                <h2 class="fw-bold">@Product.Name</h2>
+
+                <div class="mb-2">
+                    <span class="text-muted">Giá niêm yết:</span>
+                    <span class="text-decoration-line-through ms-2">@Product.OriginalPrice.ToString("N0") đ</span>
+                </div>
+
+                @if (SelectedItem != null)
+                {
+                    <div class="mb-3">
+                        <span class="text-danger fs-4 fw-semibold">@SelectedItem.Price.ToString("N0") đ</span>
+                    </div>
+                }
+
+                <!-- Biến thể -->
+                @foreach (var variation in Product.Variations)
+                {
+                    <div class="mb-3">
+                        <strong>@variation.Name:</strong>
+                        <div class="d-flex flex-wrap gap-2 mt-2">
+                            @foreach (var option in variation.Options)
+                            {
+                                <button class="btn @(IsSelected(variation.Id, option.Id) ? "btn-dark" : "btn-outline-secondary")"
+                                        @onclick="() => SelectOption(variation.Id, option.Id)">
+                                    @option.Name
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <!-- Hành động -->
+                <div class="mt-4">
+                    <button class="btn btn-danger px-4 py-2 me-3" disabled="@(!CanBuy)" @onclick="AddToCart">MUA NGAY</button>
+                    <button class="btn btn-outline-primary">TRẢ GÓP 0%</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public Guid ProductId { get; set; }
+
+    private ProductWithVariationsDto? Product;
+    private ProductItemDto? SelectedItem;
+    private Dictionary<Guid, Guid> SelectedOptions = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var res = await Http.GetFromJsonAsync<ApiResponse<ProductWithVariationsDto>>($"api/Product/{ProductId}/with-variations");
+        if (res?.IsSuccess == true)
+        {
+            Product = res.Data;
+            foreach (var v in Product.Variations)
+            {
+                if (v.Options.Any())
+                    SelectedOptions[v.Id] = v.Options.First().Id;
+            }
+            await LoadSelectedItemAsync();
+        }
+    }
+
+    private async Task LoadSelectedItemAsync()
+    {
+        if (Product == null || SelectedOptions.Count != Product.Variations.Count)
+        {
+            SelectedItem = null;
+            return;
+        }
+
+        var payload = new
+        {
+            productId = Product.Id,
+            optionIds = SelectedOptions.Values.ToList()
+        };
+
+        var response = await Http.PostAsJsonAsync("api/ProductItem/by-options", payload);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<ProductItemDto>>();
+            SelectedItem = result?.Data;
+        }
+    }
+
+    private void SelectOption(Guid variationId, Guid optionId)
+    {
+        SelectedOptions[variationId] = optionId;
+        _ = LoadSelectedItemAsync();
+    }
+
+    private bool IsSelected(Guid variationId, Guid optionId)
+    {
+        return SelectedOptions.TryGetValue(variationId, out var selected) && selected == optionId;
+    }
+
+    private bool CanBuy => SelectedItem != null;
+
+    private async Task AddToCart()
+    {
+        if (SelectedItem == null) return;
+
+        var result = await CartService.AddToCartAsync(new AddToCartRequest
+            {
+                ProductItemId = SelectedItem.Id,
+                Quantity = 1
+            });
+
+        if (result.IsSuccess)
+        {
+            
+            NavigationManager.NavigateTo("/cart");
+        }
+    }
+
+    public class ProductItemDto
+    {
+        public Guid Id { get; set; }
+        public string Sku { get; set; }
+        public decimal Price { get; set; }
+        public string Image { get; set; }
+    }
+
+    public class AddToCartRequest
+    {
+        public Guid ProductItemId { get; set; }
+        public int Quantity { get; set; }
+    }
+
+    public class ApiResponse<T>
+    {
+        public bool IsSuccess { get; set; }
+        public T Data { get; set; }
+        public string Message { get; set; }
+    }
+
+    public class ProductWithVariationsDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string ImageUrl { get; set; }
+        public decimal OriginalPrice { get; set; }
+        public List<VariationDto> Variations { get; set; } = new();
+    }
+
+    public class VariationDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public List<VariationOptionDto> Options { get; set; } = new();
+    }
+
+    public class VariationOptionDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+    }
+}

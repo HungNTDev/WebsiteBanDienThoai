@@ -94,7 +94,7 @@ namespace Application.AuthenticationManagement.Commands.Login
 
         private JwtSecurityToken CreateToken(List<Claim> claims)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthSettings:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthSettings:Key"]!));
             var add30Date = DateTime.Now.AddDays(30);
 
             var token = new JwtSecurityToken(

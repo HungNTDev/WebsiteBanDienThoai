@@ -1,5 +1,8 @@
 ﻿@page "/"
-
+@using Admin.Services
+@using User.Models
+@inject HttpClient Http
+@inject IImageService imageService
 <PageTitle>Trang Chủ</PageTitle>
 
 <div class="container mt-3">
@@ -12,26 +15,8 @@
                     @foreach (var slide in slides)
                     {
                         <div class="slide @(currentSlide == slide.Id ? "active" : "")" 
-                             style="opacity: @(currentSlide == slide.Id ? "1" : "0")">
+                        style="opacity: @(currentSlide == slide.Id ? "1" : "0")">
                             <img src="@slide.ImageUrl" alt="@slide.Title" class="w-100 rounded" />
-                           @*  <div class="banner-info position-absolute bottom-0 start-0 p-4 text-white">
-                                <div class="d-flex align-items-center gap-3 mb-2">
-                                    <h2 class="mb-0">@slide.Price</h2>
-                                    @if (!string.IsNullOrEmpty(slide.Tag))
-                                    {
-                                        <div class="banner-tag">@slide.Tag</div>
-                                    }
-                                </div>
-                                @if (!string.IsNullOrEmpty(slide.Description))
-                                {
-                                    <p class="mb-2">@slide.Description</p>
-                                }
-                                @if (!string.IsNullOrEmpty(slide.Discount))
-                                {
-                                    <div class="student-discount">@slide.Discount</div>
-                                }
-                                <button class="btn btn-light mt-3">MUA NGAY</button>
-                            </div> *@
                         </div>
                     }
                 </div>
@@ -42,122 +27,161 @@
                 <div class="d-flex gap-3 overflow-auto">
                     @foreach (var slide in slides)
                     {
-                    <div class="product-item @(currentSlide == slide.Id ? "active" : "")" 
-                            @onclick="() => ChangeSlide(slide.Id)">
-                        @* <img src="@slide.ImageUrl" alt="@slide.Title" class="w-100 mb-2" /> *@
-                        <h6>@slide.Title</h6>
-                        <p>@slide.SubTitle</p>
-                    </div>
+                        <div class="product-item @(currentSlide == slide.Id ? "active" : "")" 
+                        @onclick="() => ChangeSlide(slide.Id)">
+                            @* <img src="@slide.ImageUrl" alt="@slide.Title" class="w-100 mb-2" /> *@
+                            <h6>@slide.Title</h6>
+                            <p>@slide.SubTitle</p>
+                        </div>
                     }
                 </div>
             </div>
         </div>
     </div>
 </div>
+<div class="container mt-4">
+    <h3>ĐIỆN THOẠI NỔI BẬT NHẤT</h3>
+
+    <div class="d-flex flex-wrap gap-3">
+        @if (Products == null)
+        {
+            <p>Đang tải danh sách sản phẩm...</p>
+        }
+        else
+        {
+            <div class="row">
+                @foreach (var product in Products)
+                {
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                        <a class="text-decoration-none text-dark" href="@($"/product/{product.Id}")">
+                            <div class="card h-100 product-card">
+                                <img src="@imageService.GetImageUrl(product.Image)" class="card-img-top" alt="@product.Name" />
+                                <div class="card-body">
+                                    <h6 class="card-title">@product.Name</h6>
+                                    <p class="text-danger fw-bold">@product.Price.ToString("N0")đ</p>
+                                    <div class="d-flex align-items-center gap-1">
+                                        @for (int i = 0; i < 5; i++)
+                                        {
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        }
+                                        <span class="text-muted small ms-auto">Yêu thích <i class="bi bi-heart"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+
+        }
+    </div>
+</div>
+
 
 <style>
     .main-banner {
-        border-radius: 8px;
-        overflow: hidden;
-        height: 300px;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 300px;
     }
 
     .banner-content {
-        position: relative;
-        height: 100%;
+    position: relative;
+    height: 100%;
     }
 
     .slide {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        transition: opacity 0.5s ease-in-out;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
     }
 
     .slide.active {
-        opacity: 1;
+    opacity: 1;
     }
 
     .slide img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     }
 
     .banner-info {
-        background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
-        width: 100%;
-        padding: 20px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+    width: 100%;
+    padding: 20px;
     }
 
     .banner-tag {
-        background: rgba(255,255,255,0.2);
-        padding: 4px 12px;
-        border-radius: 4px;
-        font-size: 14px;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 14px;
     }
 
     .student-discount {
-        display: inline-block;
-        background: rgba(255,255,255,0.2);
-        padding: 4px 12px;
-        border-radius: 4px;
-        font-size: 14px;
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 14px;
     }
 
     .product-slider {
-        background: white;
-        border-radius: 8px;
-        padding: 16px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     .product-item {
-        min-width: 200px;
-        padding: 8px;
-        text-align: center;
-        cursor: pointer;
-        opacity: 0.7;
-        transition: all 0.2s;
+    min-width: 200px;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all 0.2s;
     }
 
     .product-item:hover,
     .product-item.active {
-        transform: translateY(-2px);
-        opacity: 1;
+    transform: translateY(-2px);
+    opacity: 1;
     }
 
     .product-item h6 {
-        margin: 8px 0;
-        font-size: 14px;
-        font-weight: 600;
+    margin: 8px 0;
+    font-size: 14px;
+    font-weight: 600;
     }
 
     .product-item p {
-        color: #666;
-        font-size: 13px;
-        margin: 0;
+    color: #666;
+    font-size: 13px;
+    margin: 0;
     }
 
     ::-webkit-scrollbar {
-        height: 6px;
+    height: 6px;
     }
 
     ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 3px;
+    background: #f1f1f1;
+    border-radius: 3px;
     }
 
     ::-webkit-scrollbar-thumb {
-        background: #D70018;
-        border-radius: 3px;
+    background: #D70018;
+    border-radius: 3px;
     }
 </style>
 
 @code {
+
     private List<SlideModel> slides = new()
     {
         new SlideModel
@@ -240,6 +264,34 @@
     {
         autoSlideTimer?.Dispose();
     }
+
+    private List<ProductDto> Products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await Http.GetFromJsonAsync<ApiResponse<PaginatedList<ProductDto>>>("api/Product?PageSize=20");
+            if (response != null && response.Data != null)
+            {
+                Products = response.Data.Items;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Lỗi khi load sản phẩm: {ex.Message}");
+        }
+    }
+
+    public class ProductDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Image { get; set; }
+        public decimal Price { get; set; }
+    }
+
+  
 
     public class SlideModel
     {

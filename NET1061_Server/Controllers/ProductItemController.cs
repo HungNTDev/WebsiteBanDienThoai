@@ -1,5 +1,7 @@
-﻿using Application.ProductItemManagement.Commands.Create;
+﻿using Application.Abstract.BaseClass;
+using Application.ProductItemManagement.Commands.Create;
 using Application.ProductItemManagement.Commands.Update;
+using Application.ProductItemManagement.Queries.GetAll;
 using Application.ProductItemManagement.Queries.GetById;
 using Application.ProductItemManagement.Queries.GetByOptions;
 using MediatR;
@@ -19,6 +21,14 @@ namespace NET1061_Server.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllProductItems([FromQuery] Filter query)
+        {
+            var request = new GetAllProductItemQuery(query);
+            var result = await _mediator.Send(request);
+            return result is null ? NotFound() : Ok(result);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductItemById(Guid id)
         {
@@ -30,8 +40,9 @@ namespace NET1061_Server.Controllers
         [HttpPost("by-options")]
         public async Task<IActionResult> GetByOptions([FromBody] GetProductItemQuery query)
         {
-            var result = await _mediator.Send(query);
-            return result is null ? NotFound() : Ok(result);
+            var request = new GetProductItemQuery(query.ProductId, query.OptionIds);
+            var result = await _mediator.Send(request);
+            return result.IsSuccess ? Ok(result) : NotFound();
         }
 
         [HttpPost("create")]

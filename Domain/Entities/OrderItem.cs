@@ -1,6 +1,7 @@
 ﻿using Domain.Abstract;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Domain.Entities
 {
@@ -8,6 +9,7 @@ namespace Domain.Entities
     {
         [ForeignKey("Order")]
         public Guid OrderId { get; set; }
+        [JsonIgnore]
         public Order? Order { get; set; }
 
         [ForeignKey("ProductItem")]

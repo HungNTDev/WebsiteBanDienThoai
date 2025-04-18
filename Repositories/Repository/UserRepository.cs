@@ -2,13 +2,14 @@
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
+using Repositories.Repository.GeneralRepository;
 
 namespace Repositories.Repository
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : GeneralRepository<ApplicationUser>, IUserRepository
     {
         private readonly ApplicationDbContext _context;
-        public UserRepository(ApplicationDbContext context)
+        public UserRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
         }

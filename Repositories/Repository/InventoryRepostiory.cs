@@ -1,10 +1,4 @@
-﻿using Application.Abstract.Repository;
-using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using Persistence;
-using Repositories.Repository.GeneralRepository;
-
-namespace Repositories.Repository
+﻿namespace Repositories.Repository
 {
     //public class InventoryRepostiory : GeneralRepository<Inventory>, IInventoryRepository
     //{

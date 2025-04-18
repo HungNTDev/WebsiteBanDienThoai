@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace Application.AuthenticationManagement.Queries.Profile
+﻿namespace Application.AuthenticationManagement.Queries.Profile
 {
     public class GetProfileDto
     {

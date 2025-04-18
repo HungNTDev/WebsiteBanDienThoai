@@ -30,6 +30,28 @@ namespace Repositories.Repository
                .FirstOrDefaultAsync();
         }
 
+        public async Task<ProductItemDto?> GetByIdAsync(Guid id)
+        {
+            var item = await _context.ProductItems
+                .Include(pi => pi.Product)
+                .Include(pi => pi.ProductConfigs)
+                    .ThenInclude(pc => pc.VariationOption)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (item == null) return null;
+
+            return new ProductItemDto
+            {
+                Id = item.Id,
+                SKU = item.SKU,
+                Image = item.Image,
+                Price = item.Price,
+                ProductName = item.Product?.Name ?? "",
+                ProductId = item.ProductId,
+                VariationOptions = item.ProductConfigs.Select(c => c.VariationOptionId).ToList()
+            };
+        }
+
         public async Task<Guid> CreateAsync(ProductItem item, List<Guid> variationOptionIds)
         {
             _context.ProductItems.Add(item);
@@ -78,26 +100,6 @@ namespace Repositories.Repository
 
             await _context.SaveChangesAsync();
             return true;
-        }
-
-        public async Task<ProductItemDto?> GetByIdAsync(Guid id)
-        {
-            var item = await _context.ProductItems
-                .Include(pi => pi.Product)
-                .Include(pi => pi.ProductConfigs)
-                    .ThenInclude(pc => pc.VariationOption)
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (item == null) return null;
-
-            return new ProductItemDto
-            {
-                Id = item.Id,
-                SKU = item.SKU,
-                Price = item.Price,
-                ProductName = item.Product?.Name ?? "",
-                VariationOptions = item.ProductConfigs.Select(c => c.VariationOptionId).ToList()
-            };
         }
     }
 }
