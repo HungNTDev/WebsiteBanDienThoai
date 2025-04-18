@@ -21,11 +21,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User", "User\User.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin", "Admin\Admin.csproj", "{3E0A6D59-351B-4825-BED3-CE820EB81DA1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItem", "SolutionItem", "{BC0139E7-8CF2-4432-9B82-DC6CAD23EC04}"
-	ProjectSection(SolutionItems) = preProject
-		.dockerignore = .dockerignore
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
