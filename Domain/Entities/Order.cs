@@ -1,6 +1,4 @@
-﻿using Domain.Abstract;
-using Domain.Enum;
-using System.ComponentModel.DataAnnotations;
+﻿using Domain.Enum;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
@@ -15,7 +13,7 @@ namespace Domain.Entities
         public ApplicationUser? User { get; set; }
 
         [ForeignKey("Address")]
-        public Guid AddressId { get; set; }
+        public Guid? AddressId { get; set; }
         public Address? Address { get; set; }
 
         [ForeignKey("ShippingMethod")]

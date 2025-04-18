@@ -1,11 +1,17 @@
-﻿using Application.AuthenticationManagement.Commands.ForgotPassword;
+﻿using Application.AuthenticationManagement.Commands.EditProfile;
+using Application.AuthenticationManagement.Commands.ForgotPassword;
 using Application.AuthenticationManagement.Commands.Login;
 using Application.AuthenticationManagement.Commands.Register;
 using Application.AuthenticationManagement.Commands.ResetPassword;
 using Application.BrandManagement.Commands.Create;
 using Application.BrandManagement.Commands.Update;
+using Application.CartManagement.Commands.AddCart;
+using Application.CartManagement.Commands.DeleteCart;
+using Application.CartManagement.Commands.DeleteCartItem;
+using Application.CartManagement.Commands.UpdateCart;
 using Application.CategoryManagement.Commands.Create;
 using Application.CategoryManagement.Commands.Update;
+using Application.OrderManagement.Commands.Create;
 using Application.ProductItemManagement.Commands.Create;
 using Application.ProductItemManagement.Commands.Update;
 using Application.ProductManagement.Commands.Create;
@@ -30,6 +36,7 @@ namespace NET1061_Server.Extensions
             services.AddScoped<IValidator<LoginModel>, LoginModelValidator>();
             services.AddScoped<IValidator<ForgotPasswordModel>, ForgotPasswordValidator>();
             services.AddScoped<IValidator<ResetPasswordModels>, ResetPasswordModelValidator>();
+            services.AddScoped<IValidator<EditProfileDto>, EditProfileValidation>();
 
             //Brand
             services.AddScoped<IValidator<CreateBrandDto>, CreateBrandValidation>();
@@ -63,6 +70,14 @@ namespace NET1061_Server.Extensions
             services.AddScoped<IValidator<CreateProductItemDto>, CreateProductItemValidation>();
             services.AddScoped<IValidator<UpdateProductItemDto>, UpdateProductItemValidation>();
 
+            //Cart
+            services.AddScoped<IValidator<CreateCartDto>, CreateCartValidation>();
+            services.AddScoped<IValidator<UpdateCartDto>, UpdateCartValidation>();
+            services.AddScoped<IValidator<DeleteCartDto>, DeleteCartValidation>();
+            services.AddScoped<IValidator<DeleteCartItemDto>, DeleteCartItemValidator>();
+
+            //Order
+            services.AddScoped<IValidator<CreateOrderDto>, CreateOrderValidator>();
             return services;
         }
     }

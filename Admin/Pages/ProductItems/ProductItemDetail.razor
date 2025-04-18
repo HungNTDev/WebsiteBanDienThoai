@@ -1,0 +1,165 @@
+@page "/product-items/detail/{id}"
+@using Admin.Models
+@using Admin.Models.ProductItem
+@using Admin.Services
+@inject IImageService imageService
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Product Item Details</h1>
+        <div>
+            <a href="/product-items/update/@Id" class="btn btn-warning me-2">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="/product-items" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center p-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (productItem == null)
+    {
+        <div class="alert alert-danger">
+            Product item not found.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        @if (!string.IsNullOrEmpty(productItem.Image))
+                        {
+                            <img src="@productItem.Image" alt="@productItem.ProductName"
+                                 class="img-fluid rounded" style="max-height: 300px; object-fit: contain;" />
+                        }
+                        else
+                        {
+                            <div class="text-muted">
+                                <i class="fas fa-image fa-5x mb-3"></i>
+                                <p>No image available</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Product Information</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-3 fw-bold">SKU:</div>
+                            <div class="col-md-9">@productItem.Sku</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-3 fw-bold">Product Name:</div>
+                            <div class="col-md-9">@productItem.ProductName</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-3 fw-bold">Price:</div>
+                            <div class="col-md-9">@productItem.Price.ToString("N0") đ</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-3 fw-bold">Variation Options:</div>
+                            <div class="col-md-9">
+                                @if (variationOptions != null && variationOptions.Any())
+                                {
+                                    <ul class="list-unstyled mb-0">
+                                        @foreach (var option in variationOptions)
+                                        {
+                                            <li>@option.Name: @option.Value</li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <span>No variation options</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private ProductItemDetailResponse productItem;
+    private List<VariationOption> variationOptions;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProductItem();
+    }
+
+    private async Task LoadProductItem()
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            var response = await Http.GetFromJsonAsync<ApiResponse<ProductItemDetailResponse>>($"api/ProductItem/{Id}");
+
+            if (response != null && response.IsSuccess)
+            {
+                productItem = response.Data;
+                await LoadVariationOptions();
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Error loading product item details");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Error loading product item details");
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadVariationOptions()
+    {
+        if (productItem?.VariationOptions == null || !productItem.VariationOptions.Any())
+            return;
+
+        variationOptions = new List<VariationOption>();
+        foreach (var optionId in productItem.VariationOptions)
+        {
+            try
+            {
+                var response = await Http.GetFromJsonAsync<VariationOption>($"api/VariationOption/{optionId}");
+                if (response != null)
+                {
+                    variationOptions.Add(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading variation option {optionId}: {ex.Message}");
+            }
+        }
+    }
+} 

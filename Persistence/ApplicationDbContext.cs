@@ -39,19 +39,19 @@ namespace Persistence
                   .HasKey(ua => new { ua.BrandId, ua.CategoryId });
 
             builder.Entity<ProductConfig>()
-                .HasKey(pc => new { pc.ProductItemId, pc.VariationOptionId });
+                   .HasKey(pc => new { pc.ProductItemId, pc.VariationOptionId });
 
             builder.Entity<UserAddress>()
-                        .HasKey(ua => new { ua.UserId, ua.AddressId });
+                   .HasKey(ua => new { ua.UserId, ua.AddressId });
 
             builder.Entity<IdentityUserLogin<Guid>>().ToTable("AspNetUserLogins")
-        .HasKey(l => new { l.LoginProvider, l.ProviderKey });
+                   .HasKey(l => new { l.LoginProvider, l.ProviderKey });
 
             builder.Entity<IdentityUserRole<Guid>>().ToTable("AspNetUserRoles")
                 .HasKey(r => new { r.UserId, r.RoleId });
 
             builder.Entity<IdentityUserToken<Guid>>().ToTable("AspNetUserTokens")
-                .HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
+                   .HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
 
             builder.Entity<IdentityRoleClaim<Guid>>().ToTable("AspNetRoleClaims");
             builder.Entity<IdentityUserClaim<Guid>>().ToTable("AspNetUserClaims");
@@ -115,5 +115,6 @@ namespace Persistence
         public DbSet<ProductConfig> ProductConfigs { get; set; }
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Series> Series { get; set; }
+        public DbSet<ProductImages> ProductImages { get; set; }
     }
 }

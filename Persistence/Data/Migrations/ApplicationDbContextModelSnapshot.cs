@@ -223,6 +223,9 @@ namespace Persistence.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -303,7 +306,7 @@ namespace Persistence.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AddressId")
+                    b.Property<Guid?>("AddressId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreatedBy")
@@ -545,6 +548,41 @@ namespace Persistence.Data.Migrations
                     b.HasIndex("VariationOptionId");
 
                     b.ToTable("ProductConfigs");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ProductImages", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("ProductItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductItemId");
+
+                    b.ToTable("ProductImages");
                 });
 
             modelBuilder.Entity("Domain.Entities.ProductItem", b =>
@@ -988,9 +1026,7 @@ namespace Persistence.Data.Migrations
                 {
                     b.HasOne("Domain.Entities.Address", "Address")
                         .WithMany("Orders")
-                        .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AddressId");
 
                     b.HasOne("Domain.Entities.ShippingMethod", "ShippingMethod")
                         .WithMany("Orders")
@@ -1083,6 +1119,17 @@ namespace Persistence.Data.Migrations
                     b.Navigation("ProductItem");
 
                     b.Navigation("VariationOption");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ProductImages", b =>
+                {
+                    b.HasOne("Domain.Entities.ProductItem", "ProductItem")
+                        .WithMany("ProductImages")
+                        .HasForeignKey("ProductItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductItem");
                 });
 
             modelBuilder.Entity("Domain.Entities.ProductItem", b =>
@@ -1305,6 +1352,8 @@ namespace Persistence.Data.Migrations
             modelBuilder.Entity("Domain.Entities.ProductItem", b =>
                 {
                     b.Navigation("ProductConfigs");
+
+                    b.Navigation("ProductImages");
                 });
 
             modelBuilder.Entity("Domain.Entities.Series", b =>

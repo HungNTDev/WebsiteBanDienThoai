@@ -1,119 +1,135 @@
-@page "/giohang"
+@page "/cart"
+@using Admin.Services
+@using User.Models.Cart
+@using User.Services
+@inject HttpClient Http
+@inject ICartService CartService
+@inject IImageService ImageService
+@inject NavigationManager Navigation
 
-<PageTitle>Giỏ Hàng</PageTitle>
+<h3 class="fw-bold text-center">Giỏ hàng của bạn</h3>
 
-<div class="container mt-4">
-    <h2 class="mb-4">Giỏ Hàng</h2>
-
-    @if (cartItems.Count > 0)
-    {
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Sản phẩm</th>
-                        <th>Tên</th>
-                        <th>Giá</th>
-                        <th>Số lượng</th>
-                        <th>Tổng</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in cartItems)
-                    {
-                        <tr>
-                            <td><img src="@item.ImageUrl" alt="@item.Name" style="width: 100px;" /></td>
-                            <td>@item.Name</td>
-                            <td>@item.Price.ToString("N0")₫</td>
-                            <td>
-                                <div class="input-group" style="width: 120px;">
-                                    <button class="btn btn-outline-secondary" @onclick="() => DecreaseQuantity(item)">-</button>
-                                    <input type="text" class="form-control text-center" value="@item.Quantity" readonly />
-                                    <button class="btn btn-outline-secondary" @onclick="() => IncreaseQuantity(item)">+</button>
-                                </div>
-                            </td>
-                            <td>@((item.Price * item.Quantity).ToString("N0"))₫</td>
-                            <td>
-                                <button class="btn btn-danger btn-sm" @onclick="() => RemoveItem(item)">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+@if (Cart == null)
+{
+    <p>Đang tải giỏ hàng...</p>
+}
+else if (!Cart.CartItems.Any())
+{
+    <p>Giỏ hàng của bạn đang trống.</p>
+}
+else
+{
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <input class="form-check-input me-2" type="checkbox" checked disabled />
+                <label class="form-check-label">Bỏ chọn tất cả</label>
+            </div>
+            <button class="btn btn-outline-danger btn-sm" @onclick="ClearCart">
+                <i class="bi bi-x-circle"></i> Xóa toàn bộ
+            </button>
         </div>
 
-        <div class="row justify-content-end">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Tổng đơn hàng</h5>
-                        <p class="card-text">
-                            <strong>Tổng tiền:</strong> @TotalAmount.ToString("N0")₫
-                        </p>
-                        <button class="btn btn-primary w-100" @onclick="Checkout">
-                            Thanh toán
-                        </button>
+        @foreach (var item in Cart.CartItems)
+        {
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <img src="@item.ProductItemImage" width="80" class="me-3 border rounded" />
+                        <div>
+                            <strong>@item.ProductItemName</strong>
+                            <p class="text-danger mt-1">@item.UnitPrice.ToString("N0") đ</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-outline-secondary btn-sm" @onclick="() => UpdateQuantity(item.Id, item.Quantity - 1)">-</button>
+                        <input type="text" readonly class="form-control text-center mx-2" style="width: 50px;" value="@item.Quantity" />
+                        <button class="btn btn-outline-secondary btn-sm" @onclick="() => UpdateQuantity(item.Id, item.Quantity + 1)">+</button>
+                        <button class="btn btn-link text-danger ms-3" @onclick="() => RemoveItem(item.ProductItemId)"><i class="bi bi-trash"></i></button>
                     </div>
                 </div>
             </div>
+        }
+
+        <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3">
+            <strong class="fs-5">Tạm tính: <span class="text-danger">@Total.ToString("N0") đ</span></strong>
+            <button class="btn btn-danger mt-3" @onclick="GoToOrderPage">Tiến hành đặt hàng</button>
         </div>
-    }
-    else
-    {
-        <div class="text-center">
-            <p>Giỏ hàng của bạn đang trống</p>
-            <a href="/" class="btn btn-primary">Tiếp tục mua sắm</a>
-        </div>
-    }
-</div>
+    </div>
+}
 
 @code {
-    private List<CartItem> cartItems = new List<CartItem>();
-    private decimal TotalAmount => cartItems.Sum(item => item.Price * item.Quantity);
+    private GetCartByIdDto? Cart;
+    private double Total => Cart?.CartItems.Sum(i => i.UnitPrice * i.Quantity) ?? 0;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // Sample data - in a real app, this would come from a service
-        cartItems.Add(new CartItem 
-        { 
-            Id = 1, 
-            Name = "iPhone 15 Pro Max", 
-            Price = 29990000, 
-            Quantity = 1,
-            ImageUrl = "images/iphone-15-pro-max.jpg"
-        });
+        var result = await CartService.GetCartAsync();
+        if (result.IsSuccess)
+        {
+            Cart = result.Data;
+        }
     }
 
-    private void IncreaseQuantity(CartItem item)
+    private async Task UpdateQuantity(Guid cartItemId, int quantity)
     {
-        item.Quantity++;
+        if (quantity < 1 || Cart == null) return;
+
+        var item = Cart.CartItems.FirstOrDefault(i => i.Id == cartItemId);
+        if (item == null) return;
+
+        item.Quantity = quantity;
+
+        var updateRequest = new UpdateCartRequest
+            {
+                Id = Cart.Id,
+                UserId = Cart.UserId,
+                CartItems = Cart.CartItems.Select(ci => new UpdateCartItemDto
+                {
+                    Id = ci.Id,
+                    ProductId = ci.ProductItemId,
+                    Quantity = ci.Quantity
+                }).ToList()
+            };
+
+        var result = await CartService.UpdateCartAsync(updateRequest);
+        if (result.IsSuccess)
+        {
+            await OnInitializedAsync();
+        }
     }
 
-    private void DecreaseQuantity(CartItem item)
+    private async Task RemoveItem(Guid productItemId)
     {
-        if (item.Quantity > 1)
-            item.Quantity--;
+        if (Cart == null) return;
+
+        var deleteRequest = new DeleteCartItemRequest
+            {
+                ProductId = productItemId,
+                UserId = Cart.UserId
+            };
+
+        var result = await CartService.RemoveItemAsync(deleteRequest);
+        if (result.IsSuccess)
+        {
+            await OnInitializedAsync();
+        }
     }
 
-    private void RemoveItem(CartItem item)
+    private async Task ClearCart()
     {
-        cartItems.Remove(item);
+        if (Cart == null) return;
+
+        var result = await CartService.ClearCartAsync(Cart.UserId);
+        if (result.IsSuccess)
+        {
+            await OnInitializedAsync();
+        }
     }
 
-    private void Checkout()
+    private void GoToOrderPage()
     {
-        // Implement checkout logic
+        Navigation.NavigateTo("/order/create");
     }
-
-    private class CartItem
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public decimal Price { get; set; }
-        public int Quantity { get; set; }
-        public string ImageUrl { get; set; }
-    }
-} 
+}

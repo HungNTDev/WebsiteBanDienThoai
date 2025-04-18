@@ -1,4 +1,5 @@
 ﻿using Application.ProductItemManagement.Commands.Create;
+using Application.ProductItemManagement.Queries.GetAll;
 using Application.ProductItemManagement.Queries.GetByOptions;
 using AutoMapper;
 using Domain.Entities;
@@ -36,6 +37,7 @@ namespace Application.Abstract.MapperProfile
             ));
 
             CreateMap<VariationOption, VariationOptionDto>();
+            CreateMap<ProductItem, GetAllProductItemDto>();
         }
     }
 }
