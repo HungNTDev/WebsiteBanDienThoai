@@ -19,53 +19,48 @@ namespace Application.Abstract.Library
         {
             var ordered = _requestData.OrderBy(kvp => kvp.Key);
 
-            // ✅ Encode đúng chuẩn cho SignData
+            // ✅ URL encode giá trị cho query string
+            var query = string.Join("&", ordered.Select(kvp =>
+                $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
+
+            // ✅ URL encode giá trị trong SignData nếu VNPAY yêu cầu (tránh lỗi code 70)
             var signData = string.Join("&", ordered.Select(kvp =>
-                $"{kvp.Key}={HttpUtility.UrlEncode(kvp.Value, Encoding.UTF8)}"));
+                $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));  // <-- Bây giờ cũng encode ở đây
 
             Console.WriteLine("🔍 SignData = " + signData);
-
             string secureHash = ComputeHash(hashSecret, signData);
             Console.WriteLine("🔐 SecureHash = " + secureHash);
 
-            // ✅ Dùng lại signData làm query string vì đã encode đúng chuẩn
-            var query = signData;
-
             return $"{baseUrl}?{query}&vnp_SecureHash={secureHash}";
         }
+
+
 
         public bool ValidateSignature(IQueryCollection query, string hashSecret)
         {
             var data = query
                 .Where(kvp => kvp.Key.StartsWith("vnp_") && kvp.Key != "vnp_SecureHash" && kvp.Key != "vnp_SecureHashType")
-                .OrderBy(kvp => kvp.Key)
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToString());
 
-            string signData = string.Join("&", data.Select(kvp =>
-                $"{kvp.Key}={HttpUtility.UrlEncode(kvp.Value, Encoding.UTF8)}"));
+            // ❌ KHÔNG ENCODE ở đây
+            string signData = string.Join("&", data
+                .OrderBy(kvp => kvp.Key)
+                .Select(kvp => $"{kvp.Key}={kvp.Value}")); // Raw value
 
             string checkHash = ComputeHash(hashSecret, signData);
-            Console.WriteLine("CheckHash= " + checkHash);
-            Console.WriteLine("Received Hash= " + query["vnp_SecureHash"]);
 
             return checkHash.Equals(query["vnp_SecureHash"], StringComparison.OrdinalIgnoreCase);
         }
 
-        public static string ComputeHash(string key, string data)
-        {
-            var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(key));
-            var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
-            return BitConverter.ToString(hash).Replace("-", "").ToUpper();
-        }
 
-        public string GetQueryString()
-        {
-            var sorted = _requestData
-                .Where(x => !string.IsNullOrEmpty(x.Value))
-                .OrderBy(kvp => kvp.Key);
 
-            var query = sorted.Select(kvp => $"{kvp.Key}={HttpUtility.UrlEncode(kvp.Value, Encoding.UTF8)}");
-            return string.Join("&", query);
+        private string ComputeHash(string key, string data)
+        {
+            var encoding = new UTF8Encoding(false); // Không BOM
+            var hmac = new HMACSHA512(encoding.GetBytes(key));
+            var normalizedData = data.Normalize(NormalizationForm.FormC); // Chuẩn Unicode
+            var hashValue = hmac.ComputeHash(encoding.GetBytes(normalizedData));
+            return BitConverter.ToString(hashValue).Replace("-", "").ToUpper();
         }
     }
 }

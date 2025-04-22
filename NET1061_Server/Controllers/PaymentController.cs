@@ -91,6 +91,14 @@ namespace NET1061_Server.Controllers
             return Content("FAIL");
         }
 
+        [HttpGet("return-paypal")]
+        public async Task<IActionResult> ReturnPaypal(string orderId, string token, string PayerID)
+        {
+            Console.WriteLine("🔁 PayPal RETURN URL triggered");
+            Console.WriteLine($"orderId = {orderId}, token = {token}, PayerID = {PayerID}");
+            return Redirect($"/order/{orderId}"); // hoặc xử lý logic xác nhận đơn hàng
+        }
+
         [HttpGet("return")]
         public async Task<IActionResult> Return()
         {

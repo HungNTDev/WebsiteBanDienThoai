@@ -38,6 +38,7 @@ namespace Application.Abstract.Services
             pay.AddRequestData("vnp_Amount", total.ToString());
             pay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
             pay.AddRequestData("vnp_CurrCode", "VND");
+            pay.AddRequestData("vnp_ExpireDate", DateTime.Now.AddMinutes(15).ToString("yyyyMMddHHmmss"));
             pay.AddRequestData("vnp_IpAddr", "127.0.0.1");
             pay.AddRequestData("vnp_Locale", "vn");
             pay.AddRequestData("vnp_OrderInfo", "TestPayment");
