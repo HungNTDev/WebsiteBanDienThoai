@@ -19,20 +19,23 @@ namespace Application.Abstract.Library
         {
             var ordered = _requestData.OrderBy(kvp => kvp.Key);
 
-            // ✅ URL encode giá trị cho query string
-            var query = string.Join("&", ordered.Select(kvp =>
+            // ✅ Tạo SignData để hash
+            var signData = string.Join("&", ordered.Select(kvp =>
                 $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
 
-            // ✅ URL encode giá trị trong SignData nếu VNPAY yêu cầu (tránh lỗi code 70)
-            var signData = string.Join("&", ordered.Select(kvp =>
-                $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));  // <-- Bây giờ cũng encode ở đây
-
             Console.WriteLine("🔍 SignData = " + signData);
+
+            // ✅ Tính SecureHash
             string secureHash = ComputeHash(hashSecret, signData);
             Console.WriteLine("🔐 SecureHash = " + secureHash);
 
+            // ✅ Query string với value được encode
+            var query = string.Join("&", ordered.Select(kvp =>
+                $"{kvp.Key}={HttpUtility.UrlEncode(kvp.Value, Encoding.UTF8)}"));
+
             return $"{baseUrl}?{query}&vnp_SecureHash={secureHash}";
         }
+
 
 
 
@@ -52,15 +55,14 @@ namespace Application.Abstract.Library
             return checkHash.Equals(query["vnp_SecureHash"], StringComparison.OrdinalIgnoreCase);
         }
 
-
-
-        private string ComputeHash(string key, string data)
+        public static string ComputeHash(string key, string data)
         {
-            var encoding = new UTF8Encoding(false); // Không BOM
-            var hmac = new HMACSHA512(encoding.GetBytes(key));
-            var normalizedData = data.Normalize(NormalizationForm.FormC); // Chuẩn Unicode
-            var hashValue = hmac.ComputeHash(encoding.GetBytes(normalizedData));
-            return BitConverter.ToString(hashValue).Replace("-", "").ToUpper();
+            var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(key));
+            var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
+
+            // ✅ Chuyển thành HEX UPPERCASE, không có dấu, không có dấu cộng hay bằng
+            return BitConverter.ToString(hash).Replace("-", "").ToUpper();
         }
+
     }
 }
