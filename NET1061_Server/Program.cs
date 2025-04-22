@@ -40,7 +40,6 @@ builder.Services.AddSwaggerGen(opt =>
         BearerFormat = "JWT",
         Scheme = "bearer"
     });
-
     opt.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -88,7 +87,7 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.Configure<CloudinarySettings>(
-    builder.Configuration.GetSection("CloudinarySettings"));
+builder.Configuration.GetSection("CloudinarySettings"));
 
 builder.Services.AddSingleton(sp =>
 {
@@ -97,7 +96,7 @@ builder.Services.AddSingleton(sp =>
     return new Cloudinary(account);
 });
 
-builder.Services.AddScoped<IPhotoService, PhotoService>();
+
 builder.Services.AddRegistration();
 builder.Services.AddRegistrationFluentValidations();
 builder.Services.AddRegistrationMapper();

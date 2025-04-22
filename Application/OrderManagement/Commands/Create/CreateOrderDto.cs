@@ -5,6 +5,7 @@
         public Guid UserId { get; set; }
         public List<OrderItemDto> Items { get; set; } = new();
         public decimal OrderTotal { get; set; }
+        public Guid PaymentTypeId { get; set; }
     }
 
     public class OrderItemDto
@@ -15,4 +16,12 @@
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
     }
+
+    public static class PaymentTypeCode
+    {
+        public const string CASH = "CASH";
+        public const string VNPAY = "VNPAY";
+        public const string PAYPAL = "PAYPAL";
+    }
+
 }

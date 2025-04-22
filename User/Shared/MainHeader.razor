@@ -1,3 +1,4 @@
+@using Admin.Services
 @using User.Models
 @using User.Services
 @using static System.Net.WebRequestMethods
@@ -5,13 +6,14 @@
 @inject NavigationManager NavigationManager
 @inject IAuthService AuthService
 @inject ILocalStorageService LocalStorage
+@inject IImageService imageService
 
 <header class="main-header">
     <div class="container">
         <div class="header-content">
             <div class="d-flex align-items-center">
                 <a href="/" class="logo me-4">
-                    <img src="https://cellphones.com.vn/" alt="CellphoneS" height="40" />
+                    <img src="@imageService.GetImageUrl("Shipper_CPS3.77d4065.png")" alt="CellphoneS" height="40" />
                 </a>
                 <div class="category-button position-relative">
                     <button class="btn btn-menu" @onclick="ToggleMenu">
@@ -69,26 +71,38 @@
                     <i class="bi bi-shop"></i>
                     <span>Cửa hàng<br />gần bạn</span>
                 </a>
-             
+
                 @if (IsLoggedIn)
                 {
-                       <a href="/track-order" class="action-button">
+                    <a href="/track-order" class="action-button">
                         <i class="bi bi-box-seam"></i>
                         <span>Tra cứu<br />đơn hàng</span>
                     </a>
+
                     <a href="/cart" class="action-button cart">
                         <i class="bi bi-cart3"></i>
                         <span>Giỏ<br />hàng</span>
-                        <span class="badge">0</span>
                     </a>
-                    <div class="dropdown">
-                        <a class="action-button dropdown-toggle" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i>
+
+                    <div class="dropdown d-inline-block ms-3">
+                        <a class="btn btn-outline-light dropdown-toggle d-flex align-items-center gap-2"
+                           href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle fs-5"></i>
                             <span>@UserName</span>
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/profile">Hồ sơ cá nhân</a></li>
-                            <li><button class="dropdown-item" @onclick="HandleLogout">Đăng xuất</button></li>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="/profile">
+                                    <i class="bi bi-person-lines-fill text-primary"></i> Hồ sơ cá nhân
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li>
+                                <button class="dropdown-item d-flex align-items-center gap-2 text-danger fw-semibold" @onclick="HandleLogout">
+                                    <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                                </button>
+                            </li>
                         </ul>
                     </div>
                 }
@@ -99,6 +113,7 @@
                         <span>Đăng nhập</span>
                     </a>
                 }
+
             </div>
         </div>
     </div>

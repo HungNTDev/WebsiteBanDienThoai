@@ -5,7 +5,7 @@
 <div class="sidebar-wrapper">
     <div class="sidebar-header">
         <a href="" class="logo-brand">
-            <img src="https://th.bing.com/th/id/OIP.pAuEV0Xa00NlKbRtueZK3wHaEo?w=244&h=180&c=7&r=0&o=5&pid=1.7" alt="Logo" />
+            <img src="@imageService.GetImageUrl("Shipper_CPS3.77d4065.png")" alt="Logo" />
         </a>
     </div>
 
@@ -80,14 +80,17 @@
     }
 
     .sidebar-header {
-        padding: 1rem;
+        height: 140px;
         background-color: #B01B34;
-        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .logo-brand img {
-        max-width: 150px;
-        height: auto;
+        height: 100px;
+        width: auto;
+        object-fit: contain;
     }
 
     .sidebar-menu {

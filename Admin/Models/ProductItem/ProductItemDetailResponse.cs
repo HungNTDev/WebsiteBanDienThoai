@@ -8,7 +8,7 @@
         public string Image { get; set; }
         public string ProductName { get; set; }
         public string Name { get; set; }
-        public List<OptionDetail> VariationOptions { get; set; }
+        public List<string> VariationOptions { get; set; }
     }
     public class OptionDetail
     {

@@ -446,6 +446,9 @@ namespace Persistence.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -467,6 +470,26 @@ namespace Persistence.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PaymentTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("7e47cc15-8dcd-4b46-a559-4ff25642d8d0"),
+                            Code = "CASH",
+                            CreatedDate = new DateTime(2025, 4, 20, 19, 13, 31, 307, DateTimeKind.Local).AddTicks(2682),
+                            IsActive = true,
+                            UpdatedDate = new DateTime(2025, 4, 20, 19, 13, 31, 307, DateTimeKind.Local).AddTicks(2691),
+                            Value = "Thanh toán tại cửa hàng"
+                        },
+                        new
+                        {
+                            Id = new Guid("c5900418-2763-40ce-a618-b5afded03392"),
+                            Code = "VNPAY",
+                            CreatedDate = new DateTime(2025, 4, 20, 19, 13, 31, 307, DateTimeKind.Local).AddTicks(2695),
+                            IsActive = true,
+                            UpdatedDate = new DateTime(2025, 4, 20, 19, 13, 31, 307, DateTimeKind.Local).AddTicks(2695),
+                            Value = "Thanh toán qua VNPAY"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Product", b =>

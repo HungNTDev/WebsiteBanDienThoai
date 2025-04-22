@@ -1,8 +1,9 @@
 ﻿using Application.Abstract.Repository;
 using Application.Abstract.Repository.Base;
+using Repositories.GeneralRepository;
+using Repositories.GeneralRepository.GeneralRepository;
 using Repositories.Repository;
 using Repositories.Repository.BaseRepository;
-using Repositories.Repository.GeneralRepository;
 
 namespace NET1061_Server.Extensions
 {
@@ -22,6 +23,9 @@ namespace NET1061_Server.Extensions
             services.AddScoped<ISeriesRepository, SeriesRepository>();
             services.AddScoped<ICartRepository, CartRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IPaymentTypeRepository, PaymentTypeRepository>();
+            services.AddScoped<IUserPaymentRepository, UserPaymentRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepostiory>();
             //services.AddScoped<IInventoryRepository, InventoryRepostiory>();
             return services;
         }

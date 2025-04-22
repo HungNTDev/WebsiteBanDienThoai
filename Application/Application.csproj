@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="PaymentManagement\" />
+    <Folder Include="PaymentManagement\Queries\" />
   </ItemGroup>
 
 </Project>

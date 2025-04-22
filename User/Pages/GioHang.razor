@@ -7,54 +7,74 @@
 @inject IImageService ImageService
 @inject NavigationManager Navigation
 
-<h3 class="fw-bold text-center">Giỏ hàng của bạn</h3>
+<h3 class="fw-bold text-center mt-4 mb-5">🛒 Giỏ hàng của bạn</h3>
 
 @if (Cart == null)
 {
-    <p>Đang tải giỏ hàng...</p>
+    <div class="text-center text-muted">Đang tải giỏ hàng...</div>
 }
 else if (!Cart.CartItems.Any())
 {
-    <p>Giỏ hàng của bạn đang trống.</p>
+    <div class="text-center text-muted">
+        <i class="bi bi-cart-x fs-1"></i>
+        <p class="mt-3">Giỏ hàng của bạn đang trống.</p>
+    </div>
 }
 else
 {
     <div class="container">
+
+        <!-- Tiêu đề & xóa tất cả -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-                <input class="form-check-input me-2" type="checkbox" checked disabled />
-                <label class="form-check-label">Bỏ chọn tất cả</label>
-            </div>
-            <button class="btn btn-outline-danger btn-sm" @onclick="ClearCart">
-                <i class="bi bi-x-circle"></i> Xóa toàn bộ
+            <div class="fw-semibold">Sản phẩm trong giỏ hàng</div>
+            <button class="btn btn-link text-danger" @onclick="ClearCart">
+                <i class="bi bi-trash3 me-1"></i> Xóa toàn bộ
             </button>
         </div>
 
+        <!-- Danh sách sản phẩm -->
         @foreach (var item in Cart.CartItems)
         {
-            <div class="card mb-3 shadow-sm">
-                <div class="card-body d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center">
-                        <img src="@item.ProductItemImage" width="80" class="me-3 border rounded" />
-                        <div>
-                            <strong>@item.ProductItemName</strong>
-                            <p class="text-danger mt-1">@item.UnitPrice.ToString("N0") đ</p>
-                        </div>
-                    </div>
+            <div class="border rounded-3 p-3 mb-3 d-flex flex-column flex-md-row align-items-start gap-3 shadow-sm">
 
-                    <div class="d-flex align-items-center">
-                        <button class="btn btn-outline-secondary btn-sm" @onclick="() => UpdateQuantity(item.Id, item.Quantity - 1)">-</button>
-                        <input type="text" readonly class="form-control text-center mx-2" style="width: 50px;" value="@item.Quantity" />
-                        <button class="btn btn-outline-secondary btn-sm" @onclick="() => UpdateQuantity(item.Id, item.Quantity + 1)">+</button>
-                        <button class="btn btn-link text-danger ms-3" @onclick="() => RemoveItem(item.ProductItemId)"><i class="bi bi-trash"></i></button>
+                <!-- Ảnh -->
+                <img src="@item.ProductItemImage" style="width: 80px; height: 80px; object-fit: cover;" 
+                class="rounded border" />
+
+                <!-- Nội dung chính -->
+                <div class="flex-grow-1">
+                    <div class="fw-semibold">@item.ProductItemName</div>
+
+                    <!-- Giá -->
+                    <div class="d-flex align-items-center gap-2 mt-1">
+                        <span class="fw-bold text-danger">@item.UnitPrice.ToString("N0") đ</span>
                     </div>
+                </div>
+
+                <!-- Thao tác -->
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="() 
+                    => UpdateQuantity(item.Id, item.Quantity - 1)">-</button>
+                    <input type="text" readonly class="form-control text-center" 
+                    style="width: 50px;" value="@item.Quantity" />
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="() 
+                    => UpdateQuantity(item.Id, item.Quantity + 1)">+</button>
+                    <button class="btn btn-link text-danger" @onclick="() 
+                    => RemoveItem(item.ProductItemId)">
+                        <i class="bi bi-trash fs-5"></i>
+                    </button>
                 </div>
             </div>
         }
 
-        <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3">
-            <strong class="fs-5">Tạm tính: <span class="text-danger">@Total.ToString("N0") đ</span></strong>
-            <button class="btn btn-danger mt-3" @onclick="GoToOrderPage">Tiến hành đặt hàng</button>
+        <!-- Tổng tiền + nút -->
+        <div class="d-flex justify-content-between align-items-center border-top pt-4 mt-4">
+            <div class="fs-5 fw-bold">
+                Tạm tính: <span class="text-danger">@Total.ToString("N0") đ</span>
+            </div>
+            <button class="btn btn-danger btn-lg px-4" @onclick="GoToOrderPage">
+                Tiến hành đặt hàng
+            </button>
         </div>
     </div>
 }
@@ -105,10 +125,10 @@ else
         if (Cart == null) return;
 
         var deleteRequest = new DeleteCartItemRequest
-            {
-                ProductId = productItemId,
-                UserId = Cart.UserId
-            };
+        {
+            ProductId = productItemId,
+            UserId = Cart.UserId
+        };
 
         var result = await CartService.RemoveItemAsync(deleteRequest);
         if (result.IsSuccess)

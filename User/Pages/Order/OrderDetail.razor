@@ -1,6 +1,7 @@
 ﻿@page "/order/{OrderId:guid}"
 @using System.Net.Http.Headers
 @using Microsoft.AspNetCore.Authorization
+@using System.Text.Json.Serialization
 @using User.Models
 @using User.Models.Order
 @using User.Services
@@ -9,41 +10,53 @@
 @inject NavigationManager Navigation
 @inject ILocalStorageService LocalStorage
 
-<h3 class="fw-bold mb-4">Chi tiết đơn hàng</h3>
+<h3 class="fw-bold text-center mb-5 mt-4">📦 Chi tiết đơn hàng</h3>
 
 @if (Order == null)
 {
-    <div class="alert alert-info">Đang tải đơn hàng...</div>
+    <div class="alert alert-info text-center">Đang tải đơn hàng...</div>
 }
 else
 {
     <div class="container px-4">
-        <div class="row">
-            <div class="col-md-12 col-lg-8 mx-auto">
-                <div class="card p-4 mb-4">
-                    <h5 class="fw-bold">Thông tin đơn hàng</h5>
-                    <p><strong>Mã đơn hàng:</strong> @Order.Id</p>
-                    <p><strong>Ngày tạo:</strong> @Order.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
-                    <p><strong>Trạng thái:</strong> @Order.Status</p>
-                    <p><strong>Tổng tiền:</strong> <span class="text-danger fw-bold">@Order.OrderTotal.ToString("N0") đ</span></p>
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+
+                <!-- Thông tin đơn hàng -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">🧾 Thông tin đơn hàng</h5>
+                        <p><strong>Mã đơn hàng:</strong> @Order.Id</p>
+                        <p><strong>Ngày tạo:</strong> @Order.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                        <p><strong>Trạng thái:</strong> <span class="badge @GetStatusBadgeClass(Order.Status)">@GetStatusLabel(Order.Status)</span></p>
+                        <p><strong>Tổng tiền:</strong> <span class="text-danger fw-bold">@Order.OrderTotal.ToString("N0") đ</span></p>
+
+                        @if (Order.Payments?.Any() == true)
+                        {
+                            <p><strong>Phương thức thanh toán:</strong> @string.Join(", ", Order.Payments.Select(p => p.Provider))</p>
+                        }
+                    </div>
                 </div>
 
-                <h5 class="fw-bold mb-3">Chi tiết sản phẩm</h5>
-                <div class="list-group mb-4">
-                    @foreach (var item in Order.OrderItems)
-                    {
-                        <div class="list-group-item">
-                            <div class="d-flex">
-                                <img src="@item.ProductImage" class="me-3 rounded" style="width: 80px; height: 80px; object-fit: cover;" />
+                <!-- Chi tiết sản phẩm -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">🛍️ Sản phẩm đã đặt</h5>
+
+                        @foreach (var item in Order.OrderItems)
+                        {
+                            <div class="d-flex align-items-center border-bottom py-3">
+                                <img src="@item.ProductImage" class="me-3 rounded border" style="width: 70px; height: 70px; object-fit: cover;" />
                                 <div class="flex-grow-1">
-                                    <strong>@item.ProductName</strong><br />
-                                    <small>SL: @item.Quantity x @item.UnitPrice.ToString("N0") đ</small>
+                                    <div class="fw-semibold">@item.ProductName</div>
+                                    <small class="text-muted">SL: @item.Quantity x @item.UnitPrice.ToString("N0") đ</small>
                                 </div>
                                 <div class="fw-bold text-danger">@((item.Quantity * item.UnitPrice).ToString("N0")) đ</div>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -51,7 +64,6 @@ else
 
 @code {
     [Parameter] public Guid OrderId { get; set; }
-
     private OrderDetailDto? Order;
 
     protected override async Task OnInitializedAsync()
@@ -77,20 +89,48 @@ else
         }
     }
 
+    private string GetStatusLabel(OrderStatus status) => status switch
+    {
+        OrderStatus.Pending => "Chờ xác nhận",
+        OrderStatus.Confirmed => "Đã xác nhận",
+        OrderStatus.Paid => "Đã thanh toán",
+        OrderStatus.Cancelled => "Đã hủy",
+        _ => status.ToString()
+    };
+
+    private string GetStatusBadgeClass(OrderStatus status) => status switch
+    {
+        OrderStatus.Pending => "bg-warning text-dark",
+        OrderStatus.Confirmed => "bg-primary",
+        OrderStatus.Paid => "bg-success",
+        OrderStatus.Cancelled => "bg-secondary",
+        _ => "bg-light text-dark"
+    };
+
     public class OrderDetailDto
     {
         public Guid Id { get; set; }
         public DateTime OrderDate { get; set; }
         public decimal OrderTotal { get; set; }
-        public string? Status { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public OrderStatus Status { get; set; }
+
         public List<OrderItemDto> OrderItems { get; set; } = new();
         public List<PaymentDto> Payments { get; set; } = new();
     }
-
-    
 
     public class PaymentDto
     {
         public string? Provider { get; set; }
     }
+
+    public enum OrderStatus
+    {
+        Pending,
+        Confirmed,
+        Paid,
+        Cancelled
+    }
 }
+

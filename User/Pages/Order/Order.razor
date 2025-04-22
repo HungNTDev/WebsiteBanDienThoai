@@ -1,5 +1,6 @@
 ﻿@page "/order/create"
 @using System.Net.Http.Headers
+@using System.Text.Json
 @using User.Models
 @using User.Models.Cart
 @using User.Models.Order
@@ -11,12 +12,15 @@
 @inject ILocalStorageService LocalStorage
 @inject ICartService CartService
 
-<h3 class="fw-bold mb-4">Xác nhận đơn hàng</h3>
+<h3 class="fw-bold text-center mb-5">🛒 Xác nhận đơn hàng</h3>
 
 @if (Cart == null || !Cart.CartItems.Any())
 {
-    <div class="alert alert-info">Giỏ hàng trống, không thể tạo đơn hàng.</div>
-    <button class="btn btn-outline-secondary mt-2" @onclick="GoToCart">Quay lại giỏ hàng</button>
+    <div class="alert alert-info text-center">
+        Giỏ hàng trống, không thể tạo đơn hàng.
+        <br />
+        <button class="btn btn-outline-secondary mt-3" @onclick="GoToCart">⬅ Quay lại giỏ hàng</button>
+    </div>
 }
 else if (IsSubmitting)
 {
@@ -28,35 +32,57 @@ else if (IsSubmitting)
 else
 {
     <div class="container px-4">
-        <div class="row">
-            <div class="col-md-12 col-lg-8 mx-auto">
-                <h5 class="fw-bold mb-3">Chi tiết sản phẩm</h5>
-                <div class="list-group mb-4">
-                    @foreach (var item in Cart.CartItems)
-                    {
-                        <div class="list-group-item">
-                            <div class="d-flex gap-3 align-items-center">
-                                <img src="@item.ProductItemImage" width="60" height="60" class="border rounded" style="object-fit: cover;" />
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+
+                <!-- Sản phẩm -->
+                <div class="card shadow-sm mb-4 border-0">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">📦 Chi tiết sản phẩm</h5>
+
+                        @foreach (var item in Cart.CartItems)
+                        {
+                            <div class="d-flex align-items-center border-bottom py-3">
+                                <img src="@item.ProductItemImage" width="64" height="64" class="rounded border me-3" style="object-fit: cover;" />
                                 <div class="flex-grow-1">
-                                    <strong>@item.ProductItemName</strong><br />
-                                    <small>SL: @item.Quantity x @item.UnitPrice.ToString("N0") đ</small>
+                                    <div class="fw-semibold">@item.ProductItemName</div>
+                                    <small class="text-muted">SL: @item.Quantity x @item.UnitPrice.ToString("N0") đ</small>
                                 </div>
-                                <div class="text-end fw-bold text-danger">@item.TotalPrice.ToString("N0") đ</div>
+                                <div class="fw-bold text-danger">@item.TotalPrice.ToString("N0") đ</div>
                             </div>
-                        </div>
-                    }
-                </div>
-
-                <div class="card p-4 mb-4">
-                    <h5 class="fw-bold">Thông tin đơn hàng</h5>
-                    <p><strong>Tổng sản phẩm:</strong> @Cart.CartItems.Count</p>
-                    <p><strong>Tạm tính:</strong> <span class="text-danger fw-bold">@Total.ToString("N0") đ</span></p>
-
-                    <div class="mt-4 d-flex gap-2">
-                        <button class="btn btn-danger px-4" @onclick="CreateOrder">Xác nhận đặt hàng</button>
-                        <button class="btn btn-outline-secondary" @onclick="GoToCart">Quay lại giỏ hàng</button>
+                        }
                     </div>
                 </div>
+
+                <!-- Thông tin đơn hàng -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">🧾 Thông tin đơn hàng</h5>
+                        <p><strong>Tổng sản phẩm:</strong> @Cart.CartItems.Count</p>
+                        <p><strong>Tạm tính:</strong> <span class="text-danger fw-bold">@Total.ToString("N0") đ</span></p>
+
+                        <div class="mt-3">
+                            <label class="form-label fw-bold">💳 Chọn hình thức thanh toán</label>
+                            <select class="form-select shadow-sm" @bind="SelectedPaymentTypeId" @bind:event="onchange">
+                                <option value="">-- Chọn phương thức thanh toán --</option>
+                                <option value="7e47cc15-8dcd-4b46-a559-4ff25642d8d0">Thanh toán tại cửa hàng</option>
+                                <option value="c5900418-2763-40ce-a618-b5afded03392">Thanh toán qua VNPAY</option>
+                                <option value="59913505-57c5-4fb6-bfc9-e484785d5a58">Thanh toán qua PayPal</option>
+                            </select>
+                            @if (ShowPaymentTypeWarning)
+                            {
+                                <small class="text-danger mt-1 d-block">Vui lòng chọn phương thức thanh toán.</small>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hành động -->
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-outline-secondary" @onclick="GoToCart">⬅ Quay lại</button>
+                    <button class="btn btn-danger px-4" @onclick="CreateOrder"> Xác nhận đặt hàng</button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -65,11 +91,12 @@ else
 @code {
     private GetCartByIdDto? Cart;
     private bool IsSubmitting = false;
+    private string? SelectedPaymentTypeId = null;
+    private bool ShowPaymentTypeWarning = false;
     private decimal Total => Cart?.CartItems.Sum(i => (decimal)i.UnitPrice * i.Quantity) ?? 0;
 
     protected override async Task OnInitializedAsync()
     {
-       
         var result = await CartService.GetCartAsync();
         if (result.IsSuccess)
         {
@@ -80,7 +107,15 @@ else
     private async Task CreateOrder()
     {
         if (Cart == null || !Cart.CartItems.Any()) return;
+
+        if (SelectedPaymentTypeId == null)
+        {
+            ShowPaymentTypeWarning = true;
+            return;
+        }
+
         IsSubmitting = true;
+        ShowPaymentTypeWarning = false;
 
         var token = await LocalStorage.GetItemAsync<string>("authToken");
         if (string.IsNullOrWhiteSpace(token))
@@ -93,18 +128,17 @@ else
             {
                 UserId = Cart.UserId,
                 OrderTotal = Total,
+                PaymentTypeId = Guid.Parse(SelectedPaymentTypeId!),
                 Items = Cart.CartItems.Select(i => new OrderItemDto
                 {
                     ProductItemId = i.ProductItemId,
-                    ProductName = i.ProductItemName ?? "", // Phải có giá trị
-                    ProductImage = i.ProductItemImage ?? "", // Phải có giá trị
+                    ProductName = i.ProductItemName ?? "",
+                    ProductImage = i.ProductItemImage ?? "",
                     Quantity = i.Quantity,
                     UnitPrice = (decimal)i.UnitPrice
                 }).ToList()
             };
 
-
-        // ✅ Wrap lại theo yêu cầu của API
         var payload = new { model = createCommand };
 
         var request = new HttpRequestMessage(HttpMethod.Post, "api/order/create")
@@ -114,19 +148,53 @@ else
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         var response = await Http.SendAsync(request);
-        if (response.IsSuccessStatusCode)
+        if (!response.IsSuccessStatusCode)
         {
-            var result = await response.Content.ReadFromJsonAsync<ApiResponse<OrderItemDto>>();
-            if (result?.IsSuccess == true && result.Data != null)
+            var errorContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("Order API error: " + errorContent);
+            IsSubmitting = false;
+            return;
+        }
+
+        // ✅ Đọc về object có thể là Order hoặc có trường Url nếu dùng VNPAY
+        var json = await response.Content.ReadAsStringAsync();
+        var doc = JsonDocument.Parse(json);
+
+        if (doc.RootElement.TryGetProperty("data", out var dataElement)
+            && dataElement.TryGetProperty("url", out var urlElement))
+        {
+            // ✅ Trường hợp thanh toán VNPAY: redirect luôn
+            var vnpUrl = urlElement.GetString();
+            if (!string.IsNullOrEmpty(vnpUrl))
             {
-                Navigation.NavigateTo($"/order/{result.Data.Id}");
+                Navigation.NavigateTo(vnpUrl!, forceLoad: true); // redirect ngoài hệ thống
                 return;
             }
         }
+        else
+        {
+            // ✅ Trường hợp thanh toán tiền mặt: đọc như cũ
+            var orderResult = JsonSerializer.Deserialize<ApiResponse<OrderDetailDto>>
+            (json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
 
-        // Nếu lỗi, in ra để debug thêm
-        var errorContent = await response.Content.ReadAsStringAsync();
-        Console.WriteLine("Order API error: " + errorContent);
+            if (orderResult?.IsSuccess == true && orderResult.Data != null)
+            {
+                var clearResponse = await CartService.ClearCartAsync(Cart.UserId);
+                if (!clearResponse.IsSuccess)
+                {
+                    Console.WriteLine("❌ Không thể xóa giỏ hàng.");
+                }
+
+                Navigation.NavigateTo($"/order/{orderResult.Data.Id}");
+            }
+            else
+            {
+                Console.WriteLine("❌ Order create failed.");
+            }
+        }
 
         IsSubmitting = false;
     }

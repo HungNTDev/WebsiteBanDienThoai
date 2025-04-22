@@ -1,4 +1,5 @@
 ﻿using Application.Abstract.Marker;
+using Application.Abstract.Services;
 using System.Reflection;
 
 namespace NET1061_Server.Extensions
@@ -9,6 +10,9 @@ namespace NET1061_Server.Extensions
         {
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly
             (typeof(ApplicationAssemblyMarker).GetTypeInfo().Assembly));
+            services.AddScoped<IPhotoService, PhotoService>();
+            services.AddScoped<IVnPayService, VnPayService>();
+            services.AddHttpClient<IPayPalService, PayPalService>();
             return services;
         }
     }

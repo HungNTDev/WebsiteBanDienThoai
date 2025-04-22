@@ -12,6 +12,9 @@ using Application.CartManagement.Commands.UpdateCart;
 using Application.CategoryManagement.Commands.Create;
 using Application.CategoryManagement.Commands.Update;
 using Application.OrderManagement.Commands.Create;
+using Application.PaymentManagement.Commands.Create;
+using Application.PaymentManagement.Commands.Save;
+using Application.PaymentManagement.Commands.Verify;
 using Application.ProductItemManagement.Commands.Create;
 using Application.ProductItemManagement.Commands.Update;
 using Application.ProductManagement.Commands.Create;
@@ -42,7 +45,7 @@ namespace NET1061_Server.Extensions
             services.AddScoped<IValidator<CreateBrandDto>, CreateBrandValidation>();
             services.AddScoped<IValidator<UpdateBrandDto>, UpdateBrandValidation>();
 
-            // Category
+            //Category
             services.AddScoped<IValidator<CreateCategoryDto>, CreateCategoryValidation>();
             services.AddScoped<IValidator<UpdateCategoryDto>, UpdateCategoryValidation>();
 
@@ -78,6 +81,12 @@ namespace NET1061_Server.Extensions
 
             //Order
             services.AddScoped<IValidator<CreateOrderDto>, CreateOrderValidator>();
+
+            //Payment
+            services.AddScoped<IValidator<CreateVnPayPaymentUrlDto>, CreateVnPayPaymentUrlValidator>();
+            services.AddScoped<IValidator<SavePaymentResultDto>, SavePaymentResultValidator>();
+            services.AddScoped<IValidator<VerifyVnPayPaymentDto>, VerifyVnPayPaymentValidator>();
+
             return services;
         }
     }

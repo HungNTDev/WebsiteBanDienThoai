@@ -1,0 +1,129 @@
+﻿@page "/register"
+@using System.Net.Http.Headers
+@using System.Text.Json
+@using User.Models
+@using User.Services
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="card shadow-sm p-4" style="width: 100%; max-width: 420px;">
+        <div class="text-center mb-4">
+            <h4 class="fw-bold">Đăng ký</h4>
+            <p class="text-muted">Tạo tài khoản mới để bắt đầu</p>
+        </div>
+
+        <EditForm Model="@RegisterModel" OnValidSubmit="HandleRegister">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Họ</label>
+                    <InputText class="form-control" @bind-Value="RegisterModel.FirstName" />
+                    <ValidationMessage For="@(() => RegisterModel.FirstName)" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Tên</label>
+                    <InputText class="form-control" @bind-Value="RegisterModel.LastName" />
+                    <ValidationMessage For="@(() => RegisterModel.LastName)" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <InputText class="form-control" placeholder="Họ và tên" @bind-Value="RegisterModel.FullName" />
+                <ValidationMessage For="@(() => RegisterModel.FullName)" />
+            </div>
+
+            <div class="mb-3">
+                <InputText class="form-control" placeholder="Email" @bind-Value="RegisterModel.Email" />
+                <ValidationMessage For="@(() => RegisterModel.Email)" />
+            </div>
+
+            <div class="mb-3">
+                <InputText class="form-control" placeholder="Số điện thoại" @bind-Value="RegisterModel.PhoneNumber" />
+                <ValidationMessage For="@(() => RegisterModel.PhoneNumber)" />
+            </div>
+
+            <div class="mb-3">
+                <InputText class="form-control" placeholder="Mật khẩu" type="password" @bind-Value="RegisterModel.Password" />
+                <ValidationMessage For="@(() => RegisterModel.Password)" />
+            </div>
+
+            <div class="mb-3">
+                <InputText class="form-control" placeholder="Xác nhận mật khẩu" type="password" @bind-Value="RegisterModel.ConfirmPassword" />
+                <ValidationMessage For="@(() => RegisterModel.ConfirmPassword)" />
+            </div>
+
+            <button class="btn w-100 text-white" style="background-color: #d1001c;" disabled="@isSubmitting">
+                @if (isSubmitting)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                }
+                Đăng ký
+            </button>
+
+            @if (!string.IsNullOrEmpty(Message))
+            {
+                <div class="alert mt-3 @(IsSuccess ? "alert-success" : "alert-danger")">
+                    @Message
+                </div>
+            }
+
+            <div class="text-center mt-3">
+                <a href="/login" class="text-decoration-none">Đã có tài khoản? <span class="text-danger fw-semibold">Đăng nhập</span></a>
+            </div>
+        </EditForm>
+    </div>
+</div>
+@code {
+    private RegisterCommand RegisterModel = new();
+    private bool isSubmitting = false;
+    private string? Message;
+    private bool IsSuccess;
+
+    private async Task HandleRegister()
+    {
+        isSubmitting = true;
+        Message = string.Empty;
+
+        var payload = new { model = RegisterModel };
+        var response = await Http.PostAsJsonAsync("api/Authentication/register", payload);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<string>>();
+            if (result?.IsSuccess == true)
+            {
+                IsSuccess = true;
+                Message = "Đăng ký thành công. Chuyển đến đăng nhập...";
+                await Task.Delay(1500);
+                Navigation.NavigateTo("/login");
+            }
+            else
+            {
+                IsSuccess = false;
+                Message = result?.Message ?? "Đăng ký thất bại.";
+            }
+        }
+        else
+        {
+            IsSuccess = false;
+            var error = await response.Content.ReadAsStringAsync();
+            Message = $"Lỗi: {error}";
+        }
+
+        isSubmitting = false;
+    }
+
+    public class RegisterCommand
+    {
+        public string? Email { get; set; }
+        public string? Password { get; set; }
+        public string? ConfirmPassword { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? FullName { get; set; }
+        public string? PhoneNumber { get; set; }
+    }
+}

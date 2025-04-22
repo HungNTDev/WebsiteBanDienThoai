@@ -15,6 +15,8 @@ namespace Application.Abstract.Repository.Base
         ISeriesRepository SeriesRepository { get; }
         ICartRepository CartRepository { get; }
         IPaymentRepository PaymentRepository { get; }
+        IUserPaymentRepository UserPaymentRepository { get; }
+        IPaymentTypeRepository PaymentTypeRepository { get; }
         //IInventoryRepository InventoryRepository { get; }
         void Update<T>(T entity) where T : class;
         int SaveChanges();

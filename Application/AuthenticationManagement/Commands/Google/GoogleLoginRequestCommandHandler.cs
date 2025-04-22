@@ -40,7 +40,7 @@ namespace Application.AuthenticationManagement.Commands.Google
                 var payload = await GoogleJsonWebSignature.ValidateAsync(request.model.IdToken,
                    new GoogleJsonWebSignature.ValidationSettings
                    {
-                       Audience = new[] { _configuration["Authentication:Google:ClientId"] }
+                       Audience = new[] { _configuration["Google:ClientId"] }
                    });
 
                 if (payload == null)

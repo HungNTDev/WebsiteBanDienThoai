@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Persistence;
 
-namespace Repositories.Repository.GeneralRepository
+namespace Repositories.GeneralRepository.GeneralRepository
 {
     public class UnitOfWork : IUnitOfWork
     {
@@ -20,6 +20,8 @@ namespace Repositories.Repository.GeneralRepository
         public ICartRepository CartRepository { get; }
         public IOrderRepository OrderRepository { get; }
         public IPaymentRepository PaymentRepository { get; }
+        public IPaymentTypeRepository PaymentTypeRepository { get; }
+        public IUserPaymentRepository UserPaymentRepository { get; }
         //public IInventoryRepository InventoryRepository { get; }
 
         public UnitOfWork(ApplicationDbContext context,
@@ -33,7 +35,9 @@ namespace Repositories.Repository.GeneralRepository
                           IUserRepository userRepository,
                           ICartRepository cartRepository,
                           IOrderRepository orderRepository,
-                          IPaymentRepository paymentRepository)
+                          IPaymentRepository paymentRepository,
+                          IPaymentTypeRepository paymentTypeRepository,
+                          IUserPaymentRepository userPaymentRepository)
         {
             _context = context;
             Category = category;
@@ -47,6 +51,8 @@ namespace Repositories.Repository.GeneralRepository
             CartRepository = cartRepository;
             OrderRepository = orderRepository;
             PaymentRepository = paymentRepository;
+            PaymentTypeRepository = paymentTypeRepository;
+            UserPaymentRepository = userPaymentRepository;
         }
         public void Entry<TEntity>(TEntity entity, EntityState state) where TEntity : class
         {

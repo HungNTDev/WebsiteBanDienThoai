@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Persistence
 {
@@ -11,32 +12,37 @@ namespace Persistence
         { }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<ProductConfig>()
-                .HasOne(pc => pc.ProductItem)
-                .WithMany(p => p.ProductConfigs)
-                .HasForeignKey(pc => pc.ProductItemId)
-                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<PaymentType>().HasData(
+                    new PaymentType { Id = Guid.NewGuid(), Value = "Thanh toán tại cửa hàng", Code = "CASH" },
+                    new PaymentType { Id = Guid.NewGuid(), Value = "Thanh toán qua VNPAY", Code = "VNPAY" }
+                    );
 
             builder.Entity<ProductConfig>()
-                .HasOne(pc => pc.VariationOption)
-                .WithMany(v => v.ProductConfigs)
-                .HasForeignKey(pc => pc.VariationOptionId)
-                .OnDelete(DeleteBehavior.Restrict);
+                   .HasOne(pc => pc.ProductItem)
+                   .WithMany(p => p.ProductConfigs)
+                   .HasForeignKey(pc => pc.ProductItemId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ProductConfig>()
+                   .HasOne(pc => pc.VariationOption)
+                   .WithMany(v => v.ProductConfigs)
+                   .HasForeignKey(pc => pc.VariationOptionId)
+                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Payment>()
-                .HasOne(p => p.UserPayment)
-                .WithMany(up => up.Payments)
-                .HasForeignKey(p => p.UserPaymentId)
-                .OnDelete(DeleteBehavior.Restrict);
+                   .HasOne(p => p.UserPayment)
+                   .WithMany(up => up.Payments)
+                   .HasForeignKey(p => p.UserPaymentId)
+                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Review>()
-                .HasOne(r => r.OrderItem)
-                .WithMany(oi => oi.Reviews)
-                .HasForeignKey(r => r.OrderItemId)
-                .OnDelete(DeleteBehavior.Restrict);
+                   .HasOne(r => r.OrderItem)
+                   .WithMany(oi => oi.Reviews)
+                   .HasForeignKey(r => r.OrderItemId)
+                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<CategoryBrand>()
-                  .HasKey(ua => new { ua.BrandId, ua.CategoryId });
+                   .HasKey(ua => new { ua.BrandId, ua.CategoryId });
 
             builder.Entity<ProductConfig>()
                    .HasKey(pc => new { pc.ProductItemId, pc.VariationOptionId });
@@ -48,7 +54,7 @@ namespace Persistence
                    .HasKey(l => new { l.LoginProvider, l.ProviderKey });
 
             builder.Entity<IdentityUserRole<Guid>>().ToTable("AspNetUserRoles")
-                .HasKey(r => new { r.UserId, r.RoleId });
+                   .HasKey(r => new { r.UserId, r.RoleId });
 
             builder.Entity<IdentityUserToken<Guid>>().ToTable("AspNetUserTokens")
                    .HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
@@ -60,40 +66,40 @@ namespace Persistence
 
             // Cấu hình quan hệ và cascade delete
             builder.Entity<IdentityRoleClaim<Guid>>()
-                .HasOne<ApplicationRole>()
-                .WithMany()
-                .HasForeignKey(rc => rc.RoleId)
-                .OnDelete(DeleteBehavior.Cascade);
+                   .HasOne<ApplicationRole>()
+                   .WithMany()
+                   .HasForeignKey(rc => rc.RoleId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<IdentityUserClaim<Guid>>()
-                .HasOne<ApplicationUser>()
-                .WithMany()
-                .HasForeignKey(uc => uc.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                   .HasOne<ApplicationUser>()
+                   .WithMany()
+                   .HasForeignKey(uc => uc.UserId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<IdentityUserLogin<Guid>>()
-                .HasOne<ApplicationUser>()
-                .WithMany()
-                .HasForeignKey(ul => ul.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                   .HasOne<ApplicationUser>()
+                   .WithMany()
+                   .HasForeignKey(ul => ul.UserId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<IdentityUserToken<Guid>>()
-                .HasOne<ApplicationUser>()
-                .WithMany()
-                .HasForeignKey(ut => ut.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                   .HasOne<ApplicationUser>()
+                   .WithMany()
+                   .HasForeignKey(ut => ut.UserId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<IdentityUserRole<Guid>>()
-                .HasOne<ApplicationUser>()
-                .WithMany()
-                .HasForeignKey(ur => ur.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                   .HasOne<ApplicationUser>()
+                   .WithMany()
+                   .HasForeignKey(ur => ur.UserId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<IdentityUserRole<Guid>>()
-                .HasOne<ApplicationRole>()
-                .WithMany()
-                .HasForeignKey(ur => ur.RoleId)
-                .OnDelete(DeleteBehavior.Cascade);
+                   .HasOne<ApplicationRole>()
+                   .WithMany()
+                   .HasForeignKey(ur => ur.RoleId)
+                   .OnDelete(DeleteBehavior.Cascade);
         }
 
         public DbSet<Address> Addresses { get; set; }

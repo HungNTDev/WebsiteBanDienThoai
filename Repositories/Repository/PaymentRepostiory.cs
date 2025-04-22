@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Repositories.Repository.GeneralRepository;
 
-namespace Repositories.Repository
+namespace Repositories.GeneralRepository
 {
     public class PaymentRepostiory : GeneralRepository<Payment>, IPaymentRepository
     {

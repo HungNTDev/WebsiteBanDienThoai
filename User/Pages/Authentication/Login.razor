@@ -3,60 +3,75 @@
 @using User.Services
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject HttpClient Http
 
 <PageTitle>Đăng nhập</PageTitle>
 
-<div class="container">
+<div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-4">
-            <div class="login-card">
+            <div class="card shadow-lg rounded-4 p-4">
                 <div class="text-center mb-4">
-                    <h3>Đăng nhập</h3>
-                    <p class="text-muted">Vui lòng đăng nhập để tiếp tục</p>
+                    <h3 class="fw-bold">Đăng nhập</h3>
+                    <p class="text-muted mb-0">Vui lòng đăng nhập để tiếp tục</p>
                 </div>
 
                 <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
                     <DataAnnotationsValidator />
                     <ValidationSummary />
 
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <InputText @bind-Value="loginModel.Email" class="form-control" />
+                    <div class="form-floating mb-3">
+                        <InputText @bind-Value="loginModel.Email" class="form-control" id="emailInput" placeholder="Email" />
+                        <label for="emailInput">Email</label>
                         <ValidationMessage For="@(() => loginModel.Email)" />
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Mật khẩu</label>
-                        <InputText @bind-Value="loginModel.Password" type="password" class="form-control" />
+                    <div class="form-floating mb-3">
+                        <InputText @bind-Value="loginModel.Password" type="password" class="form-control" id="passwordInput" placeholder="Mật khẩu" />
+                        <label for="passwordInput">Mật khẩu</label>
                         <ValidationMessage For="@(() => loginModel.Password)" />
                     </div>
 
-                    <div class="mb-3 form-check">
-                        <InputCheckbox @bind-Value="loginModel.RememberMe" class="form-check-input" />
-                        <label class="form-check-label">Ghi nhớ đăng nhập</label>
+                    <div class="form-check mb-3">
+                        <InputCheckbox @bind-Value="loginModel.RememberMe" class="form-check-input" id="rememberMe" />
+                        <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100" disabled="@isLoading">
+                    <button type="submit" class="btn btn-primary w-100 py-2" disabled="@isLoading">
                         @if (isLoading)
                         {
-                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                         }
                         Đăng nhập
                     </button>
 
                     <div class="text-center mt-3">
-                        <a href="/forgot-password" class="text-decoration-none">Quên mật khẩu?</a>
+                        <a href="/forgot-password" class="text-decoration-none text-muted">Quên mật khẩu?</a>
                     </div>
                 </EditForm>
 
-                <div class="text-center mt-4">
-                    <p class="mb-0">Chưa có tài khoản? <a href="/register" class="text-decoration-none">Đăng ký ngay</a></p>
+                <hr class="my-4" />
+
+                <!-- GOOGLE LOGIN BUTTON -->
+                <div class="text-center">
+                    <div id="g_id_onload"
+                         data-client_id="404644508594-a67e024ldppu5hd3ep60h9c9urk5ncp1.apps.googleusercontent.com"
+                         data-callback="handleGoogleLogin">
+                    </div>
+                    <div class="g_id_signin" data-type="standard" data-size="large"></div>
                 </div>
+
+                <div class="text-center mt-4">
+                    <p class="mb-0">
+                        Chưa có tài khoản?
+                        <a href="/register" class="fw-semibold text-decoration-none">Đăng ký ngay</a>
+                    </p>
+                </div>
+
                 @if (!string.IsNullOrEmpty(Message))
                 {
-                    <div class="alert alert-danger mt-3">
-                        @Message
-                    </div>
+                    <div class="alert alert-danger mt-3">@Message</div>
                 }
             </div>
         </div>
@@ -64,14 +79,6 @@
 </div>
 
 <style>
-    .login-card {
-        background: white;
-        padding: 2rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        margin-top: 2rem;
-    }
-
     .form-control {
         padding: 0.75rem;
         border-radius: 4px;
@@ -107,12 +114,15 @@
     a:hover {
         color: #b80015;
     }
+
 </style>
 
 @code {
     private User.Models.Authentication.LoginModel loginModel = new();
     private bool isLoading = false;
     private string Message = "";
+    private DotNetObjectReference<Login>? dotNetRef;
+
     private async Task HandleLogin()
     {
         try
@@ -123,10 +133,14 @@
             {
                 NavigationManager.NavigateTo("/");
             }
+            else
+            {
+                Message = result.Message ?? "Đăng nhập thất bại.";
+            }
         }
-        catch (Exception ex)
+        catch
         {
-            // Xử lý lỗi
+            Message = "Có lỗi xảy ra!";
         }
         finally
         {
@@ -134,5 +148,40 @@
         }
     }
 
-   
-} 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("initializeGoogleLogin", dotNetRef);
+        }
+    }
+
+    [JSInvokable("HandleGoogleLoginCallback")]
+    public async Task HandleGoogleLoginCallback(string idToken)
+    {
+        try
+        {
+            var payload = new { model = new { idToken } };
+            var response = await Http
+            .PostAsJsonAsync("https://localhost:7026/api/Authentication/googlelogin", payload);
+            if (response.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                Message = "Đăng nhập Google thất bại.";
+            }
+        }
+        catch
+        {
+            Message = "Có lỗi xảy ra khi xử lý Google Login.";
+        }
+    }
+
+    public void Dispose()
+    {
+        dotNetRef?.Dispose();
+    }
+}
