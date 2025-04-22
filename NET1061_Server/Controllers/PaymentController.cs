@@ -40,27 +40,6 @@ namespace NET1061_Server.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
-        // 2. Xác thực callback từ VNPAY (thường dùng ở /vnpay/return hoặc /vnpay/ipn)
-        //[HttpGet("vnpay-return")]
-        //public async Task<IActionResult> VerifyVnPayCallback()
-        //{
-        //    var queryParams = Request.Query
-        //        .ToDictionary(q => q.Key, q => q.Value.ToString());
-
-        //    var command = new VerifyVnPayPaymentCommand(queryParams);
-        //    var result = await _mediator.Send(command);
-
-        //    return StatusCode(result.StatusCode, result);
-        //}
-
-
-        // 3. Lưu kết quả thanh toán vào hệ thống (thường sau khi xác minh xong)
-        //[HttpPost("save-payment")]
-        //public async Task<IActionResult> SavePaymentResult([FromBody] SavePaymentResultCommand command)
-        //{
-        //    var result = await _mediator.Send(command);
-        //    return StatusCode(result.StatusCode, result);
-        //}
 
         [HttpGet("ipn")]
         public async Task<IActionResult> Ipn()
@@ -100,78 +79,41 @@ namespace NET1061_Server.Controllers
         }
 
         [HttpGet("return")]
-        public async Task<IActionResult> Return()
+        public IActionResult Return()
         {
-            var vnpLib = new VnPayLibrary();
-            var hashSecret = _config["VnPay:HashSecret"];
-
-            bool isValid = vnpLib.ValidateSignature(Request.Query, hashSecret);
-
-            if (!isValid)
+            try
             {
-                Console.WriteLine("❌ Sai chữ ký từ VNPAY");
-                return BadRequest("Sai chữ ký");
+                var vnpLib = new VnPayLibrary();
+                var hashSecret = _config["VnPay:HashSecret"];
+
+                // ✅ Kiểm tra chữ ký
+                bool isValid = vnpLib.ValidateSignature(Request.Query, hashSecret);
+                if (!isValid)
+                {
+                    Console.WriteLine("❌ Chữ ký không hợp lệ.");
+                    return Redirect("/order/failed");
+                }
+
+                // ✅ Lấy orderId từ vnp_TxnRef
+                var orderId = Request.Query["vnp_TxnRef"].ToString();
+                if (string.IsNullOrWhiteSpace(orderId))
+                {
+                    Console.WriteLine("❌ Không có OrderId (vnp_TxnRef)");
+                    return Redirect("/order/failed");
+                }
+
+                // ✅ In ra để debug
+                Console.WriteLine("✅ Thanh toán hợp lệ cho đơn hàng: " + orderId);
+
+                // ✅ Điều hướng về trang chi tiết đơn hàng
+                return Redirect($"/order/{orderId}");
             }
-
-            Console.WriteLine("✅ Chữ ký hợp lệ từ VNPAY");
-
-            // ✅ Bạn có thể xử lý tiếp đơn hàng ở đây (cập nhật trạng thái)
-            var orderId = Request.Query["vnp_TxnRef"].ToString();
-
-            return Ok(new
+            catch (Exception ex)
             {
-                Message = "Thanh toán thành công",
-                OrderId = orderId
-            });
+                Console.WriteLine("❌ Exception khi xử lý return từ VNPAY: " + ex.Message);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
-
-        //[HttpGet("VnPayReturn")]
-        //public IActionResult VnPayReturn()
-        //{
-        //    var hashSecret = _config["VnPay:HashSecret"];
-        //    var vnpLib = new VnPayLibrary();
-
-        //    bool isValid = vnpLib.ValidateSignature(Request.Query, hashSecret);
-
-        //    var vnpSecureHash = Request.Query["vnp_SecureHash"].ToString();
-
-        //    // Tính lại chữ ký để so sánh trực tiếp
-        //    var data = Request.Query
-        //        .Where(kvp => kvp.Key.StartsWith("vnp_") && kvp.Key != "vnp_SecureHash" && kvp.Key != "vnp_SecureHashType")
-        //        .OrderBy(kvp => kvp.Key)
-        //        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToString());
-
-        //    string Encode(string key, string value)
-        //    {
-        //        return key == "vnp_OrderInfo"
-        //            ? HttpUtility.UrlEncode(value, Encoding.UTF8)
-        //            : Uri.EscapeDataString(value);
-        //    }
-        //    var receivedHash = Request.Query["vnp_SecureHash"].ToString();
-        //    string signData = string.Join("&", data.Select(kvp => $"{kvp.Key}={Encode(kvp.Key, kvp.Value)}"));
-        //    string localHash = VnPayLibrary.ComputeHash(hashSecret, signData);
-
-        //    Console.WriteLine("✅ Received Hash = " + receivedHash);
-        //    Console.WriteLine("🔍 SignData = " + signData);
-        //    Console.WriteLine("✅ Local Hash = " + localHash);
-        //    Console.WriteLine("🔁 Received Hash = " + vnpSecureHash);
-
-        //    if (!string.Equals(localHash, vnpSecureHash, StringComparison.OrdinalIgnoreCase))
-        //    {
-        //        Console.WriteLine("❌ CHỮ KÝ KHÔNG TRÙNG KHỚP");
-        //        return BadRequest("Sai chữ ký");
-        //    }
-
-        //    Console.WriteLine("✅ CHỮ KÝ TRÙNG KHỚP");
-
-        //    // TODO: xử lý cập nhật đơn hàng
-        //    var orderId = Request.Query["vnp_TxnRef"].ToString();
-        //    return Ok(new
-        //    {
-        //        Message = "Thanh toán thành công",
-        //        OrderId = orderId
-        //    });
-        //}
 
     }
 }
