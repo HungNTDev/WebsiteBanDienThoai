@@ -79,6 +79,7 @@ namespace NET1061_Server.Controllers
         }
 
         [HttpGet("return")]
+        [AllowAnonymous]
         public IActionResult Return()
         {
             try
