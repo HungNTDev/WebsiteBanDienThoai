@@ -54,6 +54,7 @@ namespace Application.OrderManagement.Commands.Create
                 {
                     Id = Guid.NewGuid(),
                     UserId = dto.UserId,
+                    Code = OrderCodeGenerator.GenerateOrderCode(),
                     OrderDate = DateTime.UtcNow,
                     OrderTotal = dto.OrderTotal,
                     Status = OrderStatus.Pending,
@@ -106,18 +107,20 @@ namespace Application.OrderManagement.Commands.Create
                     case PaymentTypeCode.CASH:
                         payment.Status = PaymentStatus.Pending;
                         payment.TransactionId = "COD";
+                        order.Status = OrderStatus.Pending;
                         break;
 
                     case PaymentTypeCode.VNPAY:
                         payment.Status = PaymentStatus.Success;
                         payment.TransactionId = "VNPAY_INIT";
+                        order.Status = OrderStatus.Confirmed;
                         redirectUrl = await _vnPayService.GeneratePaymentUrl(order.Id, (decimal)payment.Amount);
                         break;
 
                     case PaymentTypeCode.PAYPAL:
                         payment.Status = PaymentStatus.Success;
                         payment.TransactionId = "PAYPAL_INIT";
-
+                        order.Status = OrderStatus.Confirmed;
                         var returnUrl = _config["PayPal:ReturnUrl"] + $"?orderId={order.Id}";
                         var cancelUrl = _config["PayPal:CancelUrl"] ?? returnUrl;
 
@@ -145,6 +148,16 @@ namespace Application.OrderManagement.Commands.Create
                 _logger.LogError(ex, "Error occurred while Create Order");
                 return ApiResponseBuilder.Error<object>("Có lỗi xảy ra", statusCode: 500);
             }
+        }
+    }
+    public static class OrderCodeGenerator
+    {
+        public static string GenerateOrderCode()
+        {
+            var prefix = "ORD"; // Hoặc bạn có thể đặt là "DH" nếu muốn viết tiếng Việt
+            var timestamp = DateTime.Now.ToString("yyyyMMddHHmmss"); // 20250421103015
+            var random = new Random().Next(1000, 99999); // 4 chữ số ngẫu nhiên
+            return $"{prefix}{timestamp}{random}";
         }
     }
 }
