@@ -26,7 +26,7 @@ else
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-body">
                         <h5 class="fw-bold mb-3">🧾 Thông tin đơn hàng</h5>
-                        <p><strong>Mã đơn hàng:</strong> @Order.Id</p>
+                        <p><strong>Mã đơn hàng:</strong> @Order.Code</p>
                         <p><strong>Ngày tạo:</strong> @Order.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
                         <p><strong>Trạng thái:</strong> <span class="badge @GetStatusBadgeClass(Order.Status)">@GetStatusLabel(Order.Status)</span></p>
                         <p><strong>Tổng tiền:</strong> <span class="text-danger fw-bold">@Order.OrderTotal.ToString("N0") đ</span></p>

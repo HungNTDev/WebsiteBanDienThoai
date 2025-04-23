@@ -21,6 +21,8 @@ namespace Application.OrderManagement.Commands.Create
         private readonly IVnPayService _vnPayService;
         private readonly IConfiguration _config;
         private readonly IPayPalService _paypalService;
+        private readonly IEmailService _emailService;
+        private readonly IUserRepository _userRepository;
 
         public CreateOrderCommandHandler(IOrderRepository orderRepository,
                                          IUnitOfWork unitOfWork,
@@ -30,7 +32,9 @@ namespace Application.OrderManagement.Commands.Create
                                          IUserPaymentRepository userPaymentRepository,
                                          IPaymentTypeRepository paymentTypeRepository,
                                          IConfiguration config,
-                                         IPayPalService paypalService)
+                                         IPayPalService paypalService,
+                                         IUserRepository userRepository,
+                                         IEmailService emailService)
         {
             _orderRepository = orderRepository;
             _unitOfWork = unitOfWork;
@@ -41,6 +45,8 @@ namespace Application.OrderManagement.Commands.Create
             _paymentTypeRepository = paymentTypeRepository;
             _config = config;
             _paypalService = paypalService;
+            _userRepository = userRepository;
+            _emailService = emailService;
         }
         public async Task<ApiResponse<object>> Handle(CreateOrderCommand request,
             CancellationToken cancellationToken)
@@ -114,7 +120,8 @@ namespace Application.OrderManagement.Commands.Create
                         payment.Status = PaymentStatus.Success;
                         payment.TransactionId = "VNPAY_INIT";
                         order.Status = OrderStatus.Confirmed;
-                        redirectUrl = await _vnPayService.GeneratePaymentUrl(order.Id, (decimal)payment.Amount);
+                        redirectUrl = await _vnPayService.
+                            GeneratePaymentUrl(order.Id, (decimal)payment.Amount);
                         break;
 
                     case PaymentTypeCode.PAYPAL:
@@ -124,7 +131,8 @@ namespace Application.OrderManagement.Commands.Create
                         var returnUrl = _config["PayPal:ReturnUrl"] + $"?orderId={order.Id}";
                         var cancelUrl = _config["PayPal:CancelUrl"] ?? returnUrl;
 
-                        redirectUrl = await _paypalService.CreateOrderAsync((decimal)payment.Amount, returnUrl,
+                        redirectUrl = await _paypalService.
+                            CreateOrderAsync((decimal)payment.Amount, returnUrl,
                             cancelUrl);
                         if (string.IsNullOrEmpty(redirectUrl))
                         {
@@ -138,6 +146,18 @@ namespace Application.OrderManagement.Commands.Create
 
                 await _paymentRepository.CreateAsync(payment);
                 await _unitOfWork.SaveChangesAsync();
+
+                var user = await _userRepository.GetByIdAsync(dto.UserId);
+                if (user != null && !string.IsNullOrWhiteSpace(user.Email))
+                {
+                    var subject = "Xác nhận đơn hàng thành công";
+                    var body = $@"<p>Xin chào {user.FullName ?? "khách hàng"},</p>
+                             <p>Đơn hàng <strong>{order.Code}</strong> đã được tạo thành công.</p>
+                             <p>Tổng tiền: <strong>{order.OrderTotal:N0} đ</strong></p>
+                             <p>Phương thức thanh toán: <strong>{paymentType.Value}</strong></p>
+                             <p>Cảm ơn bạn đã mua sắm tại cửa hàng của chúng tôi.</p>";
+                    await _emailService.SendAsync(user.Email, subject, body);
+                }
 
                 return redirectUrl != null
                     ? ApiResponseBuilder.Success<object>(new { Url = redirectUrl }, "Tạo đơn hàng thành công")

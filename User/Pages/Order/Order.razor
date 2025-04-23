@@ -67,7 +67,7 @@ else
                                 <option value="">-- Chọn phương thức thanh toán --</option>
                                 <option value="7e47cc15-8dcd-4b46-a559-4ff25642d8d0">Thanh toán tại cửa hàng</option>
                                 <option value="899e183e-fd08-42b0-abc2-3339bc4b479c">Thanh toán qua VNPAY</option>
-                                <option value="59913505-57c5-4fb6-bfc9-e484785d5a58">Thanh toán qua PayPal</option>
+                                @* <option value="59913505-57c5-4fb6-bfc9-e484785d5a58">Thanh toán qua PayPal</option> *@
                             </select>
                             @if (ShowPaymentTypeWarning)
                             {
@@ -195,10 +195,8 @@ else
                 Console.WriteLine("❌ Order create failed.");
             }
         }
-
         IsSubmitting = false;
     }
-
     private void GoToCart()
     {
         Navigation.NavigateTo("/cart");
