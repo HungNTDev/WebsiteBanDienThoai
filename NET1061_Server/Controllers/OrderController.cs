@@ -36,7 +36,11 @@ namespace NET1061_Server.Controllers
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderCommand command)
         {
             var result = await _mediator.Send(command);
-            return Ok(result);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest();
         }
     }
 }

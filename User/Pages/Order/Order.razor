@@ -66,7 +66,7 @@ else
                             <select class="form-select shadow-sm" @bind="SelectedPaymentTypeId" @bind:event="onchange">
                                 <option value="">-- Chọn phương thức thanh toán --</option>
                                 <option value="7e47cc15-8dcd-4b46-a559-4ff25642d8d0">Thanh toán tại cửa hàng</option>
-                                <option value="c5900418-2763-40ce-a618-b5afded03392">Thanh toán qua VNPAY</option>
+                                <option value="899e183e-fd08-42b0-abc2-3339bc4b479c">Thanh toán qua VNPAY</option>
                                 <option value="59913505-57c5-4fb6-bfc9-e484785d5a58">Thanh toán qua PayPal</option>
                             </select>
                             @if (ShowPaymentTypeWarning)
@@ -161,13 +161,13 @@ else
         var doc = JsonDocument.Parse(json);
 
         if (doc.RootElement.TryGetProperty("data", out var dataElement)
+            && dataElement.ValueKind == JsonValueKind.Object
             && dataElement.TryGetProperty("url", out var urlElement))
         {
-            // ✅ Trường hợp thanh toán VNPAY: redirect luôn
-            var vnpUrl = urlElement.GetString();
+            var vnpUrl = urlElement.GetString()?.Trim(); // 👈 Trim ở đây
             if (!string.IsNullOrEmpty(vnpUrl))
             {
-                Navigation.NavigateTo(vnpUrl!, forceLoad: true); // redirect ngoài hệ thống
+                Navigation.NavigateTo(vnpUrl!, forceLoad: true);
                 return;
             }
         }
