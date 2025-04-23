@@ -107,7 +107,7 @@ namespace NET1061_Server.Controllers
                 Console.WriteLine("✅ Thanh toán hợp lệ cho đơn hàng: " + orderId);
 
                 // ✅ Điều hướng về trang chi tiết đơn hàng
-                return Redirect($"https://localhost:7001/order/{orderId}");
+                return Redirect($"https://websitebandienthoai-7.onrender.com/order/{orderId}");
             }
             catch (Exception ex)
             {
