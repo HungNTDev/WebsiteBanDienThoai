@@ -1,4 +1,5 @@
 ﻿using Application.OrderManagement.Commands.Create;
+using Application.OrderManagement.Queries.GetDaily;
 using Application.OrderManagement.Queries.GetOrderById;
 using Application.OrderManagement.Queries.GetOrdersByUserIdQuery;
 using MediatR;
@@ -31,6 +32,14 @@ namespace NET1061_Server.Controllers
             var result = await _mediator.Send(new GetOrdersByUserIdQuery(userId));
             return Ok(result);
         }
+
+        [HttpGet("daily")]
+        public async Task<IActionResult> GetDailyStats([FromQuery] int days = 7)
+        {
+            var result = await _mediator.Send(new GetDailyOrderStatsQuery { NumberOfDays = days });
+            return Ok(result);
+        }
+
 
         [HttpPost("create")]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderCommand command)

@@ -9,5 +9,6 @@ namespace Application.Abstract.Repository
         Task<Order?> GetByIdAsync(Guid id);
         //Task<Order> GetOrderByUserIdAsync(Guid userId);
         Task<List<Order>> GetByUserIdAsync(Guid userId);
+        Task<List<Order>> GetOrdersFromDateAsync(DateTime fromDate);
     }
 }
