@@ -114,19 +114,8 @@ namespace NET1061_Server.Controllers
                 Console.WriteLine("✅ Thanh toán hợp lệ cho đơn hàng: " + orderId);
                 var order = Request.Query["vnp_TxnRef"].ToString();
 
-                var subject = $" Xác nhận đã thanh toán thành công đơn hàng: {orderId}";
-                var body = $@"
-                  Chào {user.UserName},<br/><br/>
-                     Chúc mừng đã thanh toán thành công đơn hàng: {orderId}<br/><br/>
-                     
-                      Nếu có bất kỳ vấn đề nào về đơn hàng, vui lòng liên hệ với chúng tôi qua email hoặc số điện thoại bên dưới.<br/><br/>
-                       Số Hotline: 18002063 (8h00 - 21h30)<br><br/>
 
-                     Đội ngũ hỗ trợ cellphoneS.
-                    
-                ";
 
-                await _emailService.SendAsync(user.Email, subject, body);
                 // ✅ Điều hướng về trang chi tiết đơn hàng
                 return Redirect($"https://localhost:7001/order/{orderId}");
             }

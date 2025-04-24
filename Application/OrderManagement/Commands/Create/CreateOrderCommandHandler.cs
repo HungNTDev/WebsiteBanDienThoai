@@ -106,6 +106,7 @@ namespace Application.OrderManagement.Commands.Create
                     Amount = dto.OrderTotal
                 };
 
+
                 string? redirectUrl = null;
 
                 switch (paymentType.Code)

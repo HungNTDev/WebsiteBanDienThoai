@@ -1,7 +1,9 @@
 ﻿using Application.Abstract.Library;
 using Application.PaymentManagement.ModelVnPay;
+using Domain.Entities;
 using Domain.Enum;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 
@@ -16,11 +18,13 @@ namespace Application.Abstract.Services
     public class VnPayService : IVnPayService
     {
         private readonly IConfiguration _config;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public VnPayService(IConfiguration config, IHttpContextAccessor httpContextAccessor)
+        public VnPayService(IConfiguration config, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager)
         {
             _config = config;
             _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
         }
 
         public async Task<string> GeneratePaymentUrl(Guid orderId, decimal amount)
