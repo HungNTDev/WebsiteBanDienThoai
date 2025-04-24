@@ -1,14 +1,13 @@
 ﻿using Application.Abstract.Library;
 using Application.Abstract.Repository;
 using Application.Abstract.Repository.Base;
+using Application.Abstract.Services;
 using Application.PaymentManagement.Commands.Create;
-using Application.PaymentManagement.Commands.Save;
-using Application.PaymentManagement.Commands.Verify;
+using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Text;
-using System.Web;
 
 namespace NET1061_Server.Controllers
 {
@@ -21,16 +20,23 @@ namespace NET1061_Server.Controllers
         private readonly IConfiguration _config;
         private readonly IOrderRepository _orderRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IEmailService _emailService;
+        private readonly UserManager<ApplicationUser> _userManager;
+
 
         public PaymentController(IMediator mediator,
                                  IConfiguration config,
                                  IOrderRepository orderRepository,
-                                 IUnitOfWork unitOfWork)
+                                 IUnitOfWork unitOfWork,
+                                 IEmailService emailService,
+                                 UserManager<ApplicationUser> userManager)
         {
             _mediator = mediator;
             _config = config;
             _orderRepository = orderRepository;
             _unitOfWork = unitOfWork;
+            _emailService = emailService;
+            _userManager = userManager;
         }
         [HttpPost("create-vnpay")]
         public async Task<IActionResult> CreateVnPayUrl([FromBody] CreateVnPayPaymentUrlDto command)
@@ -61,7 +67,7 @@ namespace NET1061_Server.Controllers
 
             if (status == "00" && responseCode == "00")
             {
-                order.Status = Domain.Enum.OrderStatus.Completed;
+                order.Status = Domain.Enum.OrderStatus.Paid;
                 _orderRepository.Update(order);
                 await _unitOfWork.SaveChangesAsync();
                 return Content("SUCCESS");
@@ -80,8 +86,9 @@ namespace NET1061_Server.Controllers
 
         [HttpGet("return")]
         [AllowAnonymous]
-        public IActionResult Return()
+        public async Task<IActionResult> Return()
         {
+            var user = _userManager.GetUserAsync(User).Result;
             try
             {
                 var vnpLib = new VnPayLibrary();
@@ -105,7 +112,21 @@ namespace NET1061_Server.Controllers
 
                 // ✅ In ra để debug
                 Console.WriteLine("✅ Thanh toán hợp lệ cho đơn hàng: " + orderId);
+                var order = Request.Query["vnp_TxnRef"].ToString();
 
+                var subject = $" Xác nhận đã thanh toán thành công đơn hàng: {orderId}";
+                var body = $@"
+                  Chào {user.UserName},<br/><br/>
+                     Chúc mừng đã thanh toán thành công đơn hàng: {orderId}<br/><br/>
+                     
+                      Nếu có bất kỳ vấn đề nào về đơn hàng, vui lòng liên hệ với chúng tôi qua email hoặc số điện thoại bên dưới.<br/><br/>
+                       Số Hotline: 18002063 (8h00 - 21h30)<br><br/>
+
+                     Đội ngũ hỗ trợ cellphoneS.
+                    
+                ";
+
+                await _emailService.SendAsync(user.Email, subject, body);
                 // ✅ Điều hướng về trang chi tiết đơn hàng
                 return Redirect($"https://localhost:7001/order/{orderId}");
             }

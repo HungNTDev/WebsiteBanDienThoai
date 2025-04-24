@@ -17,7 +17,7 @@ namespace Application.AuthenticationManagement.Commands.Register
                         .Matches(@"[A-Z]+").WithMessage("Mật khẩu phải chứa ít nhất một chữ cái viết hoa.")
                         .Matches(@"[a-z]+").WithMessage("Mật khẩu phải chứa ít nhất một chữ cái viết thường.")
                         .Matches(@"[0-9]+").WithMessage("Mật khẩu phải chứa ít nhất một chữ số.")
-                        .Matches(@"[\!\?\*\.]+").WithMessage("Mật khẩu phải chứa ít nhất một " +
+                        .Matches(@"[\@\!\?\*\.]+").WithMessage("Mật khẩu phải chứa ít nhất một " +
                         "ký tự đặc biệt như (!? *.).");
 
             RuleFor(x => x.ConfirmPassword)

@@ -30,5 +30,22 @@ namespace Repositories.Repository
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
         }
+
+        public async Task<List<Order>> GetOrdersByUserIdAsync(Guid userId)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderItems).ThenInclude(i => i.ProductItem)
+                .ThenInclude(p => p.Product)
+                .Where(o => o.UserId == userId)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
+        }
+
+        public async Task<List<Order>> GetOrdersFromDateAsync(DateTime fromDate)
+        {
+            return await _context.Orders
+                .Where(o => o.OrderDate >= fromDate)
+                .ToListAsync();
+        }
     }
 }

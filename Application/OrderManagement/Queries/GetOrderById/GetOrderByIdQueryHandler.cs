@@ -28,6 +28,7 @@ namespace Application.OrderManagement.Queries.GetOrderById
                 var orderDto = new GetOrderByIdDto
                 {
                     Id = order.Id,
+                    Code = order.Code,
                     OrderDate = order.OrderDate,
                     OrderTotal = order.OrderTotal,
                     Status = order.Status.ToString(),
