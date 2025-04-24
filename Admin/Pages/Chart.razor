@@ -8,7 +8,9 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 
-<h3 class="fw-bold text-center mb-4">📊 Thống kê đơn hàng mỗi ngày</h3>
+<h3 class="fw-bold text-center mb-4">
+    📊 Thống kê đơn hàng mỗi ngày
+</h3>
 
 @if (isLoading)
 {
@@ -29,6 +31,7 @@ else
 @code {
     private bool isLoading = false;
     private List<OrderDailyStatsDto>? Stats;
+    private bool shouldRenderChart = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -42,11 +45,12 @@ else
         }
 
         Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
         var response = await Http.GetFromJsonAsync<ApiResponse<List<OrderDailyStatsDto>>>("api/Order/daily?days=7");
+
         if (response?.IsSuccess == true)
         {
             Stats = response.Data;
+            shouldRenderChart = true;
         }
 
         isLoading = false;
@@ -54,8 +58,10 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && Stats != null && Stats.Any())
+        if (shouldRenderChart && Stats != null && Stats.Any())
         {
+            shouldRenderChart = false;
+
             var labels = Stats.Select(s => s.Date.ToString("MM-dd")).ToList();
             var values = Stats.Select(s => s.OrderCount).ToList();
 
