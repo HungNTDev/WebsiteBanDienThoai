@@ -168,6 +168,11 @@ else
             var vnpUrl = urlElement.GetString()?.Trim(); // 👈 Trim ở đây
             if (!string.IsNullOrEmpty(vnpUrl))
             {
+                var clearResponse = await CartService.ClearCartAsync(Cart.UserId);
+                if (!clearResponse.IsSuccess)
+                {
+                    Console.WriteLine("❌ Không thể xóa giỏ hàng.");
+                }
                 Navigation.NavigateTo(vnpUrl!, forceLoad: true);
                 return;
             }
