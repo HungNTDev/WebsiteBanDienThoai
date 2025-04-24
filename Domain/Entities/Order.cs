@@ -7,6 +7,7 @@ namespace Domain.Entities
     {
         public DateTime OrderDate { get; set; }
         public decimal OrderTotal { get; set; }
+        public string Code { get; set; } = string.Empty;
 
         [ForeignKey("ApplicationUser")]
         public Guid UserId { get; set; }

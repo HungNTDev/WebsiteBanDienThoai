@@ -12,6 +12,7 @@ namespace NET1061_Server.Extensions
             (typeof(ApplicationAssemblyMarker).GetTypeInfo().Assembly));
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<IVnPayService, VnPayService>();
+            services.AddScoped<IEmailService, EmailService>();
             services.AddHttpClient<IPayPalService, PayPalService>();
             return services;
         }

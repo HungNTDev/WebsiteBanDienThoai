@@ -1,5 +1,7 @@
 ﻿using Application.OrderManagement.Commands.Create;
+using Application.OrderManagement.Queries.GetDaily;
 using Application.OrderManagement.Queries.GetOrderById;
+using Application.OrderManagement.Queries.GetOrderHistory;
 using Application.OrderManagement.Queries.GetOrdersByUserIdQuery;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -32,11 +34,35 @@ namespace NET1061_Server.Controllers
             return Ok(result);
         }
 
+        [HttpGet("daily")]
+        public async Task<IActionResult> GetDailyStats([FromQuery] int days = 7)
+        {
+            var result = await _mediator.Send(new GetDailyOrderStatsQuery { NumberOfDays = days });
+            return Ok(result);
+        }
+
+        [HttpGet("user/history")]
+
+        public async Task<IActionResult> GetUserOrderHistory()
+        {
+            var response = new GetOrderHistoryQuery();
+            var result = await _mediator.Send(response);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest();
+        }
+
         [HttpPost("create")]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderCommand command)
         {
             var result = await _mediator.Send(command);
-            return Ok(result);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest();
         }
     }
 }
