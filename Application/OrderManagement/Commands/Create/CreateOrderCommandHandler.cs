@@ -136,12 +136,14 @@ namespace Application.OrderManagement.Commands.Create
                             cancelUrl);
                         if (string.IsNullOrEmpty(redirectUrl))
                         {
-                            return ApiResponseBuilder.Error<object>("Không tạo được đơn hàng PayPal");
+                            return ApiResponseBuilder.Error<object>
+                                ("Không tạo được đơn hàng PayPal");
                         }
                         break;
 
                     default:
-                        return ApiResponseBuilder.Error<object>("Phương thức thanh toán không hợp lệ");
+                        return ApiResponseBuilder.Error<object>
+                            ("Phương thức thanh toán không hợp lệ");
                 }
 
                 await _paymentRepository.CreateAsync(payment);
@@ -159,9 +161,17 @@ namespace Application.OrderManagement.Commands.Create
                     await _emailService.SendAsync(user.Email, subject, body);
                 }
 
+                var orderDto = new
+                {
+                    order.Id,
+                    order.Code,
+                    order.OrderDate,
+                    order.OrderTotal
+                };
+
                 return redirectUrl != null
                     ? ApiResponseBuilder.Success<object>(new { Url = redirectUrl }, "Tạo đơn hàng thành công")
-                    : ApiResponseBuilder.Success<object>(order, "Tạo đơn hàng thành công");
+                    : ApiResponseBuilder.Success<object>(orderDto, "Tạo đơn hàng thành công");
             }
             catch (Exception ex)
             {
@@ -174,7 +184,7 @@ namespace Application.OrderManagement.Commands.Create
     {
         public static string GenerateOrderCode()
         {
-            var prefix = "ORD"; // Hoặc bạn có thể đặt là "DH" nếu muốn viết tiếng Việt
+            var prefix = "DH";
             var timestamp = DateTime.Now.ToString("yyyyMMddHHmmss"); // 20250421103015
             var random = new Random().Next(1000, 99999); // 4 chữ số ngẫu nhiên
             return $"{prefix}{timestamp}{random}";

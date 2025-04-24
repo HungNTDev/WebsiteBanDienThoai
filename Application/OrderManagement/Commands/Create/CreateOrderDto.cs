@@ -23,5 +23,4 @@
         public const string VNPAY = "VNPAY";
         public const string PAYPAL = "PAYPAL";
     }
-
 }
