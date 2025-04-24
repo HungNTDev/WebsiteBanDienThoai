@@ -16,7 +16,8 @@ namespace User.Services
             try
             {
                 var json = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", key);
-                return json == null ? default : System.Text.Json.JsonSerializer.Deserialize<T>(json);
+                return json == null ? default :
+                    System.Text.Json.JsonSerializer.Deserialize<T>(json);
             }
             catch
             {
@@ -49,4 +50,4 @@ namespace User.Services
             }
         }
     }
-} 
+}

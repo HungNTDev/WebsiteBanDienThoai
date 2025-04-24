@@ -1,149 +1,143 @@
-﻿@using Microsoft.AspNetCore.Components.Web
+﻿@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
 @using Admin.Services
 @inject IImageService imageService
 
 <div class="sidebar-wrapper">
-    <div class="sidebar-header">
         <a href="" class="logo-brand">
-            <img src="@imageService.GetImageUrl("Shipper_CPS3.77d4065.png")" alt="Logo" />
+            <img src="@imageService.GetImageUrl("HI.gif")" class="img" alt="CellphoneS" />
         </a>
-    </div>
 
     <div class="sidebar-menu">
         <nav class="nav-menu">
             <div class="nav-item">
-                <NavLink class="nav-link" href="/dashboard" Match="NavLinkMatch.All">
-                    <i class="fas fa-home"></i> <!-- Dashboard icon -->
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </NavLink>
             </div>
-
-            <div class="nav-item">
-                <NavLink class="nav-link" href="/chart">
-                    <i class="fas fa-chart-bar"></i> <!-- FontAwesome chart bar icon -->
-                    <span>Chart</span>
-                </NavLink>
-            </div>
-
+               <div class="nav-item">
+                 <NavLink class="nav-link" href="/chart">
+                  <i class="fas fa-chart-bar"></i> <!-- FontAwesome chart bar icon -->
+                    <span>Statistical</span>
+                    </NavLink>
+                 </div>
             <div class="nav-item">
                 <NavLink class="nav-link" href="categories">
-                    <i class="fas fa-layer-group"></i> <!-- Category icon -->
+                    <i class="fas fa-layer-group"></i>
                     <span>Category</span>
                 </NavLink>
             </div>
-
             <div class="nav-item">
                 <NavLink class="nav-link" href="brands">
-                    <i class="fas fa-briefcase"></i> <!-- Brand icon -->
+                    <i class="fas fa-briefcase"></i>
                     <span>Brand</span>
                 </NavLink>
             </div>
-
             <div class="nav-item">
                 <NavLink class="nav-link" href="series">
-                    <i class="fas fa-stream"></i> <!-- Series icon -->
+                    <i class="fas fa-stream"></i>
                     <span>Series</span>
                 </NavLink>
             </div>
-
             <div class="nav-item">
                 <NavLink class="nav-link" href="variations">
-                    <i class="fas fa-sliders-h"></i> <!-- Variation icon -->
+                    <i class="fas fa-sliders-h"></i>
                     <span>Variation</span>
                 </NavLink>
             </div>
-
             <div class="nav-item">
                 <NavLink class="nav-link" href="variation-options">
-                    <i class="fas fa-list-ul"></i> <!-- Variation Option icon -->
+                    <i class="fas fa-list-ul"></i>
                     <span>Variation Option</span>
                 </NavLink>
             </div>
-
             <div class="nav-item">
                 <NavLink class="nav-link" href="products">
-                    <i class="fas fa-box"></i> <!-- Product icon -->
+                    <i class="fas fa-box"></i>
                     <span>Product</span>
                 </NavLink>
             </div>
-
             <div class="nav-item">
                 <NavLink class="nav-link" href="product-items">
-                    <i class="fas fa-boxes"></i> <!-- Product Item icon -->
+                    <i class="fas fa-boxes"></i>
                     <span>Product Item</span>
                 </NavLink>
             </div>
         </nav>
-
     </div>
 </div>
 
 <style>
     .sidebar-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
         height: 100vh;
-        background-color: #C41E3A;
-        color: white;
         width: 250px;
+        background-color: #C41E3A;
+        color: #fff;
+        overflow-y: auto;
+        z-index: 100;
     }
 
-    .sidebar-header {
-        height: 140px;
-        background-color: #B01B34;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+        /* 1. Cho .logo-brand chiếm hết chiều ngang, đồng thời bật flex để căn giữa */
+        .sidebar-wrapper .logo-brand {
+            display: flex;
+            justify-content: center; /* căn giữa ngang */
+            align-items: center; /* căn giữa dọc nếu bạn gán chiều cao */
+            width: 100%;
+            padding: 1rem 0; /* khoảng trên/dưới cho đẹp */
+}
 
-    .logo-brand img {
-        height: 100px;
-        width: auto;
-        object-fit: contain;
-    }
+            /* 2. Giới hạn kích thước logo, và block để margin:auto có tác dụng */
+            .sidebar-wrapper .logo-brand img {
+                display: block;
+                max-width: 120px; /* tuỳ chỉnh độ rộng tối đa */
+                width: 80%; /* hoặc width cố định, ví dụ 100px */
+                height: auto;
+                margin: 0 auto; /* backup căn giữa */
+            }
+
+
+
 
     .sidebar-menu {
         padding-top: 1rem;
     }
 
-    .nav-section {
-        padding: 1rem 1rem 0.5rem;
-    }
-
-    .nav-section-title {
-        color: rgba(255,255,255,0.7);
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    .nav-menu {
+        list-style: none;
         margin: 0;
+        padding: 0;
     }
 
     .nav-item {
-        font-size: 0.9rem;
+        margin: 0;
     }
 
     .nav-link {
-        color: white;
         display: flex;
         align-items: center;
-        padding: 0.8rem 1rem;
+        padding: 0.75rem 1rem;
+        color: #fff;
+        font-size: 0.9rem;
         text-decoration: none;
-        transition: all 0.3s ease;
+        transition: background-color 0.2s ease;
     }
 
         .nav-link i {
-            margin-right: 0.8rem;
             width: 20px;
+            margin-right: 0.75rem;
             text-align: center;
         }
 
         .nav-link:hover {
             background-color: rgba(255,255,255,0.1);
-            color: white;
-            text-decoration: none;
         }
 
         .nav-link.active {
             background-color: rgba(255,255,255,0.15);
-            color: white;
         }
 </style>
 

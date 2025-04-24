@@ -61,7 +61,7 @@ namespace NET1061_Server.Controllers
 
             if (status == "00" && responseCode == "00")
             {
-                order.Status = Domain.Enum.OrderStatus.Completed;
+                order.Status = Domain.Enum.OrderStatus.Paid;
                 _orderRepository.Update(order);
                 await _unitOfWork.SaveChangesAsync();
                 return Content("SUCCESS");
